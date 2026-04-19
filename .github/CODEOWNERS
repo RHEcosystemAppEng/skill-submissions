@@ -1,0 +1,8 @@
+# Default reviewers for all submissions
+* @RHEcosystemAppEng/ecosystem-appeng
+
+# Submission intake — route to ABEvalFlow maintainers
+/submissions/ @GuyZivRH @RoddieKieley @r2dedios @dmartinol
+
+# Repo configuration
+/.github/ @GuyZivRH @RoddieKieley

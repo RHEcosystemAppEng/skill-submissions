@@ -1,0 +1,8 @@
+# Default reviewers for all submissions
+* @RHEcosystemAppEng/ecosystem-appeng
+
+# Submission intake
+/submissions/ @GuyZivRH
+
+# Repo configuration
+/.github/ @GuyZivRH

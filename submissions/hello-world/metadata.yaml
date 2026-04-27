@@ -1,7 +1,7 @@
 name: hello-world
 description: "Create a file with specific content -- minimal smoke-test submission"
 persona: general
-version: "0.1.2"
+version: "0.1.3"
 tags:
   - smoke-test
   - trivial

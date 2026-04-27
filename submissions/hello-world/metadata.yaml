@@ -5,5 +5,8 @@ version: "0.1.0"
 tags:
   - smoke-test
   - trivial
+cpus: 1
+memory_mb: 512
+storage_mb: 1024
 experiment:
   n_trials: 1

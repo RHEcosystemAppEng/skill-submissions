@@ -5,3 +5,5 @@ version: "0.1.0"
 tags:
   - smoke-test
   - trivial
+experiment:
+  n_trials: 1

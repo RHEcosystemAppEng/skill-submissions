@@ -1,7 +1,7 @@
 name: hello-world
 description: "Create a file with specific content -- minimal smoke-test submission"
 persona: general
-version: "0.3.0"
+version: "0.4.0"
 tags:
   - smoke-test
   - trivial
@@ -11,4 +11,4 @@ storage_mb: 1024
 experiment:
   n_trials: 1
 
-# Triggered with real LLM model
+# Triggered with claude-sonnet via LiteLLM proxy

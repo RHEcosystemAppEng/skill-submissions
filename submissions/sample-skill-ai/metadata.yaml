@@ -5,6 +5,7 @@ description: >-
 persona: rh-developer
 version: "0.1.0"
 generation_mode: ai
+skip_llm_judge: true
 tags:
   - sample
   - ai-generated

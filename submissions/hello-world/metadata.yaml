@@ -13,3 +13,4 @@ experiment:
 
 llm:
   model: claude-blah
+  api_base: "http://fake-llm-endpoint:9999"

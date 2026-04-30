@@ -1,7 +1,7 @@
 name: hello-world
 description: "Create a file with specific content -- minimal smoke-test submission"
 persona: general
-version: "0.5.0"
+version: "0.5.1"
 tags:
   - smoke-test
   - trivial
@@ -11,5 +11,5 @@ storage_mb: 1024
 experiment:
   n_trials: 1
 
-# Triggered with debug artifact upload to MinIO
-
+llm:
+  model: claude-blah

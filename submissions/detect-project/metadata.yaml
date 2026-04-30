@@ -1,0 +1,15 @@
+name: detect-project
+description: >-
+  Analyze a local project directory to detect programming language, framework,
+  version requirements, and recommend an S2I builder image or build strategy.
+  Supports Node.js, Python, Java, Go, Ruby, .NET, PHP, Perl, and Rust.
+persona: rh-developer
+version: "0.1.0"
+generation_mode: ai
+tags:
+  - developer
+  - detection
+  - s2i
+  - openshift
+experiment:
+  n_trials: 3

@@ -1,5 +1,5 @@
 name: ocp-admin-cluster-report
-description: "Multi-cluster OpenShift health report — validates node status, resource utilization, workload counts, and cluster reachability"
+description: "Multi-cluster OpenShift health report: node status, resource utilization, workload counts, and cluster reachability"
 persona: ocp-admin
 version: "1.0.0"
 generation_mode: manual

@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "lightspeed-mcp": {
+      "command": "python3",
+      "args": [
+        "/workspace/supportive/mcp-servers/mock-lightspeed-mcp.py"
+      ]
+    },
+    "aap-mcp-job-management": {
+      "command": "python3",
+      "args": [
+        "/workspace/supportive/mcp-servers/mock-aap-mcp.py"
+      ]
+    }
+  }
+}

@@ -1,0 +1,13 @@
+name: rh-sre-mcp-aap-validator
+description: "rh-sre AAP MCP Validation Skill Evaluation"
+persona: rh-sre
+version: "1.0.0"
+generation_mode: manual
+tags:
+  - rh-sre
+  - mcp-aap-validator
+cpus: 2
+memory_mb: 2048
+storage_mb: 10240
+experiment:
+  n_trials: 5

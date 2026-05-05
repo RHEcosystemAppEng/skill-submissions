@@ -1,0 +1,13 @@
+name: rh-virt-vm-clone
+description: "rh-virt VM Cloning Skill Evaluation"
+persona: rh-virt
+version: "1.0.0"
+generation_mode: manual
+tags:
+  - rh-virt
+  - vm-clone
+cpus: 2
+memory_mb: 2048
+storage_mb: 10240
+experiment:
+  n_trials: 5

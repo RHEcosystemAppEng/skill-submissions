@@ -1,0 +1,33 @@
+# ABEvalFlow Evaluation Tracker
+# Each task runs 5 trials per variant (10 total) via the Tekton pipeline.
+# Open one PR at a time from eval/* branches to trigger a run.
+#
+# Format: branch | status | date_started | date_completed | recommendation
+# Status: pending | running | completed | failed | skipped
+
+# --- rh-sre (13 tasks) ---
+eval/rh-sre-cve-impact              | pending | | |
+eval/rh-sre-cve-validation          | pending | | |
+eval/rh-sre-execution-summary       | pending | | |
+eval/rh-sre-fleet-inventory         | pending | | |
+eval/rh-sre-job-template-creator    | pending | | |
+eval/rh-sre-job-template-remediation-validator | pending | | |
+eval/rh-sre-mcp-aap-validator       | pending | | |
+eval/rh-sre-mcp-lightspeed-validator | pending | | |
+eval/rh-sre-playbook-executor       | pending | | |
+eval/rh-sre-playbook-generator      | pending | | |
+eval/rh-sre-remediation             | pending | | |
+eval/rh-sre-remediation-verifier    | pending | | |
+eval/rh-sre-system-context          | pending | | |
+
+# --- rh-virt (10 tasks) ---
+eval/rh-virt-vm-clone               | pending | | |
+eval/rh-virt-vm-create              | pending | | |
+eval/rh-virt-vm-delete              | pending | | |
+eval/rh-virt-vm-inventory           | pending | | |
+eval/rh-virt-vm-lifecycle-manager   | pending | | |
+eval/rh-virt-vm-rebalance           | pending | | |
+eval/rh-virt-vm-snapshot-create     | pending | | |
+eval/rh-virt-vm-snapshot-delete     | pending | | |
+eval/rh-virt-vm-snapshot-list       | pending | | |
+eval/rh-virt-vm-snapshot-restore    | pending | | |

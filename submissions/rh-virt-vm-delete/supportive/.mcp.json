@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "openshift-virtualization": {
+      "command": "python3",
+      "args": [
+        "/workspace/supportive/mcp-servers/mock-virt-mcp.py"
+      ]
+    }
+  }
+}

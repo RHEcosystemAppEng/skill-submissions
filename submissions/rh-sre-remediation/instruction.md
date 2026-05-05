@@ -1,21 +1,16 @@
 # CVE Remediation Workflow Task
 
-You are a Red Hat SRE. A critical CVE has been reported and you need to plan and document a complete end-to-end remediation workflow, from initial validation through execution and verification.
+You are a Red Hat SRE. A critical CVE has been reported and you need to plan and document a complete end-to-end remediation workflow.
 
 ## Scenario
-CVE-2026-1234 (Critical, CVSS 9.8) has been identified as affecting production RHEL systems in your fleet. Management wants a comprehensive remediation plan that covers every phase of the response.
+CVE-2026-1234 (Critical, CVSS 9.8) has been identified as affecting production RHEL systems in your fleet. Management wants a comprehensive remediation plan covering the full response lifecycle — from initial discovery through post-remediation verification.
 
 ## Requirements
-Your workflow plan must cover these phases in order, with decision gates between them:
-
-1. **CVE Validation** — Confirm the CVE is real, assess severity, and determine whether automated remediation is available. If no remediation exists, document how to handle this (manual intervention, risk acceptance, etc.).
-2. **Impact Assessment** — Identify which systems are affected and their criticality.
-3. **System Context** — Understand each affected system's role, dependencies, and constraints before patching.
-4. **Playbook Planning** — How the remediation playbook will be created or selected.
-5. **Execution Planning** — How the playbook will be run: dry-run first, then production. Include approval gates and rollback strategy.
-6. **Verification Planning** — How you will confirm remediation was successful after execution.
-
-At each phase transition, describe the decision gate: what conditions must be met before proceeding, and what happens if the gate fails. Include an upfront planning checkpoint (before starting) and a pre-execution review checkpoint (after playbook is ready but before running it).
+- Document a complete remediation workflow for this CVE
+- Address what happens when automated remediation is not available
+- Cover how affected systems are identified and prioritized
+- Describe how remediation will be executed and verified
+- The plan should be production-ready and suitable for a team to follow
 
 Document the complete workflow plan in `/solution/report.md`.
 

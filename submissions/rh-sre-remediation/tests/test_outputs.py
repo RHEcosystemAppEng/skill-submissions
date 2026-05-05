@@ -1,7 +1,7 @@
 """
 Tests for rh-sre__remediation per-skill evaluation.
-Baseline tests: report structure.
-Skill-dependent tests: conceptual checks (no exact tool/field name matching).
+Baseline tests: any reasonable remediation report passes.
+Skill-dependent tests: check for methodology taught by the skill and its references.
 """
 import os
 import pytest
@@ -32,72 +32,95 @@ class TestBaseline:
 
 
 class TestSkillDependent:
-    def test_phased_workflow(self):
-        """Skill: Orchestrate in order: validate → impact → context → playbook → execute → verify.
-        Require at least 4 of the 6 phase concepts AND explicit ordering language."""
+    def test_mcp_prerequisite_validation(self):
+        """Skill teaches: Step 0 — validate MCP server availability (Lightspeed, AAP)
+        before any CVE operations. A generic agent won't mention MCP validation."""
         c = read_report().lower()
-        phases = ["validat", "impact", "context", "playbook", "execut", "verif"]
-        found = sum(1 for p in phases if p in c)
-        has_order = any(t in c for t in [
-            "step", "phase", "stage", "before", "after",
-            "workflow order", "sequence", "in order",
+        has_mcp = any(t in c for t in [
+            "mcp", "lightspeed", "aap",
+            "prerequisite validation", "server validation",
+            "validate prerequisite", "tool validation",
         ])
-        assert found >= 4 and has_order, (
-            f"should define phased workflow with at least 4 of 6 phases "
-            f"(found {found}/6) and ordering language"
+        has_prereq_step = any(t in c for t in [
+            "step 0", "before any", "prerequisite check",
+            "validate.*before", "availability check",
+        ])
+        assert has_mcp or has_prereq_step, (
+            "should validate MCP/tool prerequisites before starting "
+            "(skill: Step 0 MCP validation)"
         )
 
-    def test_remediatable_gate(self):
-        """Skill: Gate on CVE validation — if no automated remediation is available,
-        document the decision (manual, risk acceptance, etc.) before proceeding."""
+    def test_remediatable_gate_with_advisory(self):
+        """Skill teaches: gate on remediation availability using Red Hat advisory
+        indicators (advisory_available, RHSA, advisories_list). Generic agents
+        won't mention advisory-based gating."""
         c = read_report().lower()
+        has_advisory_indicator = any(t in c for t in [
+            "advisory", "rhsa", "advisories_list", "advisory_available",
+            "errata", "security advisory",
+        ])
         has_gate = any(t in c for t in [
-            "gate", "prerequisite", "decision point", "checkpoint",
-            "remediation available", "remediation_available",
+            "gate", "remediatable", "remediation available",
+            "automated remediation", "remediation_available",
         ])
-        has_remediation_check = any(t in c for t in [
-            "no remediation", "not remediatable", "manual",
-            "no automated", "advisory", "risk accept",
-        ])
-        assert has_gate and has_remediation_check, (
-            "should gate on remediation availability with fallback handling "
-            "(skill: Remediatable Gate)"
+        assert has_advisory_indicator and has_gate, (
+            "should gate on remediation availability using Red Hat advisory "
+            "indicators (skill: Remediatable Gate with RHSA/advisory check)"
         )
 
-    def test_plan_validation_before_execute(self):
-        """Skill: Present Remediation Plan (summary, table, checklist) for review before execution."""
+    def test_plan_template_format(self):
+        """Skill reference doc teaches a specific plan format: Summary + Table + Checklist.
+        Generic agents produce prose, not this structured format."""
         c = read_report().lower()
-        has_plan = any(t in c for t in ["plan", "checklist", "summary", "table"])
-        has_confirm = any(t in c for t in [
-            "confirm", "proceed", "approval", "review", "abort", "sign-off",
+        has_summary = "summary" in c
+        has_table = any(t in c for t in ["table", "| cve", "| target", "| system"])
+        has_checklist = any(t in c for t in [
+            "checklist", "☐", "☑", "- [", "— done",
+            "step 0:", "step 1:", "step 2:",
         ])
-        assert has_plan and has_confirm, (
-            "should require plan validation before execution (skill: Remediation Plan)"
+        parts_found = sum([has_summary, has_table, has_checklist])
+        assert parts_found >= 2, (
+            f"should use structured plan format (Summary + Table + Checklist), "
+            f"found {parts_found}/3 components (skill: Remediation Plan Template)"
         )
 
-    def test_dry_run_recommendation(self):
-        """Skill: Recommend dry-run first before actual execution."""
+    def test_sub_skill_orchestration(self):
+        """Skill teaches: orchestrate specialized sub-skills (cve-validation,
+        cve-impact, system-context, playbook-generator, playbook-executor,
+        remediation-verifier) rather than doing everything inline."""
         c = read_report().lower()
-        assert any(t in c for t in ["dry-run", "dry run", "check mode", "preview"]), (
-            "should recommend dry-run first (skill: before execution)"
+        sub_skills = [
+            "cve-validation", "cve-impact", "system-context",
+            "playbook-generator", "playbook-executor", "remediation-verifier",
+            "cve_validation", "cve_impact", "system_context",
+            "playbook_generator", "playbook_executor", "remediation_verifier",
+        ]
+        found = sum(1 for s in sub_skills if s in c)
+        assert found >= 2, (
+            f"should reference specialized sub-skills for orchestration "
+            f"(found {found} sub-skill references, need >= 2). "
+            f"Skill delegates to: cve-validation, cve-impact, system-context, "
+            f"playbook-generator, playbook-executor, remediation-verifier"
         )
 
     def test_two_checkpoint_structure(self):
-        """Skill/docs teach two distinct confirmation checkpoints: an upfront planning
-        review (before starting remediation) and a pre-execution review (after playbook
-        is ready but before running it). Without docs, agents use a single checkpoint."""
+        """Skill teaches two distinct confirmation checkpoints:
+        Part A (upfront planned-tasks review before Step 0) and
+        Part B (execution plan after playbook generation, before execution).
+        Without the skill, agents use at most a single generic confirmation."""
         c = read_report().lower()
         has_upfront = any(t in c for t in [
-            "part a", "upfront", "pre-step", "before start",
-            "planning checkpoint", "initial review",
-            "before step 0", "pre-execution plan",
+            "part a", "upfront", "planned task",
+            "before step 0", "initial review", "planning checkpoint",
+            "before any step", "task list",
         ])
         has_pre_exec = any(t in c for t in [
-            "part b", "pre-execution", "post-step", "before running",
-            "execution review", "after step 4", "before execution",
-            "execution checkpoint", "approval gate",
+            "part b", "pre-execution", "execution plan",
+            "after step 4", "before step 5", "execution review",
+            "execution checkpoint", "before execution",
         ])
-        assert has_upfront or has_pre_exec, (
-            "should describe at least one structured checkpoint "
-            "(upfront planning review or pre-execution review)"
+        assert has_upfront and has_pre_exec, (
+            "should describe TWO distinct checkpoints: upfront planning review "
+            "(Part A, before starting) AND pre-execution review (Part B, after "
+            "playbook ready). Skill teaches this dual-checkpoint pattern."
         )

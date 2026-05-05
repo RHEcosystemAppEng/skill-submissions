@@ -22,7 +22,7 @@ eval/rh-sre-system-context          | pending | | |
 
 # --- rh-virt (10 tasks) ---
 eval/rh-virt-vm-clone               | pending | | |
-eval/rh-virt-vm-create              | pending | | |
+eval/rh-virt-vm-create              | running | 2026-05-05 | | PR #4
 eval/rh-virt-vm-delete              | pending | | |
 eval/rh-virt-vm-inventory           | pending | | |
 eval/rh-virt-vm-lifecycle-manager   | pending | | |

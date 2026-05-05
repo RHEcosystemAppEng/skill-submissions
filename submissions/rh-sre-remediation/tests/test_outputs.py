@@ -84,43 +84,32 @@ class TestSkillDependent:
             f"found {parts_found}/3 components (skill: Remediation Plan Template)"
         )
 
-    def test_sub_skill_orchestration(self):
-        """Skill teaches: orchestrate specialized sub-skills (cve-validation,
-        cve-impact, system-context, playbook-generator, playbook-executor,
-        remediation-verifier) rather than doing everything inline."""
+    def test_three_response_options(self):
+        """Skill reference 01-remediation-plan-template.md teaches three distinct
+        response options at the execution confirmation: proceed/yes, dry-run only,
+        and abort. A generic agent will at most offer proceed/abort."""
         c = read_report().lower()
-        sub_skills = [
-            "cve-validation", "cve-impact", "system-context",
-            "playbook-generator", "playbook-executor", "remediation-verifier",
-            "cve_validation", "cve_impact", "system_context",
-            "playbook_generator", "playbook_executor", "remediation_verifier",
-        ]
-        found = sum(1 for s in sub_skills if s in c)
-        assert found >= 2, (
-            f"should reference specialized sub-skills for orchestration "
-            f"(found {found} sub-skill references, need >= 2). "
-            f"Skill delegates to: cve-validation, cve-impact, system-context, "
-            f"playbook-generator, playbook-executor, remediation-verifier"
+        has_proceed = any(t in c for t in ["proceed", "yes", "confirm"])
+        has_dryrun = any(t in c for t in ["dry-run only", "dry run only", "check mode only"])
+        has_abort = any(t in c for t in ["abort", "cancel"])
+        options_found = sum([has_proceed, has_dryrun, has_abort])
+        assert options_found >= 3, (
+            f"should offer three response options at execution confirmation: "
+            f"proceed, dry-run only, and abort (found {options_found}/3). "
+            f"Skill reference: 01-remediation-plan-template.md"
         )
 
-    def test_two_checkpoint_structure(self):
-        """Skill teaches two distinct confirmation checkpoints:
-        Part A (upfront planned-tasks review before Step 0) and
-        Part B (execution plan after playbook generation, before execution).
-        Without the skill, agents use at most a single generic confirmation."""
+    def test_mcp_tool_awareness(self):
+        """Skill teaches specific MCP tool names: get_cve for validation,
+        create_vulnerability_playbook for remediation. Generic agents won't
+        reference these specific tool names."""
         c = read_report().lower()
-        has_upfront = any(t in c for t in [
-            "part a", "upfront", "planned task",
-            "before step 0", "initial review", "planning checkpoint",
-            "before any step", "task list",
+        has_tool = any(t in c for t in [
+            "get_cve", "create_vulnerability_playbook",
+            "vulnerability__get_cve", "vulnerability__explain_cves",
+            "explain_cves",
         ])
-        has_pre_exec = any(t in c for t in [
-            "part b", "pre-execution", "execution plan",
-            "after step 4", "before step 5", "execution review",
-            "execution checkpoint", "before execution",
-        ])
-        assert has_upfront and has_pre_exec, (
-            "should describe TWO distinct checkpoints: upfront planning review "
-            "(Part A, before starting) AND pre-execution review (Part B, after "
-            "playbook ready). Skill teaches this dual-checkpoint pattern."
+        assert has_tool, (
+            "should reference specific MCP tool names (get_cve, "
+            "create_vulnerability_playbook) from the skill's toolset"
         )

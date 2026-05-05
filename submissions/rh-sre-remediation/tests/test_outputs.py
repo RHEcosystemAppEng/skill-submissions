@@ -1,7 +1,8 @@
 """
 Tests for rh-sre__remediation per-skill evaluation.
 Baseline tests: any reasonable remediation report passes.
-Skill-dependent tests: check for methodology taught by the skill and its references.
+Skill-dependent tests: check for mock-data-specific outputs that require
+correct MCP tool usage taught by the skill.
 """
 import os
 import pytest
@@ -20,11 +21,9 @@ class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
-    def test_mentions_topic(self):
+    def test_mentions_cve(self):
         content = read_report().lower()
-        assert any(t in content for t in ['remediation', 'orchestrat', 'workflow']), (
-            "report should mention key topic"
-        )
+        assert "cve" in content, "report should mention CVE"
 
     def test_report_has_structure(self):
         content = read_report()
@@ -32,84 +31,72 @@ class TestBaseline:
 
 
 class TestSkillDependent:
-    def test_mcp_prerequisite_validation(self):
-        """Skill teaches: Step 0 — validate MCP server availability (Lightspeed, AAP)
-        before any CVE operations. A generic agent won't mention MCP validation."""
-        c = read_report().lower()
-        has_mcp = any(t in c for t in [
-            "mcp", "lightspeed", "aap",
-            "prerequisite validation", "server validation",
-            "validate prerequisite", "tool validation",
-        ])
-        has_prereq_step = any(t in c for t in [
-            "step 0", "before any", "prerequisite check",
-            "validate.*before", "availability check",
-        ])
-        assert has_mcp or has_prereq_step, (
-            "should validate MCP/tool prerequisites before starting "
-            "(skill: Step 0 MCP validation)"
+    def test_specific_cve_ids_from_mock(self):
+        """Mock MCP returns 5 CVE IDs. The skill teaches to call get_cves to
+        enumerate the full fleet. Check that mock-specific IDs appear."""
+        c = read_report()
+        cve_ids = [
+            "CVE-2024-12345", "CVE-2024-54321", "CVE-2024-98765",
+            "CVE-2024-11111", "CVE-2024-22222",
+        ]
+        found = sum(1 for cve in cve_ids if cve in c)
+        assert found >= 3, (
+            f"should discover CVEs from mock MCP (found {found}/5). "
+            f"Skill teaches to call get_cves for fleet-wide enumeration."
         )
 
-    def test_remediatable_gate_with_advisory(self):
-        """Skill teaches: gate on remediation availability using Red Hat advisory
-        indicators (advisory_available, RHSA, advisories_list). Generic agents
-        won't mention advisory-based gating."""
+    def test_playbook_content(self):
+        """Skill teaches to call create_vulnerability_playbook which returns
+        specific YAML with dnf, become: true, security: true, and
+        hosts: targeted_systems. A control agent describes playbooks
+        conceptually but won't have these exact mock artifacts."""
         c = read_report().lower()
-        has_advisory_indicator = any(t in c for t in [
-            "advisory", "rhsa", "advisories_list", "advisory_available",
-            "errata", "security advisory",
-        ])
-        has_gate = any(t in c for t in [
-            "gate", "remediatable", "remediation available",
-            "automated remediation", "remediation_available",
-        ])
-        assert has_advisory_indicator and has_gate, (
-            "should gate on remediation availability using Red Hat advisory "
-            "indicators (skill: Remediatable Gate with RHSA/advisory check)"
+        markers = ["dnf", "become: true", "security: true", "targeted_systems"]
+        found = sum(1 for m in markers if m in c)
+        assert found >= 2, (
+            f"should include actual playbook content from "
+            f"create_vulnerability_playbook (found {found}/4 markers: "
+            f"dnf, become: true, security: true, targeted_systems)"
         )
 
-    def test_plan_template_format(self):
-        """Skill reference doc teaches a specific plan format: Summary + Table + Checklist.
-        Generic agents produce prose, not this structured format."""
-        c = read_report().lower()
-        has_summary = "summary" in c
-        has_table = any(t in c for t in ["table", "| cve", "| target", "| system"])
-        has_checklist = any(t in c for t in [
-            "checklist", "☐", "☑", "- [", "— done",
-            "step 0:", "step 1:", "step 2:",
-        ])
-        parts_found = sum([has_summary, has_table, has_checklist])
-        assert parts_found >= 2, (
-            f"should use structured plan format (Summary + Table + Checklist), "
-            f"found {parts_found}/3 components (skill: Remediation Plan Template)"
+    def test_system_environment_counts(self):
+        """Mock fleet has 63 systems: 30 prod, 15 staging, 10 dev, 5 QA,
+        3 legacy. These exact counts come from calling get_host_details
+        and classifying by tags — skill teaches this workflow."""
+        c = read_report()
+        exact_counts = ["63", "30", "15", "10"]
+        found = sum(1 for n in exact_counts if n in c)
+        assert found >= 2, (
+            f"should report fleet counts from mock data (found {found}/4 "
+            f"of: 63 total, 30 prod, 15 staging, 10 dev). "
+            f"Skill: get_host_details + tag classification."
         )
 
-    def test_three_response_options(self):
-        """Skill reference 01-remediation-plan-template.md teaches three distinct
-        response options at the execution confirmation: proceed/yes, dry-run only,
-        and abort. A generic agent will at most offer proceed/abort."""
+    def test_compliance_framework_references(self):
+        """Mock CVE data includes pci_impact, soc2_impact, hipaa_impact
+        fields. The skill teaches to incorporate compliance context."""
         c = read_report().lower()
-        has_proceed = any(t in c for t in ["proceed", "yes", "confirm"])
-        has_dryrun = any(t in c for t in ["dry-run only", "dry run only", "check mode only"])
-        has_abort = any(t in c for t in ["abort", "cancel"])
-        options_found = sum([has_proceed, has_dryrun, has_abort])
-        assert options_found >= 3, (
-            f"should offer three response options at execution confirmation: "
-            f"proceed, dry-run only, and abort (found {options_found}/3). "
-            f"Skill reference: 01-remediation-plan-template.md"
+        frameworks = ["pci", "soc2", "soc 2", "hipaa"]
+        found = sum(1 for f in frameworks if f in c)
+        assert found >= 2, (
+            f"should reference compliance frameworks from mock data "
+            f"(found {found} of: PCI, SOC2, HIPAA). "
+            f"Mock CVEs include compliance impact fields."
         )
 
-    def test_mcp_tool_awareness(self):
-        """Skill teaches specific MCP tool names: get_cve for validation,
-        create_vulnerability_playbook for remediation. Generic agents won't
-        reference these specific tool names."""
+    def test_non_remediable_cve_identified(self):
+        """CVE-2024-22222 in the mock has remediation_available: False.
+        The skill teaches the remediatable gate — check this field before
+        generating playbooks. The report should flag this."""
         c = read_report().lower()
-        has_tool = any(t in c for t in [
-            "get_cve", "create_vulnerability_playbook",
-            "vulnerability__get_cve", "vulnerability__explain_cves",
-            "explain_cves",
+        has_cve = "cve-2024-22222" in c
+        has_no_remediation = any(t in c for t in [
+            "no automated", "not remediable", "no remediation",
+            "remediation_available: false", "manual",
+            "no playbook", "cannot be remediated automatically",
         ])
-        assert has_tool, (
-            "should reference specific MCP tool names (get_cve, "
-            "create_vulnerability_playbook) from the skill's toolset"
+        assert has_cve or has_no_remediation, (
+            "should identify CVE-2024-22222 as not having automated "
+            "remediation (remediation_available: False in mock). "
+            "Skill: remediatable gate check."
         )

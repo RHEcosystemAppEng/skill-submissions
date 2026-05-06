@@ -1,7 +1,9 @@
 """
 Tests for ocp-admin__cluster-report per-skill evaluation.
 
-Exact-field tests: require API field paths and probe logic that only SKILL.md teaches.
+Hybrid approach:
+  - Exact-field tests: API field paths / GVKs that only SKILL.md teaches
+  - Behavioral tests: report structure and classification logic the skill produces
 """
 import os
 import pytest
@@ -30,56 +32,93 @@ class TestBaseline:
 
 
 class TestSkillDependent:
-    def test_cluster_version_probe(self):
+
+    # -- Exact-field tests (API knowledge only SKILL.md teaches) --
+
+    def test_cluster_version_gvk(self):
         """Skill teaches probing OpenShift via resources_get with
-        config.openshift.io/v1 ClusterVersion, name 'version'.
-        Without skill, agents use generic API discovery."""
+        config.openshift.io/v1 ClusterVersion. Without skill, agents
+        use generic API discovery or oc version."""
         c = read_report()
-        has_cv = "ClusterVersion" in c
-        has_api = "config.openshift.io" in c
-        assert has_cv or has_api, (
-            "must reference ClusterVersion with config.openshift.io for OpenShift detection"
+        assert "ClusterVersion" in c and "config.openshift.io" in c, (
+            "must reference ClusterVersion with config.openshift.io for "
+            "OpenShift detection (exact GVK from skill)"
         )
 
     def test_desired_version_field(self):
         """Skill teaches reading version from .status.desired.version
-        on the ClusterVersion resource. Without skill, agents use
-        different version sources."""
+        on the ClusterVersion resource. Without skill, agents parse
+        oc version output or use other sources."""
         c = read_report()
-        assert "status.desired.version" in c or "desired.version" in c, (
-            "must reference status.desired.version for cluster version"
+        assert "desired.version" in c or "desired version" in c.lower(), (
+            "must reference desired.version path for cluster version extraction"
         )
 
-    def test_403_classification(self):
-        """Skill teaches that 403 on ClusterVersion probe means
-        'OpenShift (unverified)' — include with version 'unknown'.
-        404 means non-OpenShift — exclude. Without skill, agents
-        treat all errors the same."""
+    def test_403_vs_404_classification(self):
+        """Skill teaches a specific classification table:
+        403 = OpenShift (unverified, include), 404 = non-OpenShift (exclude).
+        Without skill, agents treat all probe errors the same."""
         c = read_report()
         has_403 = "403" in c
-        has_classification = "unverified" in c.lower() or "unknown" in c.lower()
-        assert has_403 or has_classification, (
-            "must classify 403 as OpenShift (unverified) vs 404 as non-OpenShift"
+        has_404 = "404" in c
+        has_unverified = "unverified" in c.lower()
+        assert (has_403 and has_404) or (has_403 and has_unverified), (
+            "must distinguish 403 (OpenShift unverified) from 404 (non-OpenShift)"
         )
 
-    def test_projects_list_with_fallback(self):
-        """Skill teaches using projects_list tool for OpenShift, with
-        namespaces_list as fallback. Generic 'projects' and 'namespace'
-        appear everywhere — only the tool names discriminate."""
+    def test_projects_list_tool(self):
+        """Skill teaches using projects_list MCP tool for OpenShift with
+        namespaces_list as fallback for non-OpenShift contexts."""
         c = read_report()
-        assert "projects_list" in c, (
-            "must reference projects_list tool (not generic 'projects')"
-        )
-        assert "namespaces_list" in c, (
-            "must reference namespaces_list tool as fallback"
+        has_projects_tool = "projects_list" in c
+        has_namespaces_tool = "namespaces_list" in c
+        assert has_projects_tool or has_namespaces_tool, (
+            "must reference projects_list or namespaces_list MCP tool names"
         )
 
-    def test_artifact_layout(self):
-        """Skill teaches specific artifact paths under /tmp/cluster-report/
-        and a manifest JSON with $file references.
-        Without skill, agents use ad-hoc output paths."""
-        c = read_report()
-        has_path = "/tmp/cluster-report" in c or "cluster-report" in c
-        assert has_path, (
-            "must reference /tmp/cluster-report artifact path"
+    # -- Behavioral tests (report quality the skill produces) --
+
+    def test_non_openshift_exclusion(self):
+        """Skill teaches excluding non-OpenShift contexts by default and
+        explaining why. Without skill, agents include everything or skip
+        without explanation."""
+        c = read_report().lower()
+        has_exclusion = any(t in c for t in [
+            "excluded", "non-openshift", "not openshift",
+            "vanilla kubernetes", "not included",
+        ])
+        assert has_exclusion, (
+            "must explicitly identify and exclude non-OpenShift contexts"
+        )
+
+    def test_aggregated_totals(self):
+        """Skill template includes a cross-cluster comparison table with
+        a Total row. Without skill, agents report each cluster separately."""
+        c = read_report().lower()
+        has_total = "total" in c
+        has_agg = any(t in c for t in [
+            "total node", "total cpu", "total memory",
+            "across cluster", "aggregate", "combined",
+        ])
+        assert has_total and has_agg, (
+            "must include aggregated cross-cluster totals (nodes, CPU, memory)"
+        )
+
+    def test_gpu_inventory(self):
+        """Skill template includes a GPU column in node resource tables.
+        Without skill, agents typically omit GPU information."""
+        c = read_report().lower()
+        assert "gpu" in c, "must include GPU information in node resources"
+
+    def test_cluster_verification_section(self):
+        """Skill workflow starts with a verification step that classifies
+        every context before collecting data. Without skill, agents jump
+        straight to querying cluster resources."""
+        c = read_report().lower()
+        has_verify = any(t in c for t in [
+            "verification", "discovery result", "cluster discovery",
+            "classified", "probe", "openshift cluster",
+        ])
+        assert has_verify, (
+            "must include a cluster verification/discovery section"
         )

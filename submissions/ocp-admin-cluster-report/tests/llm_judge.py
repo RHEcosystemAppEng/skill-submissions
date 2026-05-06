@@ -12,28 +12,40 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "cluster_version_probe",
+        "id": "cluster_version_gvk",
         "file": "/solution/report.md",
-        "question": "Does the report probe for OpenShift by checking ClusterVersion (config.openshift.io/v1) with name 'version'?",
-        "reference": "A skilled report probes each context with resources_get for ClusterVersion (config.openshift.io/v1, name: version). An unskilled report uses ad-hoc API checks.",
-    },
-    {
-        "id": "desired_version",
-        "file": "/solution/report.md",
-        "question": "Does the report read the cluster version from status.desired.version on the ClusterVersion resource?",
-        "reference": "A skilled report reads .status.desired.version for the cluster version. An unskilled report uses other version sources.",
+        "question": "Does the report reference the ClusterVersion resource from the config.openshift.io API group as the method for verifying whether a context is OpenShift?",
+        "reference": "A skilled report probes each context with resources_get for ClusterVersion (config.openshift.io/v1, name: version). An unskilled report uses ad-hoc checks like 'oc version' or guesses based on server URL.",
     },
     {
         "id": "error_classification",
         "file": "/solution/report.md",
-        "question": "Does the report classify 403 errors on ClusterVersion as 'OpenShift (unverified)' and 404 as non-OpenShift?",
-        "reference": "A skilled report: 403 = OpenShift with unknown version (include), 404 = not OpenShift (exclude). An unskilled report treats all errors identically.",
+        "question": "Does the report distinguish between 403 and 404 errors when probing for OpenShift, classifying 403 as 'OpenShift (unverified)' and 404 as 'non-OpenShift'?",
+        "reference": "A skilled report: 403 on ClusterVersion = OpenShift with unknown version (include in report), 404 = not OpenShift (exclude by default). An unskilled report treats all probe errors the same way.",
     },
     {
-        "id": "projects_fallback",
+        "id": "non_openshift_exclusion",
         "file": "/solution/report.md",
-        "question": "Does the report use projects_list for OpenShift clusters with namespaces_list as fallback for non-OpenShift?",
-        "reference": "A skilled report tries projects_list first (OpenShift), falls back to namespaces_list (Kubernetes). An unskilled report uses only one method.",
+        "question": "Does the report explicitly exclude non-OpenShift contexts from the detailed cluster report, explaining why they are excluded?",
+        "reference": "A skilled report classifies each context and excludes non-OpenShift contexts by default, explaining the classification. An unskilled report either includes everything without classification or silently skips contexts.",
+    },
+    {
+        "id": "aggregated_totals",
+        "file": "/solution/report.md",
+        "question": "Does the report include aggregated totals across all clusters (total nodes, total CPU, total memory) in a comparison view?",
+        "reference": "A skilled report includes a 'Total' row or summary aggregating resources across all reported clusters. An unskilled report lists each cluster independently without cross-cluster comparison.",
+    },
+    {
+        "id": "gpu_inventory",
+        "file": "/solution/report.md",
+        "question": "Does the report include GPU information in the node resource inventory?",
+        "reference": "A skilled report includes a GPU column in node/cluster resource tables. An unskilled report typically omits GPU data entirely.",
+    },
+    {
+        "id": "verification_workflow",
+        "file": "/solution/report.md",
+        "question": "Does the report show a verification or discovery step where each context is classified before collecting detailed data?",
+        "reference": "A skilled report starts with a 'Cluster Discovery' or 'Verification' section showing which contexts are OpenShift, non-OpenShift, or unreachable. An unskilled report jumps directly to querying resources without verification.",
     },
 ]
 

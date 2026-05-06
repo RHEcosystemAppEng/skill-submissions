@@ -1,15 +1,17 @@
 # Cluster Report Task
 
-You are an OpenShift cluster administrator. Your operations lead needs a comprehensive infrastructure health snapshot for the weekly review.
+You are an OpenShift cluster administrator. Your operations lead has requested a comprehensive infrastructure health snapshot for the weekly review. Your environment has multiple cluster contexts configured.
 
 ## Scenario
-Your environment has multiple cluster contexts configured — some are OpenShift, some may be vanilla Kubernetes, and some may be unreachable. You must accurately classify each context and produce a structured report for the accessible OpenShift clusters.
+Your KUBECONFIG contains several contexts — some point to OpenShift clusters, some to vanilla Kubernetes, and some may be unreachable. You need to accurately verify which contexts are genuine OpenShift, collect resource and workload data from the accessible ones, and produce a consolidated comparison report.
 
 ## Requirements
-- Discover all available cluster contexts
-- Determine which contexts are OpenShift vs non-OpenShift vs unreachable
-- For each accessible OpenShift cluster: report version, nodes, projects, and workload health
-- Explicitly classify contexts that are not OpenShift or cannot be reached
+- Discover all available cluster contexts and their server URLs
+- Verify each context to determine if it is OpenShift, non-OpenShift, or unreachable
+- For each accessible OpenShift cluster: report version, node resources (CPU, memory, GPUs), projects/namespaces, and pod status
+- Explicitly classify and report non-OpenShift and unreachable contexts with the reason for exclusion
+- Include aggregated totals across all reported clusters for comparison
+- Describe any issues needing attention (unhealthy nodes, resource pressure, failing workloads)
 
 Write the complete cluster report in `/solution/report.md`.
 

@@ -63,14 +63,15 @@ class TestSkillDependent:
         )
 
     def test_projects_list_with_fallback(self):
-        """Skill teaches using projects_list for OpenShift, with
-        namespaces_list as fallback for vanilla Kubernetes.
-        Without skill, agents use only one approach."""
+        """Skill teaches using projects_list tool for OpenShift, with
+        namespaces_list as fallback. Generic 'projects' and 'namespace'
+        appear everywhere — only the tool names discriminate."""
         c = read_report()
-        has_projects = "projects_list" in c or "projects" in c.lower()
-        has_ns_fallback = "namespaces_list" in c or "namespace" in c.lower()
-        assert has_projects and has_ns_fallback, (
-            "must use projects_list with namespaces_list fallback"
+        assert "projects_list" in c, (
+            "must reference projects_list tool (not generic 'projects')"
+        )
+        assert "namespaces_list" in c, (
+            "must reference namespaces_list tool as fallback"
         )
 
     def test_artifact_layout(self):

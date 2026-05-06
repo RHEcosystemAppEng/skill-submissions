@@ -11,10 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "playbook_from_tool", "file": "/solution/report.md", "question": "Does the report include actual Ansible playbook YAML content that appears to come from an MCP tool call (e.g., containing 'dnf', 'become: true', 'security: true', 'hosts: targeted_systems') rather than a generic conceptual description of what a playbook would look like?", "reference": "A skilled report includes specific playbook YAML returned by the create_vulnerability_playbook MCP tool, with exact markers like 'dnf', 'become: true', 'security: true', 'hosts: targeted_systems'. An unskilled report describes playbooks conceptually ('you would create a playbook that...') without these specific artifacts."},
-  {"id": "fleet_enumeration", "file": "/solution/report.md", "question": "Does the report include specific fleet statistics (such as total system count of 63, or environment breakdowns like 30 production / 15 staging / 10 development) that could only come from querying an inventory API?", "reference": "A skilled report includes exact numbers from the mock fleet (63 total systems, 30 production, 15 staging, 10 development, 5 QA, 3 legacy) obtained by calling get_host_details. An unskilled report discusses systems generically without exact counts from the data source."},
-  {"id": "non_remediable_flagged", "file": "/solution/report.md", "question": "Does the report identify that at least one CVE (specifically CVE-2024-22222) does not have automated remediation available, and handles this case differently from remediable CVEs?", "reference": "A skilled report identifies CVE-2024-22222 as having no automated remediation (remediation_available: False) and treats it differently — suggesting manual steps or flagging it. An unskilled report either misses this distinction or treats all CVEs identically."},
-  {"id": "compliance_from_data", "file": "/solution/report.md", "question": "Does the report reference specific compliance frameworks (PCI, SOC2, HIPAA) with details that appear to come from structured data fields rather than generic compliance advice?", "reference": "A skilled report references PCI-DSS, SOC2, and HIPAA compliance impacts as returned by the mock MCP data (pci_impact, soc2_impact, hipaa_impact fields with specific deadlines). An unskilled report may mention compliance generically but without data-driven specifics."},
+    {
+        "id": "advisory_available",
+        "file": "/solution/report.md",
+        "question": "Does the report use advisory_available (not rules[]) to determine if a CVE has automated remediation?",
+        "reference": "A skilled report checks advisory_available=true for remediatability. An unskilled report checks rules[] which can be empty even when remediation exists.",
+    },
+    {
+        "id": "remediation_gate",
+        "file": "/solution/report.md",
+        "question": "Does the report reference remediation_available or validation_status as the gate before proceeding with remediation?",
+        "reference": "A skilled report gates on remediation_available=true or validation_status='valid' before generating playbooks. An unskilled report proceeds without validation.",
+    },
+    {
+        "id": "advisories_list",
+        "file": "/solution/report.md",
+        "question": "Does the report reference the advisories_list field for CVE remediation details?",
+        "reference": "A skilled report uses advisories_list to determine available patches. An unskilled report doesn't know this field.",
+    },
+    {
+        "id": "absolute_playbook_path",
+        "file": "/solution/report.md",
+        "question": "Does the report specify playbook files using absolute repo paths (not relative paths)?",
+        "reference": "A skilled report uses absolute paths like <repo>/playbooks/remediation/<file> for playbook locations. An unskilled report uses relative paths which cause write errors.",
+    },
 ]
 
 SYSTEM_PROMPT = (

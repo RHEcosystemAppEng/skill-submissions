@@ -38,29 +38,22 @@ class TestSkillDependent:
             "must reference spec.domain.cpu field path for VM CPU allocation"
         )
 
-    def test_kvm_allocatable_field(self):
-        """Skill teaches checking status.allocatable for
-        devices.kubevirt.io/kvm to confirm node can run VMs.
-        status.capacity.cpu/memory is standard K8s — no uplift."""
+    def test_kvm_device_resource(self):
+        """Skill teaches devices.kubevirt.io/kvm as the extended resource
+        that confirms a node can run VMs. Without skill, agents check
+        only standard CPU/memory capacity."""
         c = read_report()
-        has_allocatable_kvm = (
-            "allocatable" in c.lower() and "devices.kubevirt.io/kvm" in c
-        )
-        has_kvm_capacity = "devices.kubevirt.io/kvm" in c
-        assert has_allocatable_kvm or has_kvm_capacity, (
-            "must reference devices.kubevirt.io/kvm in allocatable/capacity"
+        assert "devices.kubevirt.io/kvm" in c, (
+            "must reference devices.kubevirt.io/kvm for VM-capable node filtering"
         )
 
-    def test_kvm_device_label(self):
-        """Skill teaches filtering schedulable nodes via
-        devices.kubevirt.io/kvm > 0 and kubevirt.io/schedulable=true.
-        Without skill, agents don't know the KVM device resource."""
+    def test_schedulable_label(self):
+        """Skill teaches kubevirt.io/schedulable=true as the node label
+        for VM scheduling eligibility. Without skill, agents use generic
+        node selectors."""
         c = read_report()
-        has_kvm = "devices.kubevirt.io/kvm" in c
-        has_schedulable = "kubevirt.io/schedulable" in c
-        assert has_kvm or has_schedulable, (
-            "must reference devices.kubevirt.io/kvm or kubevirt.io/schedulable "
-            "for node eligibility filtering"
+        assert "kubevirt.io/schedulable" in c, (
+            "must reference kubevirt.io/schedulable label for node eligibility"
         )
 
     def test_vmim_api(self):

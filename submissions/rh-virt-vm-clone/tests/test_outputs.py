@@ -50,15 +50,13 @@ class TestSkillDependent:
             "must reference domain.firmware.uuid/serial regeneration"
         )
 
-    def test_metadata_stripping(self):
-        """Skill teaches stripping uid, resourceVersion, creationTimestamp,
-        and status from cloned spec. Without skill, agents copy the full
-        manifest including server-managed fields."""
+    def test_datavolume_templates_in_clone(self):
+        """Skill teaches embedding dataVolumeTemplates in the clone VM spec
+        for cross-namespace cloning with independent storage. Without skill,
+        agents try to share PVCs across namespaces."""
         c = read_report()
-        strip_fields = sum(1 for f in ["uid", "resourceVersion", "creationTimestamp"]
-                          if f in c)
-        assert strip_fields >= 2, (
-            "must strip uid, resourceVersion, creationTimestamp from clone spec"
+        assert "dataVolumeTemplates" in c or "DataVolumeTemplate" in c, (
+            "must reference dataVolumeTemplates for clone storage independence"
         )
 
     def test_datavolume_label_selector(self):
@@ -69,13 +67,10 @@ class TestSkillDependent:
             "must use vm.kubevirt.io/name labelSelector for DataVolume discovery"
         )
 
-    def test_datavolume_phase_monitoring(self):
-        """Skill teaches monitoring DataVolume status.phase for
-        Pending/Succeeded/Failed during clone. Without skill, agents
-        don't know the exact status field."""
+    def test_cdi_datavolume_gvk(self):
+        """Skill teaches DataVolume uses cdi.kubevirt.io/v1beta1 as the
+        apiVersion. Without skill, agents use wrong GVK or omit it."""
         c = read_report()
-        has_dv_phase = "status.phase" in c
-        has_states = any(s in c for s in ["Succeeded", "Pending"])
-        assert has_dv_phase or has_states, (
-            "must monitor DataVolume status.phase (Pending/Succeeded/Failed)"
+        assert "cdi.kubevirt.io/v1beta1" in c, (
+            "must reference cdi.kubevirt.io/v1beta1 for DataVolume GVK"
         )

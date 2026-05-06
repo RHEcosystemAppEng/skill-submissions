@@ -11,8 +11,36 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "cpu_compatibility_check", "file": "/solution/report.md", "question": "Does the report check CPU model or feature compatibility between source and target nodes before recommending migration?", "reference": "A skilled report verifies CPU compatibility (model, features) to ensure live migration success. An unskilled report migrates VMs without CPU compatibility checks."},
-  {"id": "overcommit_awareness", "file": "/solution/report.md", "question": "Does the report assess overcommit risk (whether the target node will exceed capacity after receiving migrated VMs)?", "reference": "A skilled report calculates whether the target node can handle the additional load without overcommitting. An unskilled report moves VMs without capacity verification."}
+    {
+        "id": "allocation_based_capacity",
+        "file": "/solution/report.md",
+        "question": "Does the report calculate node utilization percentages based on VM resource ALLOCATIONS (vCPUs, memory requests) vs node capacity, rather than using runtime metrics from nodes_top?",
+        "reference": "A skilled report sums VM allocations (spec.domain.cpu, spec.domain.memory.guest) and divides by node capacity (status.capacity) to get utilization. An unskilled report uses nodes_top runtime usage, which shows low numbers for idle VMs and gives misleading rebalance decisions.",
+    },
+    {
+        "id": "rwo_cold_only",
+        "file": "/solution/report.md",
+        "question": "Does the report identify that VMs with RWO (ReadWriteOnce) storage cannot be live migrated and must use cold migration?",
+        "reference": "A skilled report checks PVC access modes and flags RWO as requiring cold migration (stop, move, start). An unskilled report attempts live migration on all VMs regardless of storage type, or doesn't check storage at all.",
+    },
+    {
+        "id": "overcommit_detection",
+        "file": "/solution/report.md",
+        "question": "Does the report check whether any node would exceed 100% allocated capacity after rebalancing, and warn about overcommit if so?",
+        "reference": "A skilled report calculates post-migration allocated capacity and warns if any node exceeds 100% (CPU throttling risk, memory eviction risk). An unskilled report moves VMs without verifying the target node can handle the additional allocations.",
+    },
+    {
+        "id": "cold_migration_procedure",
+        "file": "/solution/report.md",
+        "question": "Does the report describe the correct cold migration procedure: stop VM, set nodeAffinity to target node, then start VM?",
+        "reference": "A skilled report follows the correct cold migration sequence: stop the VM, update nodeAffinity in the VM spec to pin it to the target, then start it. An unskilled report either just restarts hoping for different placement or uses only kubectl drain.",
+    },
+    {
+        "id": "migration_type_distinction",
+        "file": "/solution/report.md",
+        "question": "Does the report clearly distinguish between live migration (RWX, near-zero downtime) and cold migration (RWO, brief downtime) for different VMs?",
+        "reference": "A skilled report assigns the correct migration type per VM based on storage access mode: live for RWX (VirtualMachineInstanceMigration), cold for RWO (stop/affinity/start). An unskilled report uses a single migration method for all VMs.",
+    },
 ]
 
 SYSTEM_PROMPT = (

@@ -1,0 +1,9 @@
+name: ocp-admin-cluster-inventory
+description: Inventory both self-managed and OCM-managed OpenShift clusters
+persona: ocp-admin
+version: "0.1.0"
+tags:
+  - openshift
+  - cluster-inventory
+  - ocm
+  - assisted-installer

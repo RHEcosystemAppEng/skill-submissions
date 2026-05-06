@@ -69,15 +69,9 @@ class TestSkillDependent:
         """Skill explicitly forbids --force and --grace-period=0.
         Without skill, agents suggest force deletion for stuck VMs."""
         c = read_report().lower()
-        rejection_phrases = [
-            "do not use --force", "never use --force", "avoid --force",
-            "must not.*--force", "no.*--force", "without --force",
-            "not recommended.*force", "force.*not", "force.*avoid",
-            "grace-period=0.*not", "do not.*grace-period",
-        ]
         has_rejection = any(p in c for p in [
             "do not use --force", "never use --force", "avoid --force",
-            "without --force", "not.*force",
+            "without --force",
         ]) or ("force" in c and any(t in c for t in [
             "never", "do not", "must not", "avoid", "should not",
         ]))

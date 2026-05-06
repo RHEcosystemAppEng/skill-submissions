@@ -65,13 +65,18 @@ class TestSkillDependent:
             "must check ClusterServiceVersion in openshift-cnv namespace"
         )
 
-    def test_status_conditions_diagnostics(self):
-        """Skill teaches inspecting status.conditions on the VM for
-        scheduling and readiness diagnostics. Without skill, agents
-        only check if the VM exists."""
+    def test_printable_status_error_values(self):
+        """Skill teaches specific printableStatus error values:
+        ErrorUnschedulable, ErrorDataVolumeNotReady. Generic 'conditions'
+        appears in any K8s output — zero uplift."""
         c = read_report()
-        assert "status.conditions" in c or "conditions" in c.lower(), (
-            "must reference status.conditions for VM diagnostics"
+        has_errors = any(v in c for v in [
+            "ErrorUnschedulable", "ErrorDataVolumeNotReady",
+            "DataVolumeReady", "VMIReady",
+        ])
+        assert has_errors, (
+            "must reference specific diagnostic values: ErrorUnschedulable, "
+            "ErrorDataVolumeNotReady, DataVolumeReady, or VMIReady"
         )
 
     def test_volume_binding_mode(self):

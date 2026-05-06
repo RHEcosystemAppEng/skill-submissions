@@ -61,10 +61,11 @@ class TestSkillDependent:
         apiGroup: kubevirt.io and kind: VirtualMachine. Without skill,
         agents omit or guess apiGroup."""
         c = read_report()
-        has_api_group = "apiGroup" in c and "kubevirt.io" in c
-        has_source = "spec.source" in c or ("source" in c.lower() and "VirtualMachine" in c)
-        assert has_api_group or has_source, (
-            "must specify spec.source with apiGroup: kubevirt.io"
+        assert "apiGroup" in c and "kubevirt.io" in c, (
+            "must specify apiGroup: kubevirt.io in spec.source"
+        )
+        assert "spec.source" in c, (
+            "must reference spec.source for snapshot target"
         )
 
     def test_volume_snapshot_class_gvk(self):

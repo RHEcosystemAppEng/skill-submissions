@@ -11,9 +11,36 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "launch_config_and_git_flow", "file": "/solution/report.md", "question": "Does the report configure launch-time prompts for flexibility (variables, host limits, job type) and require Git synchronization before execution?", "reference": "A skilled report configures launch-time prompts and requires Git sync. An unskilled report hardcodes execution settings and skips synchronization requirements."},
-  {"id": "relaunch_failed_hosts", "file": "/solution/report.md", "question": "Does the report mention relaunching with hosts: failed to retry only failed hosts?", "reference": "A skilled report uses jobs_relaunch_retrieve with hosts: failed. An unskilled report suggests full re-execution."},
-  {"id": "dry_run_and_monitoring", "file": "/solution/report.md", "question": "Does the report recommend dry-run first and include per-host execution monitoring?", "reference": "A skilled report follows check mode before run and monitors per-host. An unskilled report runs directly without dry-run."}
+    {
+        "id": "no_launch_override",
+        "file": "/solution/report.md",
+        "question": "Does the report explicitly state that AAP does NOT support overriding the playbook at launch time, and that the playbook must be in the SCM repository before launching?",
+        "reference": "A skilled report explicitly states there is no way to specify a different playbook at job launch time — AAP executes whatever the synced project contains. An unskilled report assumes you can pass a playbook path when launching a job template.",
+    },
+    {
+        "id": "git_flow_blocking",
+        "file": "/solution/report.md",
+        "question": "Does the report describe Git commit/push/sync as a mandatory BLOCKING prerequisite before launching any job (including dry-run)?",
+        "reference": "A skilled report treats Git Flow (commit, push, project sync) as a hard blocker — no job launch until sync is confirmed. An unskilled report either skips Git entirely or treats it as optional/post-launch.",
+    },
+    {
+        "id": "path_mismatch_handling",
+        "file": "/solution/report.md",
+        "question": "Does the report identify that the existing template points to a different playbook (cve-remediation.yml) and explain how to resolve this mismatch?",
+        "reference": "A skilled report identifies the path mismatch between the template's playbook and the generated playbook, then explains writing the new content to the template's expected path (or updating it) and syncing. An unskilled report ignores the mismatch or claims it can override at launch.",
+    },
+    {
+        "id": "dry_run_check_mode",
+        "file": "/solution/report.md",
+        "question": "Does the report specify that dry-run is done by launching the same job template with job_type 'check' (Ansible check mode)?",
+        "reference": "A skilled report uses job_type 'check' on the same launch API for dry-run. An unskilled report invents a separate dry-run API or skips explaining the mechanism.",
+    },
+    {
+        "id": "relaunch_failed_hosts",
+        "file": "/solution/report.md",
+        "question": "Does the report describe relaunching only the failed hosts (not all hosts) after a partial failure?",
+        "reference": "A skilled report uses relaunch with hosts='failed' to retry only failed hosts. An unskilled report suggests re-running the entire job on all hosts.",
+    },
 ]
 
 SYSTEM_PROMPT = (

@@ -1,7 +1,7 @@
 """
 Tests for rh-virt__vm-snapshot-restore per-skill evaluation.
-Baseline tests: report structure.
-Skill-dependent tests: conceptual checks (no exact tool/field name matching).
+
+Exact-field tests: require API field paths and GVKs that only SKILL.md teaches.
 """
 import os
 import pytest
@@ -15,57 +15,64 @@ def read_report():
     with open(REPORT) as f:
         return f.read()
 
+
 class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
     def test_mentions_restore(self):
         content = read_report().lower()
-        assert "restor" in content, "report should discuss restore operation"
+        assert "restore" in content
 
-    def test_mentions_snapshot(self):
-        content = read_report().lower()
-        assert "snapshot" in content or "backup" in content, "report should mention the snapshot"
+    def test_report_has_structure(self):
+        content = read_report()
+        assert len(content) > 200, "report should have substantial content"
 
 
 class TestSkillDependent:
-    def test_vm_stopped_prerequisite(self):
-        """Skill: VM must be stopped before restore; stop-and-restore option."""
-        c = read_report().lower()
-        assert any(t in c for t in ["stop before restor", "must be stopped", "stop-and-restore", "vm must be stopped", "halt"]) and (
-            "stop" in c and "restor" in c
-        ), (
-            "should require VM stopped before restore"
+    def test_restore_gvk(self):
+        """Skill teaches VirtualMachineRestore with apiVersion
+        snapshot.kubevirt.io/v1beta1. Without skill, agents don't know
+        the correct GVK for restore objects."""
+        c = read_report()
+        has_restore = "VirtualMachineRestore" in c
+        has_gvk = "snapshot.kubevirt.io/v1beta1" in c
+        assert has_restore and has_gvk, (
+            "must reference VirtualMachineRestore with snapshot.kubevirt.io/v1beta1"
         )
 
-    def test_destructive_warning(self):
-        """Skill: Data loss warning; changes since snapshot will be lost."""
-        c = read_report().lower()
-        assert any(t in c for t in ["data loss", "changes since", "will be lost", "overwrite", "destructive", "replace current", "cannot recover"]), (
-            "should warn about data loss from restore"
+    def test_spec_virtual_machine_snapshot_name(self):
+        """Skill teaches spec.virtualMachineSnapshotName as the field
+        that links the restore to its source snapshot.
+        Without skill, agents use wrong field names."""
+        c = read_report()
+        assert "virtualMachineSnapshotName" in c, (
+            "must reference spec.virtualMachineSnapshotName field"
         )
 
-    def test_restore_cr(self):
-        """Skill: VirtualMachineRestore CR with target and snapshot reference."""
-        c = read_report().lower()
-        assert "virtualmachinerestore" in c and any(t in c for t in ["target", "virtualmachinesnapshotname", "spec"]), (
-            "should define VirtualMachineRestore resource"
+    def test_spec_target_api_group(self):
+        """Skill teaches spec.target with apiGroup: kubevirt.io and
+        kind: VirtualMachine. Without skill, agents omit apiGroup."""
+        c = read_report()
+        has_target = "spec.target" in c or "target" in c.lower()
+        has_api_group = "apiGroup" in c and "kubevirt.io" in c
+        assert has_target and has_api_group, (
+            "must specify spec.target with apiGroup: kubevirt.io"
         )
 
-    def test_post_restore_verification(self):
-        """Skill: Verify restore complete; status.complete; start VM after."""
-        c = read_report().lower()
-        assert any(t in c for t in ["status.complete", "restore complete", "post-restore", "after restore", "start vm", "start the vm"]) and (
-            "restor" in c or "complete" in c or "start" in c
-        ), (
-            "should include post-restore verification or start step"
+    def test_status_complete_field(self):
+        """Skill teaches monitoring status.complete (true/false) on the
+        VirtualMachineRestore object. Without skill, agents don't know
+        the exact monitoring field."""
+        c = read_report()
+        assert "status.complete" in c, (
+            "must monitor status.complete on VirtualMachineRestore"
         )
 
-    def test_typed_confirmation(self):
-        """Skill: Typed snapshot name confirmation before restore."""
-        c = read_report().lower()
-        assert any(t in c for t in ["type", "typed", "exact name", "to confirm", "snapshot name"]) and (
-            "confirm" in c or "type" in c
-        ), (
-            "should require typed snapshot name confirmation"
+    def test_snapshot_readiness_check(self):
+        """Skill teaches verifying status.readyToUse == true on the
+        snapshot before attempting restore."""
+        c = read_report()
+        assert "readyToUse" in c, (
+            "must verify snapshot readyToUse before restore"
         )

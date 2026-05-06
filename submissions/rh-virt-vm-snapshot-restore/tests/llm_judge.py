@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "vm_stopped_prerequisite", "file": "/solution/report.md", "question": "Does the report require the VM to be stopped before restore and explain this is enforced by the platform?", "reference": "A skilled report enforces stop-before-restore. An unskilled report doesn't mention this prerequisite."},
-  {"id": "restore_cr_definition", "file": "/solution/report.md", "question": "Does the report define a VirtualMachineRestore CR with virtualMachineSnapshotName reference?", "reference": "A skilled report creates proper VirtualMachineRestore resource. An unskilled report doesn't know the restore API."},
-  {"id": "destructive_warning_and_verification", "file": "/solution/report.md", "question": "Does the report warn about data loss (changes since snapshot) and verify restore completion via status.complete?", "reference": "A skilled report warns about destructive nature and verifies completion. An unskilled report restores without warnings."}
+    {
+        "id": "restore_gvk",
+        "file": "/solution/report.md",
+        "question": "Does the report define a VirtualMachineRestore resource with apiVersion snapshot.kubevirt.io/v1beta1?",
+        "reference": "A skilled report creates VirtualMachineRestore with snapshot.kubevirt.io/v1beta1. An unskilled report doesn't know the correct GVK for restore objects.",
+    },
+    {
+        "id": "snapshot_name_field",
+        "file": "/solution/report.md",
+        "question": "Does the report reference spec.virtualMachineSnapshotName as the field linking the restore to its source snapshot?",
+        "reference": "A skilled report sets spec.virtualMachineSnapshotName to the snapshot name. An unskilled report uses wrong field names or references.",
+    },
+    {
+        "id": "target_api_group",
+        "file": "/solution/report.md",
+        "question": "Does the report specify spec.target with apiGroup: kubevirt.io and kind: VirtualMachine?",
+        "reference": "A skilled report sets spec.target.apiGroup to kubevirt.io with kind VirtualMachine. An unskilled report omits the apiGroup.",
+    },
+    {
+        "id": "status_complete",
+        "file": "/solution/report.md",
+        "question": "Does the report describe monitoring status.complete on the VirtualMachineRestore to track restore progress?",
+        "reference": "A skilled report polls status.complete (true = done, false = in progress) with a timeout. An unskilled report doesn't describe restore monitoring.",
+    },
 ]
 
 SYSTEM_PROMPT = (

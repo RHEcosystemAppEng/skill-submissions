@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "tool_purpose_attribution", "file": "/solution/report.md", "question": "Does the report pair each tool or MCP call with an explicit purpose statement explaining why it was invoked, rather than just listing tools used or describing actions narratively?", "reference": "A skilled report explicitly pairs each tool (e.g., get_host_details, get_cves) with a 'Purpose:' or 'used to' statement. An unskilled report lists tools in a table or mentions them inline without structured per-tool purpose mapping."},
-  {"id": "tool_purpose_categorization", "file": "/solution/report.md", "question": "Does the report organize MCP tools into named functional categories (e.g., 'Vulnerability Assessment Tools', 'Fleet Management Tools', 'Remediation Tools') rather than listing all tools in a single flat list?", "reference": "A skilled report groups tools by their functional purpose into labeled sub-sections (e.g., 'Assessment Tools: get_cves, get_cve', 'Fleet Tools: get_host_details'). An unskilled report lists all tools sequentially without categorizing them by function."},
-  {"id": "methodology_phases", "file": "/solution/report.md", "question": "Does the report organize the execution into at least two named methodology phases (e.g., 'Data Collection', 'Evidence Gathering', 'Triage', 'Verification') as distinct sections or headings?", "reference": "A skilled report structures execution into named phases as headings or sections. An unskilled report presents a flat narrative or simple numbered list without phase-level organization."}
+    {
+        "id": "sentinel_format",
+        "file": "/solution/report.md",
+        "question": "Does the report contain the exact sentinel markers '**** EXECUTION SUMMARY START ****' and '**** EXECUTION SUMMARY END ****' (with four asterisks on each side)?",
+        "reference": "A skilled report uses the exact sentinel format with four asterisks: '**** EXECUTION SUMMARY START ****' and '**** EXECUTION SUMMARY END ****'. An unskilled report uses markdown headers, generic labels, or different delimiter formats.",
+    },
+    {
+        "id": "naming_conventions",
+        "file": "/solution/report.md",
+        "question": "Does the report use the correct naming conventions: 'rh-sre:' prefix for skills, 'server:tool' format for MCP tools, and 'docs/' or 'skills/' relative paths for documentation?",
+        "reference": "A skilled report uses 'rh-sre:fleet-inventory' for skills, 'lightspeed-mcp:get_cve' for tools, and 'docs/insights/vulnerability-logic.md' for docs. An unskilled report uses bare names without prefixes or inconsistent naming.",
+    },
+    {
+        "id": "four_categories",
+        "file": "/solution/report.md",
+        "question": "Does the report include all four required categories (Agents, Skills, Tools, Docs) with the Agents category set to 'None'?",
+        "reference": "A skilled report includes all four categories: Agents (set to None since no agents were invoked), Skills, Tools, and Docs. An unskilled report omits categories or uses arbitrary groupings.",
+    },
+    {
+        "id": "chronological_order",
+        "file": "/solution/report.md",
+        "question": "Are the skills and tools listed in chronological order of first use (mcp-lightspeed-validator before fleet-inventory before cve-validation), not alphabetical?",
+        "reference": "A skilled report preserves the chronological workflow sequence. An unskilled report alphabetizes resources or uses arbitrary ordering.",
+    },
 ]
 
 SYSTEM_PROMPT = (

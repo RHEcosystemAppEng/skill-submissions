@@ -64,14 +64,11 @@ class TestSkillDependent:
         )
 
     def test_get_cve_systems_tool(self):
-        """Skill teaches get_cve_systems with uppercase CVE-YYYY-NNNNN format
-        for querying affected systems per CVE.
-        Without skill, agents use wrong tool or parameter format."""
+        """Skill teaches get_cve_systems as the tool for querying affected
+        systems per CVE. Without skill, agents use wrong tool names."""
         c = read_report()
-        has_tool = "get_cve_systems" in c
-        has_cve_format = "CVE-" in c
-        assert has_tool or has_cve_format, (
-            "must reference get_cve_systems tool or CVE-YYYY-NNNNN format"
+        assert "get_cve_systems" in c, (
+            "must reference get_cve_systems tool for per-CVE system queries"
         )
 
     def test_display_name_and_fqdn(self):

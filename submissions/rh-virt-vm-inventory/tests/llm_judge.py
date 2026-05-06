@@ -11,8 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "vmi_vs_vm_distinction", "file": "/solution/report.md", "question": "Does the report distinguish between VirtualMachine (spec/desired state) and VirtualMachineInstance (runtime state) as separate resources to query?", "reference": "A skilled report queries both VM and VMI, understanding VM defines the spec while VMI reflects the running state. An unskilled report only queries VirtualMachine without VMI runtime data."},
-  {"id": "status_ordering", "file": "/solution/report.md", "question": "Does the report organize or sort VMs by operational status (e.g., Running first, then Pending, Stopped, Failed) rather than just listing alphabetically?", "reference": "A skilled report groups or sorts VMs by status priority. An unskilled report lists VMs in arbitrary order without status-based organization."}
+    {
+        "id": "vmi_runtime",
+        "file": "/solution/report.md",
+        "question": "Does the report query VirtualMachineInstance (VMI) objects separately from VirtualMachine for runtime data like node, IP, and guest OS?",
+        "reference": "A skilled report queries both VirtualMachine (desired state) and VirtualMachineInstance (runtime state) to get accurate live data. An unskilled report only queries VirtualMachine objects.",
+    },
+    {
+        "id": "guest_os_field",
+        "file": "/solution/report.md",
+        "question": "Does the report reference status.guestOSInfo (prettyName or name+version) for reading the guest operating system?",
+        "reference": "A skilled report reads guestOSInfo.prettyName from VMI for accurate OS detection. An unskilled report guesses OS from image names or labels.",
+    },
+    {
+        "id": "agent_connected",
+        "file": "/solution/report.md",
+        "question": "Does the report check the AgentConnected condition from VMI status.conditions to verify guest agent health?",
+        "reference": "A skilled report checks AgentConnected condition to flag VMs without responsive guest agents. An unskilled report doesn't check guest agent status.",
+    },
+    {
+        "id": "storage_volume_status",
+        "file": "/solution/report.md",
+        "question": "Does the report reference volumeStatus or persistentVolumeClaimInfo for calculating per-VM storage from VMI status?",
+        "reference": "A skilled report sums PVC-backed volume capacity from status.volumeStatus[].persistentVolumeClaimInfo.capacity.storage, excluding container disks. An unskilled report doesn't report per-VM storage accurately.",
+    },
 ]
 
 SYSTEM_PROMPT = (

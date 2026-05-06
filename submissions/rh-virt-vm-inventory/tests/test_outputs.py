@@ -1,7 +1,7 @@
 """
 Tests for rh-virt__vm-inventory per-skill evaluation.
-Baseline tests: report structure.
-Skill-dependent tests: conceptual checks (no exact tool/field name matching).
+
+Exact-field tests: require API field paths that only SKILL.md teaches.
 """
 import os
 import pytest
@@ -15,6 +15,7 @@ def read_report():
     with open(REPORT) as f:
         return f.read()
 
+
 class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
@@ -23,66 +24,57 @@ class TestBaseline:
         content = read_report()
         has_table = "|" in content and content.count("|") >= 4
         has_list = content.count("- ") >= 5
-        assert has_table or has_list, "report should present VM inventory in a structured format (table or list)"
+        assert has_table or has_list, "report should present inventory in structured format"
 
     def test_mentions_namespace(self):
         content = read_report().lower()
-        assert "namespace" in content, "report should organize by namespace"
+        assert "namespace" in content
 
 
 class TestSkillDependent:
-    def test_vmi_runtime_data(self):
-        """Skill: Query VirtualMachineInstance (VMI) for running VM runtime data."""
-        c = read_report().lower()
-        assert any(t in c for t in ["virtualmachineinstance", "vmi", "virtual machine instance"]), (
-            "should reference VMI for runtime data, not just VirtualMachine"
+    def test_storage_capacity_field_path(self):
+        """Skill teaches summing storage from
+        status.volumeStatus[].persistentVolumeClaimInfo.capacity.storage
+        on VMI, excluding container disks and cloud-init.
+        Without skill, agents don't know this nested path."""
+        c = read_report()
+        has_volume_status = "volumeStatus" in c or "persistentVolumeClaimInfo" in c
+        assert has_volume_status, (
+            "must reference volumeStatus or persistentVolumeClaimInfo for storage"
         )
 
-    def test_resource_format(self):
-        """Skill: Resources as 'X vCPU, YGi' format, not instance type names like u1.medium."""
-        c = read_report().lower()
-        assert any(t in c for t in ["vcpu", "vcpus"]) and any(t in c for t in ["gi", "gib"]), (
-            "should use vCPU/Gi resource format, not instance type names"
+    def test_guest_os_info_field(self):
+        """Skill teaches reading guest OS from status.guestOSInfo.prettyName
+        (or .name + version) on VMI. Without skill, agents guess OS from
+        the image name."""
+        c = read_report()
+        assert "guestOSInfo" in c, (
+            "must reference guestOSInfo field for OS detection"
         )
 
-    def test_status_based_grouping(self):
-        """Skill: Sort by namespace, then status (Running > Pending > Stopped > Failed), then name."""
-        c = read_report().lower()
-        status_terms = sum(1 for t in ["running", "stopped", "pending", "failed"] if t in c)
-        has_organization = any(t in c for t in [
-            "group", "sort", "order", "organiz", "by namespace",
-            "by status", "running first", "namespace",
-        ])
-        assert status_terms >= 2 and has_organization, (
-            "should organize VMs with status awareness (Running/Stopped/etc) by namespace"
+    def test_agent_connected_condition(self):
+        """Skill teaches checking AgentConnected condition from VMI
+        status.conditions. Without skill, agents skip guest agent health."""
+        c = read_report()
+        assert "AgentConnected" in c, (
+            "must reference AgentConnected condition from VMI"
         )
 
-    def test_conditions_awareness(self):
-        """Skill: KubeVirt-specific conditions — AgentConnected, LiveMigratable."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "agentconnected", "agent connected", "agent_connected",
-            "livemigratable", "live migratable", "live_migratable",
-            "guest agent",
-        ]), "should mention KubeVirt-specific conditions (AgentConnected, LiveMigratable)"
-
-    def test_summary_statistics(self):
-        """Instruction requires totals: VMs per namespace, running vs stopped, resource allocation."""
-        c = read_report().lower()
-        has_count = any(t in c for t in ["total", "count", "summary", "overall"])
-        has_breakdown = any(t in c for t in [
-            "running", "stopped",
-        ]) and any(t in c for t in [
-            "total", "count", "sum", "number of",
-        ])
-        assert has_count and has_breakdown, (
-            "should include summary statistics (totals, running vs stopped counts)"
+    def test_vmi_for_runtime_data(self):
+        """Skill teaches querying VirtualMachineInstance (separate from VM)
+        for live runtime data: nodeName, IP, guestOS, conditions.
+        Without skill, agents query only VirtualMachine objects."""
+        c = read_report()
+        assert "VirtualMachineInstance" in c or "VMI" in c, (
+            "must distinguish VirtualMachineInstance for runtime data"
         )
 
-    def test_eol_or_compliance_flagging(self):
-        """Instruction asks to flag VMs running end-of-life operating systems."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "end of life", "end-of-life", "eol", "unsupported",
-            "deprecated", "out of support", "compliance",
-        ]), "should flag VMs running end-of-life or unsupported operating systems"
+    def test_interfaces_ip_field(self):
+        """Skill teaches reading IP from status.interfaces[0].ipAddress
+        on VMI. Without skill, agents use generic network lookup."""
+        c = read_report()
+        has_interfaces = "status.interfaces" in c or "interfaces[" in c
+        has_ip = "ipAddress" in c
+        assert has_interfaces or has_ip, (
+            "must reference status.interfaces[].ipAddress for VM IP"
+        )

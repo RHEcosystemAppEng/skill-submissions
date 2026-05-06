@@ -1,14 +1,16 @@
 # VM Inventory Task
 
-You are an OpenShift Virtualization administrator. Your team needs a complete picture of every VM in the cluster for capacity planning and compliance reporting.
+You are an OpenShift Virtualization administrator. Your team needs a complete inventory of every VM in the cluster for capacity planning and compliance reporting.
+
+## Scenario
+The cluster has VMs spread across multiple namespaces. Some are running, some stopped. You need to produce a structured inventory showing each VM's resources, operating system, network details, and health conditions.
 
 ## Requirements
-- List every VM across all namespaces, organized in a clear, structured format
-- For each VM report: name, namespace, status (Running/Stopped/Paused), CPU and memory allocation, operating system, and IP address if running
-- Distinguish between the VM definition (desired state) and the runtime instance (actual state) where relevant
-- Identify any VMs with issues: stopped unexpectedly, guest agent not responding, degraded conditions, or running end-of-life operating systems
-- Summarize totals: how many VMs per namespace, how many running vs stopped, total resource allocation
+- List every VM across all namespaces in a structured table format
+- For each VM report: name, namespace, status, CPU/memory resources, guest OS, IP address, node placement
+- Identify VMs with health issues or degraded conditions
+- Summarize totals per namespace
 
 Write the inventory report in `/solution/report.md`.
 
-Use MCP tools to gather VM data. If reference documentation or skills are available in this environment, consult them before beginning work. Complete the entire analysis autonomously — do not stop to ask for user confirmation or input at any checkpoint.
+Use MCP tools to gather VM data. If reference documentation or skills are available in this environment, consult them before beginning work. Complete the entire analysis autonomously — do not stop for user confirmation.

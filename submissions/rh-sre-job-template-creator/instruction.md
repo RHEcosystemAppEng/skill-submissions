@@ -1,17 +1,17 @@
 # Job Template Creator Task
 
-You are a Red Hat SRE. A remediation playbook has been written for a critical CVE, and you need to set up an Ansible Automation Platform job template so the team can run it against affected systems.
+You are a Red Hat SRE. A remediation playbook for CVE-2026-1234 has been prepared and you need to create a job template in Ansible Automation Platform (AAP) so the operations team can execute it against affected production hosts.
 
 ## Scenario
-The security team delivered a remediation playbook for CVE-2026-1234. You need to create a job template in AAP that the operations team can use to run this playbook against production hosts.
+The playbook `remediation-CVE-2026-1234.yml` is ready. There is an AAP instance available with projects, inventories, and credentials already configured. Your task is to set up a complete job template that the ops team can use to execute this playbook.
 
 ## Requirements
-- Check which projects and inventories are available in AAP
-- Determine the correct project, inventory, and credentials for the remediation playbook
-- Document the job template configuration: name, playbook path, inventory, project, credentials, and execution settings (privilege escalation, variable prompts, limit prompts)
-- Explain any decisions about template settings (e.g., why `become` is enabled, whether to prompt for variables at launch)
-- If template creation requires manual steps (e.g., via the AAP Web UI), document those steps clearly
+- Investigate the AAP environment to determine available projects, inventories, and credentials
+- Create a plan for setting up the job template, including the exact method for creating it
+- Specify all template configuration: name, playbook path, project, inventory, credentials, privilege escalation, and launch-time prompt settings
+- Explain what must happen to the playbook file before the template can reference it
+- Address how the template should handle flexibility at execution time (variables, host limiting, job type selection)
 
-Document your methodology, plan, and configuration in `/solution/report.md`.
+Write your complete plan and configuration in `/solution/report.md`.
 
-Use MCP tools to query AAP. If reference documentation or skills are available in this environment, consult them before beginning work.
+Use MCP tools to query AAP. If reference documentation or skills are available in this environment, consult them before beginning work. Complete the entire analysis autonomously — do not stop for user confirmation.

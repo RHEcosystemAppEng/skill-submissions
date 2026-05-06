@@ -12,28 +12,28 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "guest_agent_consistency",
+        "id": "snapshot_gvk",
         "file": "/solution/report.md",
-        "question": "Does the report explain that GuestAgent presence (in status.indications or AgentConnected condition) determines whether the snapshot is application-consistent (with filesystem freeze/thaw) vs crash-consistent?",
-        "reference": "A skilled report checks for GuestAgent in status.indications: if present, the snapshot is application-consistent (filesystem quiesce). If Online without GuestAgent, it's crash-consistent only. An unskilled report doesn't check guest agent status or doesn't distinguish consistency levels.",
+        "question": "Does the report specify the exact apiVersion snapshot.kubevirt.io/v1beta1 for the VirtualMachineSnapshot resource?",
+        "reference": "A skilled report uses the exact GVK: apiVersion snapshot.kubevirt.io/v1beta1, kind VirtualMachineSnapshot. An unskilled report guesses wrong apiVersions or omits it entirely.",
+    },
+    {
+        "id": "status_indications",
+        "file": "/solution/report.md",
+        "question": "Does the report reference the status.indications field on VirtualMachineSnapshot to determine consistency level (GuestAgent vs Online)?",
+        "reference": "A skilled report checks status.indications for GuestAgent (application-consistent, filesystem freeze/thaw) vs Online without GuestAgent (crash-consistent). An unskilled report doesn't reference this specific field path.",
+    },
+    {
+        "id": "agent_connected_condition",
+        "file": "/solution/report.md",
+        "question": "Does the report reference the AgentConnected condition for verifying guest agent presence on the VM?",
+        "reference": "A skilled report checks the AgentConnected condition (from VM/VMI status.conditions) to verify qemu-guest-agent is running before snapshot. An unskilled report vaguely mentions guest agent without the exact condition name.",
     },
     {
         "id": "hot_plug_blocker",
         "file": "/solution/report.md",
-        "question": "Does the report identify hot-plugged volumes as a blocker that prevents snapshot creation entirely?",
-        "reference": "A skilled report warns that hot-plugged volumes (attached after VM creation without restart) block snapshot creation and must be made permanent or removed first. An unskilled report doesn't mention this blocker.",
-    },
-    {
-        "id": "volume_snapshot_class",
-        "file": "/solution/report.md",
-        "question": "Does the report verify VolumeSnapshotClass exists as a prerequisite before attempting snapshot creation?",
-        "reference": "A skilled report checks for VolumeSnapshotClass matching the CSI driver as a mandatory prerequisite. An unskilled report attempts to create snapshots without verifying storage snapshot support.",
-    },
-    {
-        "id": "snapshot_monitoring",
-        "file": "/solution/report.md",
-        "question": "Does the report describe monitoring snapshot progress via status.phase (InProgress/Succeeded/Failed) and readyToUse indicator?",
-        "reference": "A skilled report explains the snapshot status lifecycle: InProgress during creation, Succeeded when complete, readyToUse=true when consumable, and status.indications for consistency metadata. An unskilled report doesn't explain monitoring.",
+        "question": "Does the report identify hot-plugged volumes as blocking snapshot creation and explain persistence into spec.template.spec.volumes?",
+        "reference": "A skilled report warns hot-plugged volumes block snapshots and recommends persisting them in spec.template.spec.volumes. An unskilled report doesn't mention this blocker.",
     },
 ]
 

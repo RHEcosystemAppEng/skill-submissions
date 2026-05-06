@@ -1,11 +1,7 @@
 """
 Tests for rh-virt__vm-snapshot-create per-skill evaluation.
 
-Skill-specific knowledge tested:
-- GuestAgent in status.indications = application-consistent; Online without = crash-consistent
-- Hot-plugged volumes block snapshot creation entirely
-- VolumeSnapshotClass must exist (CSI prerequisite)
-- AgentConnected condition on VM for guest agent detection
+Exact-field tests: require API field paths and GVKs that only SKILL.md teaches.
 """
 import os
 import pytest
@@ -34,91 +30,47 @@ class TestBaseline:
 
 
 class TestSkillDependent:
-    def test_guest_agent_determines_consistency(self):
-        """Skill: If GuestAgent is in status.indications, snapshot is
-        application-consistent (filesystem freeze/thaw). If only Online
-        without GuestAgent, it's crash-consistent. Without skill, agents
-        don't distinguish consistency levels."""
-        c = read_report().lower()
-        has_guest = any(t in c for t in [
-            "guest agent", "guestagent", "qemu-guest-agent",
-            "agentconnected",
-        ])
-        has_consistency = any(t in c for t in [
-            "application-consistent", "crash-consistent",
-            "quiesce", "freeze", "thaw",
-        ])
-        assert has_guest and has_consistency, (
-            "should explain that GuestAgent presence determines "
-            "application-consistent vs crash-consistent snapshot "
-            "(skill: status.indications)"
+    def test_snapshot_gvk(self):
+        """Skill teaches snapshot.kubevirt.io/v1beta1 as the apiVersion for
+        VirtualMachineSnapshot. Without skill, agents guess a wrong GVK."""
+        c = read_report()
+        assert "snapshot.kubevirt.io/v1beta1" in c, (
+            "must reference exact apiVersion snapshot.kubevirt.io/v1beta1"
         )
 
-    def test_hot_plug_blocks_snapshot(self):
-        """Skill: Hot-plugged volumes (attached without restart) BLOCK
-        snapshot creation entirely. Without skill, agents attempt the
-        snapshot and fail unexpectedly."""
-        c = read_report().lower()
-        has_hotplug = any(t in c for t in [
-            "hot-plug", "hotplug", "hot plug",
-        ])
-        has_block = any(t in c for t in [
-            "block", "prevent", "cannot", "fail",
-            "not possible", "must", "remove",
-        ])
-        assert has_hotplug and has_block, (
-            "should identify hot-plugged volumes as blocking snapshot creation "
-            "(skill: volumes attached after VM creation without restart)"
+    def test_status_indications_field(self):
+        """Skill teaches that status.indications on the VirtualMachineSnapshot
+        contains GuestAgent/Online values that determine consistency level.
+        Without skill, agents don't know this field path."""
+        c = read_report()
+        assert "status.indications" in c, (
+            "must reference status.indications field path for consistency"
         )
 
-    def test_volume_snapshot_class_prerequisite(self):
-        """Skill: VolumeSnapshotClass must exist for the CSI driver before
-        any snapshot can be created. Without skill, agents skip this check."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "volumesnapshotclass", "volume snapshot class",
-            "snapshot class", "csi",
-        ]), (
-            "should check for VolumeSnapshotClass as CSI prerequisite "
-            "(skill: storage prerequisite verification)"
+    def test_agent_connected_condition(self):
+        """Skill teaches AgentConnected condition on the VM/VMI as the way
+        to verify guest agent presence before snapshot. Without skill,
+        agents check vaguely for 'guest agent' without the exact condition."""
+        c = read_report()
+        assert "AgentConnected" in c, (
+            "must reference AgentConnected condition name"
         )
 
-    def test_snapshot_cr_definition(self):
-        """Skill: VirtualMachineSnapshot CR with correct apiVersion
-        (snapshot.kubevirt.io/v1beta1) and spec.source."""
-        c = read_report().lower()
-        assert "virtualmachinesnapshot" in c, (
-            "should define VirtualMachineSnapshot CR "
-            "(skill: snapshot resource specification)"
+    def test_spec_source_shape(self):
+        """Skill teaches the snapshot spec.source must include
+        apiGroup: kubevirt.io and kind: VirtualMachine. Without skill,
+        agents omit or guess apiGroup."""
+        c = read_report()
+        has_api_group = "apiGroup" in c and "kubevirt.io" in c
+        has_source = "spec.source" in c or ("source" in c.lower() and "VirtualMachine" in c)
+        assert has_api_group or has_source, (
+            "must specify spec.source with apiGroup: kubevirt.io"
         )
 
-    def test_online_vs_offline_distinction(self):
-        """Skill: Online snapshot (VM running) has different implications
-        than offline (VM stopped). Online shows in status.indications."""
-        c = read_report().lower()
-        has_online = any(t in c for t in [
-            "online", "running", "live",
-        ])
-        has_offline = any(t in c for t in [
-            "offline", "stopped", "shut down",
-        ])
-        has_distinction = any(t in c for t in [
-            "status.indications", "indications",
-            "consistency", "consistent",
-        ])
-        assert (has_online or has_offline) and has_distinction, (
-            "should distinguish online vs offline snapshot behavior "
-            "(skill: status.indications contains 'Online' when running)"
-        )
-
-    def test_monitoring_progress(self):
-        """Skill: Monitor via status.phase (InProgress/Succeeded/Failed)
-        and readyToUse indicator."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "readytouse", "ready to use",
-            "status.phase", "inprogress", "succeeded",
-        ]), (
-            "should describe snapshot progress monitoring "
-            "(skill: status.phase and readyToUse)"
+    def test_volume_snapshot_class_gvk(self):
+        """Skill teaches VolumeSnapshotClass with snapshot.storage.k8s.io/v1
+        as CSI prerequisite. Without skill, agents skip or use wrong GVK."""
+        c = read_report()
+        assert "VolumeSnapshotClass" in c, (
+            "must reference VolumeSnapshotClass prerequisite check"
         )

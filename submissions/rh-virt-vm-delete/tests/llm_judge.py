@@ -14,26 +14,26 @@ CRITERIA = [
     {
         "id": "protected_label",
         "file": "/solution/report.md",
-        "question": "Does the report check for a 'protected: true' label on the VM and refuse deletion if it is present?",
-        "reference": "A skilled report checks metadata.labels for protected='true' and explicitly refuses to proceed with deletion until the label is removed. An unskilled report skips this check or attempts deletion regardless of protection labels.",
+        "question": "Does the report check for metadata.labels key 'protected' with value 'true' and describe removal via 'oc label vm <name> protected-' or equivalent?",
+        "reference": "A skilled report checks for the exact 'protected' label with value 'true' in metadata.labels and refuses deletion until removed via 'oc label vm <name> -n <ns> protected-'. An unskilled report either skips protection checks or uses a generic approach.",
     },
     {
-        "id": "typed_name_confirmation",
+        "id": "datavolume_discovery",
         "file": "/solution/report.md",
-        "question": "Does the report require the user to type the exact VM name (case-sensitive) to confirm deletion, rather than a simple yes/no prompt?",
-        "reference": "A skilled report requires typed name confirmation (e.g. 'Type legacy-app to confirm') with exact case-sensitive matching. An unskilled report uses generic 'Are you sure? y/n' confirmation which is less safe.",
+        "question": "Does the report discover associated DataVolumes using the vm.kubevirt.io/name label selector or reference cdi.kubevirt.io/v1beta1?",
+        "reference": "A skilled report finds DataVolumes via labelSelector vm.kubevirt.io/name=<vm-name> with apiVersion cdi.kubevirt.io/v1beta1. An unskilled report doesn't know the exact label key or GVK for associated storage discovery.",
     },
     {
-        "id": "no_force_delete",
+        "id": "printable_status",
         "file": "/solution/report.md",
-        "question": "Does the report explicitly state that --force or --grace-period=0 should NOT be used, or avoid recommending force deletion entirely?",
-        "reference": "A skilled report follows a 'No Force Delete' policy and handles stuck deletions via finalizer removal instead. An unskilled report suggests --force or --grace-period=0 as a first resort.",
+        "question": "Does the report reference status.printableStatus to determine if the VM is Running/Starting/Migrating (needs stop) vs Stopped/Halted (safe to proceed)?",
+        "reference": "A skilled report checks status.printableStatus for exact values: Running/Starting/Migrating means stop first, Stopped/Halted means safe to delete. An unskilled report vaguely checks 'if running' without the exact field path.",
     },
     {
-        "id": "storage_scope",
+        "id": "no_force_policy",
         "file": "/solution/report.md",
-        "question": "Does the report distinguish between VM-only deletion (preserving storage) and VM+storage deletion (removing DataVolumes and PVCs)?",
-        "reference": "A skilled report presents explicit options: delete VM only (preserve DataVolumes/PVCs for later) or delete VM + all associated storage. An unskilled report deletes everything without explaining the scope choice.",
+        "question": "Does the report explicitly forbid or avoid --force and --grace-period=0 for VM deletion?",
+        "reference": "A skilled report follows a 'No Force Delete' policy: never uses --force or --grace-period=0, instead handles stuck deletions via finalizer inspection. An unskilled report suggests force deletion as a troubleshooting step.",
     },
 ]
 

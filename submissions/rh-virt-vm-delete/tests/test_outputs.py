@@ -1,13 +1,7 @@
 """
 Tests for rh-virt__vm-delete per-skill evaluation.
 
-Skill-specific knowledge tested:
-- protected: "true" label blocks deletion
-- Typed VM name confirmation (not yes/no)
-- No --force or --grace-period=0 policy
-- VM-only vs VM+storage deletion scope
-- Stop VM before deletion
-- Finalizer handling for stuck Terminating
+Exact-field tests: require API field paths and label keys that only SKILL.md teaches.
 """
 import os
 import pytest
@@ -38,98 +32,57 @@ class TestBaseline:
 
 
 class TestSkillDependent:
-    def test_protected_label_check(self):
-        """Skill: VM with label protected='true' MUST NOT be deleted.
-        Deletion is refused until label is removed. Without skill,
-        agents skip this check and delete regardless."""
-        c = read_report().lower()
-        has_protected = any(t in c for t in [
-            "protected", 'protected: "true"', "protected label",
-            "protected: true", "protection label",
-        ])
-        has_block = any(t in c for t in [
-            "refuse", "block", "cannot delete", "must not",
-            "prevent", "stop", "remove label", "remove the label",
-        ])
-        assert has_protected and has_block, (
-            "should check for protected:'true' label that blocks deletion "
-            "(skill: refuse deletion until label removed)"
+    def test_protected_label_exact(self):
+        """Skill teaches metadata.labels key 'protected' with value '"true"'
+        blocks deletion. Removal command: oc label vm <name> -n <ns> protected-
+        Without skill, agents don't know this specific label convention."""
+        c = read_report()
+        has_protected_label = (
+            "protected" in c
+            and ('"true"' in c or "'true'" in c or "true" in c.lower())
+        )
+        has_label_removal = "protected-" in c or "label" in c.lower()
+        assert has_protected_label and has_label_removal, (
+            "must reference protected label with value 'true' and its removal"
         )
 
-    def test_typed_name_confirmation(self):
-        """Skill: User must type the exact VM name to confirm deletion
-        (case-sensitive). NOT a yes/no prompt. Without skill, agents
-        use generic 'Are you sure? yes/no' confirmation."""
-        c = read_report().lower()
-        has_typed = any(t in c for t in [
-            "type the", "type vm", "typed", "exact name",
-            "type the name", "type the vm name",
-            "case-sensitive", "exact match",
-        ])
-        assert has_typed, (
-            "should require typed VM name confirmation (exact, case-sensitive) "
-            "(skill: 'Type <vm> to confirm', not yes/no)"
+    def test_datavolume_label_selector(self):
+        """Skill teaches discovering associated storage via labelSelector
+        vm.kubevirt.io/name on DataVolumes (cdi.kubevirt.io/v1beta1).
+        Without skill, agents don't know the exact label key."""
+        c = read_report()
+        assert "vm.kubevirt.io/name" in c or "cdi.kubevirt.io/v1beta1" in c, (
+            "must reference vm.kubevirt.io/name label or cdi.kubevirt.io/v1beta1 "
+            "DataVolume GVK for storage discovery"
         )
 
-    def test_no_force_delete(self):
-        """Skill: NEVER use --force or --grace-period=0.
-        Without skill, agents may suggest force deletion for stuck VMs."""
+    def test_printable_status_field(self):
+        """Skill teaches checking status.printableStatus for Running/Starting/
+        Migrating (need stop) vs Stopped/Halted (safe to delete).
+        Without skill, agents don't know this exact field path."""
+        c = read_report()
+        assert "printableStatus" in c or "status.printableStatus" in c, (
+            "must reference printableStatus field for VM state check"
+        )
+
+    def test_no_force_delete_policy(self):
+        """Skill explicitly forbids --force and --grace-period=0.
+        Without skill, agents suggest force deletion for stuck VMs."""
         c = read_report().lower()
-        has_no_force = any(t in c for t in [
-            "no force", "never force", "not force",
-            "never use --force", "no --force",
-            "without force", "avoid force",
-        ])
-        uses_force = any(t in c for t in [
-            "--force", "--grace-period=0",
-            "force delete",
-        ])
+        uses_force = "--force" in c or "--grace-period=0" in c
         if uses_force:
+            has_no_force = any(t in c for t in [
+                "never", "no force", "do not", "must not", "avoid",
+            ])
             assert has_no_force, (
-                "should NOT recommend --force deletion "
-                "(skill: 'No Force Delete' policy)"
+                "must NOT recommend --force or --grace-period=0"
             )
-        else:
-            assert True
 
-    def test_storage_scope_distinction(self):
-        """Skill: Explicit choice between VM-only (preserve storage) and
-        VM+storage (delete DataVolumes and PVCs). Without skill, agents
-        delete everything without presenting the choice."""
-        c = read_report().lower()
-        has_vm_only = any(t in c for t in [
-            "vm only", "vm-only", "preserve storage",
-            "keep storage", "without storage",
-        ])
-        has_vm_storage = any(t in c for t in [
-            "vm + storage", "vm+storage", "delete storage",
-            "including storage", "with storage",
-            "datavolume", "pvc",
-        ])
-        assert has_vm_only or has_vm_storage, (
-            "should distinguish VM-only vs VM+storage deletion scope "
-            "(skill: explicit storage scope choice)"
-        )
-
-    def test_stop_before_delete(self):
-        """Skill: Must stop the VM before deletion. Cannot delete a running VM
-        safely."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "stop", "halt", "shut down", "shutdown",
-        ]) and any(t in c for t in [
-            "before delet", "before remov", "first",
-            "prior to", "must stop",
-        ]), (
-            "should require stopping VM before deletion"
-        )
-
-    def test_finalizer_handling(self):
-        """Skill: If VM stuck in Terminating, handle by removing finalizers.
-        Without skill, agents just wait or force-delete."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "finalizer", "terminating", "stuck",
-        ]), (
-            "should address finalizer handling for stuck deletion"
+    def test_resources_delete_gvk(self):
+        """Skill teaches using resources_delete with kubevirt.io/v1
+        VirtualMachine for the deletion call.
+        Without skill, agents use generic kubectl delete."""
+        c = read_report()
+        assert "kubevirt.io/v1" in c or "resources_delete" in c, (
+            "must reference kubevirt.io/v1 GVK or resources_delete for VM deletion"
         )

@@ -54,10 +54,11 @@ class TestSkillDependent:
         """Skill teaches spec.target with apiGroup: kubevirt.io and
         kind: VirtualMachine. Without skill, agents omit apiGroup."""
         c = read_report()
-        has_target = "spec.target" in c or "target" in c.lower()
-        has_api_group = "apiGroup" in c and "kubevirt.io" in c
-        assert has_target and has_api_group, (
-            "must specify spec.target with apiGroup: kubevirt.io"
+        assert "spec.target" in c, (
+            "must reference spec.target (not bare 'target')"
+        )
+        assert "apiGroup" in c and "kubevirt.io" in c, (
+            "must specify apiGroup: kubevirt.io in spec.target"
         )
 
     def test_status_complete_field(self):

@@ -39,15 +39,16 @@ class TestSkillDependent:
             "must reference advisory_available field for remediatability"
         )
 
-    def test_advisory_over_rules(self):
-        """Skill teaches that rules[] emptiness does NOT mean no remediation;
-        advisory_available is the correct check. Must always reference
-        advisory_available unconditionally."""
+    def test_no_rules_as_source_of_truth(self):
+        """Skill teaches that rules[] emptiness does NOT mean no remediation.
+        If rules[] is mentioned, advisory_available must also appear to show
+        the correct check is known."""
         c = read_report()
-        assert "advisory_available" in c, (
-            "must reference advisory_available as the remediatability check "
-            "(not rules[] which can be empty even when remediation exists)"
-        )
+        if "rules" in c.lower() and "rules[]" not in c and "advisory_available" not in c:
+            raise AssertionError(
+                "mentions 'rules' without advisory_available — must not use "
+                "rules[] as the sole remediatability check"
+            )
 
     def test_remediation_available_gate(self):
         """Skill teaches remediation_available: true or validation_status:

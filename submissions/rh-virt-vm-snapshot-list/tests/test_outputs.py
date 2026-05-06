@@ -62,15 +62,19 @@ class TestSkillDependent:
         """Skill teaches exact status.phase values: InProgress, Succeeded,
         Failed. Without skill, agents use generic status descriptions."""
         c = read_report()
-        exact_count = sum(1 for v in ["InProgress", "Succeeded", "Failed"] if v in c)
-        assert exact_count >= 2, (
-            "must reference exact phase values: InProgress, Succeeded, Failed"
-        )
+        for phase in ["InProgress", "Succeeded", "Failed"]:
+            assert phase in c, (
+                f"must reference exact phase value: {phase}"
+            )
 
-    def test_status_conditions_troubleshooting(self):
-        """Skill teaches inspecting status.conditions on the snapshot
-        for error details when readyToUse is false."""
+    def test_ready_to_use_false_troubleshooting(self):
+        """Skill teaches that readyToUse == false is the trigger for
+        troubleshooting. Generic 'conditions' appears everywhere."""
         c = read_report()
-        assert "status.conditions" in c or "conditions" in c.lower(), (
-            "must reference status.conditions for troubleshooting failed snapshots"
+        has_ready_false = (
+            "readyToUse" in c
+            and ("false" in c.lower() or "not ready" in c.lower())
+        )
+        assert has_ready_false, (
+            "must reference readyToUse == false as troubleshooting trigger"
         )

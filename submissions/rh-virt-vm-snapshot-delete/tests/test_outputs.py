@@ -1,7 +1,7 @@
 """
 Tests for rh-virt__vm-snapshot-delete per-skill evaluation.
-Baseline tests: report structure.
-Skill-dependent tests: conceptual checks (no exact tool/field name matching).
+
+Exact-field tests: require API field paths and GVKs that only SKILL.md teaches.
 """
 import os
 import pytest
@@ -15,57 +15,60 @@ def read_report():
     with open(REPORT) as f:
         return f.read()
 
+
 class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
     def test_mentions_snapshot(self):
         content = read_report().lower()
-        assert "snapshot" in content, "report should mention snapshots"
+        assert "snapshot" in content
 
-    def test_mentions_deletion(self):
-        content = read_report().lower()
-        assert "delet" in content, "report should discuss deletion"
+    def test_report_has_structure(self):
+        content = read_report()
+        assert len(content) > 200, "report should have substantial content"
 
 
 class TestSkillDependent:
-    def test_restore_conflict_check(self):
-        """Skill: Active VirtualMachineRestore blocks snapshot deletion."""
-        c = read_report().lower()
-        assert any(t in c for t in ["virtualmachinerestore", "restore", "in use", "active restore", "block delet"]) and (
-            "restore" in c or "conflict" in c
-        ), (
-            "should check for active restore blocking deletion"
+    def test_snapshot_gvk(self):
+        """Skill teaches snapshot.kubevirt.io/v1beta1 as the apiVersion
+        for VirtualMachineSnapshot resources."""
+        c = read_report()
+        assert "snapshot.kubevirt.io/v1beta1" in c, (
+            "must reference snapshot.kubevirt.io/v1beta1 GVK"
         )
 
-    def test_last_snapshot_warning(self):
-        """Skill: Warn when deleting the only snapshot for a VM."""
-        c = read_report().lower()
-        assert any(t in c for t in ["last snapshot", "only snapshot", "no recovery", "only remaining", "no other snapshot"]) or (
-            "last" in c and "snapshot" in c and ("warn" in c or "only" in c)
-        ), (
-            "should warn when deleting the last snapshot for a VM"
+    def test_restore_in_use_check(self):
+        """Skill teaches checking for active VirtualMachineRestore resources
+        before deleting a snapshot. Without skill, agents skip this check."""
+        c = read_report()
+        assert "VirtualMachineRestore" in c, (
+            "must check VirtualMachineRestore for in-use snapshots"
         )
 
-    def test_storage_reclaim(self):
-        """Skill: Storage freed by deletion; recovery point lost."""
-        c = read_report().lower()
-        assert any(t in c for t in ["storage freed", "storage reclaim", "freed", "recovery point"]), (
-            "should mention storage reclamation or recovery point loss"
+    def test_spec_source_name(self):
+        """Skill teaches reading spec.source.name to identify the source VM
+        of a snapshot. Without skill, agents guess from the snapshot name."""
+        c = read_report()
+        assert "spec.source.name" in c or "spec.source" in c, (
+            "must reference spec.source.name to identify source VM"
         )
 
-    def test_virtualmachinesnapshot_delete(self):
-        """Skill: Delete VirtualMachineSnapshot resource."""
-        c = read_report().lower()
-        assert any(t in c for t in ["virtualmachinesnapshot", "resources_delete", "delete snapshot"]) and (
-            "snapshot" in c
-        ), (
-            "should reference VirtualMachineSnapshot deletion"
+    def test_label_selector_for_siblings(self):
+        """Skill teaches using vm.kubevirt.io/name labelSelector to find
+        sibling snapshots, with fallback to spec.source.name filtering."""
+        c = read_report()
+        has_label = "vm.kubevirt.io/name" in c
+        has_fallback = "spec.source.name" in c
+        assert has_label or has_fallback, (
+            "must use vm.kubevirt.io/name label or spec.source.name for sibling discovery"
         )
 
-    def test_list_other_snapshots(self):
-        """Skill: List other snapshots for same VM before delete."""
-        c = read_report().lower()
-        assert any(t in c for t in ["spec.source.name", "label selector", "vm.kubevirt.io/name", "other snapshot", "list snapshot", "same vm"]), (
-            "should list other snapshots for the VM"
+    def test_rbac_check(self):
+        """Skill teaches verifying delete permission on
+        snapshot.kubevirt.io/virtualmachinesnapshots."""
+        c = read_report()
+        has_rbac = "virtualmachinesnapshots" in c.lower() or "can-i" in c
+        assert has_rbac, (
+            "must verify RBAC for deleting virtualmachinesnapshots"
         )

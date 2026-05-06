@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "restore_conflict", "file": "/solution/report.md", "question": "Does the report check for active VirtualMachineRestore before deleting a snapshot?", "reference": "A skilled report checks for active restores. An unskilled report deletes without checking conflicts."},
-  {"id": "last_snapshot_warning", "file": "/solution/report.md", "question": "Does the report warn when deleting the only remaining snapshot for a VM?", "reference": "A skilled report warns about loss of last recovery point. An unskilled report deletes without warning."},
-  {"id": "label_selector_filter", "file": "/solution/report.md", "question": "Does the report use spec.source.name or vm.kubevirt.io/name label to list other snapshots for the same VM?", "reference": "A skilled report uses proper filtering to find related snapshots. An unskilled report lists all snapshots without VM filtering."}
+    {
+        "id": "snapshot_gvk",
+        "file": "/solution/report.md",
+        "question": "Does the report reference the exact apiVersion snapshot.kubevirt.io/v1beta1 for VirtualMachineSnapshot resources?",
+        "reference": "A skilled report uses snapshot.kubevirt.io/v1beta1 as the GVK. An unskilled report uses wrong or missing apiVersions.",
+    },
+    {
+        "id": "restore_check",
+        "file": "/solution/report.md",
+        "question": "Does the report check for active VirtualMachineRestore resources that might reference the snapshot before deletion?",
+        "reference": "A skilled report lists VirtualMachineRestore resources to ensure no active restore depends on the snapshot. An unskilled report deletes without checking for in-use references.",
+    },
+    {
+        "id": "spec_source",
+        "file": "/solution/report.md",
+        "question": "Does the report reference spec.source.name to identify the source VM of a snapshot?",
+        "reference": "A skilled report reads spec.source.name from the VirtualMachineSnapshot to confirm the source VM. An unskilled report infers the VM from the snapshot name.",
+    },
+    {
+        "id": "sibling_discovery",
+        "file": "/solution/report.md",
+        "question": "Does the report use vm.kubevirt.io/name labelSelector or spec.source.name filtering to find sibling snapshots?",
+        "reference": "A skilled report finds sibling snapshots via labelSelector vm.kubevirt.io/name or by filtering on spec.source.name. An unskilled report doesn't check for other recovery points.",
+    },
 ]
 
 SYSTEM_PROMPT = (

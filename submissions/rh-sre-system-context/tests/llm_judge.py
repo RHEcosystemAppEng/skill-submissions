@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "infrastructure_classification", "file": "/solution/report.md", "question": "Does the report classify systems by infrastructure_type (bare_metal/virtualized/container) and infrastructure_vendor?", "reference": "A skilled report uses infrastructure classification fields. An unskilled report doesn't distinguish infrastructure types."},
-  {"id": "kubernetes_safety_context", "file": "/solution/report.md", "question": "Does the report consider Kubernetes context (PDBs, daemonsets) for safe remediation planning?", "reference": "A skilled report checks hasPdbs and daemonsets for safety. An unskilled report ignores K8s workload context."},
-  {"id": "staged_rollout", "file": "/solution/report.md", "question": "Does the report recommend staged rollout (staging first, then production batches) based on environment criticality?", "reference": "A skilled report follows staged rollout pattern. An unskilled report patches all systems simultaneously."}
+    {
+        "id": "infrastructure_classification",
+        "file": "/solution/report.md",
+        "question": "Does the report classify systems by specific infrastructure_type values (bare_metal, virtualized, container) and reference infrastructure_vendor (e.g. kvm)?",
+        "reference": "A skilled report uses the specific field values bare_metal, virtualized, container for infrastructure_type and mentions infrastructure_vendor. An unskilled report uses generic terms like 'physical' or 'cloud' without the specific classification fields.",
+    },
+    {
+        "id": "needs_restarting",
+        "file": "/solution/report.md",
+        "question": "Does the report mention the 'needs-restarting' command (with -r flag for reboot check or -s for services) as part of post-patch assessment?",
+        "reference": "A skilled report references the RHEL-specific 'needs-restarting' utility to determine if reboot or service restarts are needed after patching. An unskilled report either assumes reboot is always needed or skips this check entirely.",
+    },
+    {
+        "id": "pdb_and_eviction",
+        "file": "/solution/report.md",
+        "question": "Does the report check for PodDisruptionBudgets (PDBs) before recommending node drain or pod eviction for Kubernetes nodes?",
+        "reference": "A skilled report checks hasPdbs and considers PodDisruptionBudgets before draining Kubernetes nodes, ensuring service availability. An unskilled report drains nodes without checking PDBs, risking service disruption.",
+    },
+    {
+        "id": "staged_rollout",
+        "file": "/solution/report.md",
+        "question": "Does the report recommend a staged rollout strategy where staging/test environments are remediated first, followed by production in batches?",
+        "reference": "A skilled report follows a staged approach: validate in staging first, then deploy to production in controlled batches with approval gates. An unskilled report patches all systems simultaneously or in arbitrary order.",
+    },
 ]
 
 SYSTEM_PROMPT = (

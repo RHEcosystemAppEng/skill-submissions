@@ -12,28 +12,28 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "stale_detection",
+        "id": "exact_status_strings",
         "file": "/solution/report.md",
-        "question": "Does the report flag stale systems using a specific threshold (7 days or similar) based on last check-in time?",
-        "reference": "A skilled report uses the stale boolean field or last_seen timestamp with a 7-day threshold to identify non-reporting systems. An unskilled report either uses an arbitrary threshold, doesn't check staleness, or just lists all systems without freshness assessment.",
+        "question": "Does the report use the exact case-sensitive status strings 'Vulnerable', 'Patched', and 'Not Affected' when reporting per-system CVE status?",
+        "reference": "A skilled report uses the exact API strings: Vulnerable, Patched, Not Affected (case-sensitive). An unskilled report uses generic lowercase terms like 'affected' or 'fixed'.",
     },
     {
-        "id": "vulnerability_status_strings",
+        "id": "stale_last_seen",
         "file": "/solution/report.md",
-        "question": "Does the report use specific per-system vulnerability status classifications like 'Vulnerable', 'Patched', and 'Not Affected'?",
-        "reference": "A skilled report uses the exact status strings from get_cve_systems: Vulnerable (unpatched), Patched (remediated), Not Affected (not vulnerable). An unskilled report uses generic terms like 'at risk' or 'safe' without the specific API status values.",
+        "question": "Does the report reference the 'stale' boolean field and 'last_seen' timestamp from the API to identify systems with outdated check-ins?",
+        "reference": "A skilled report checks the stale boolean and last_seen timestamp, knowing stale means >7 days since check-in. An unskilled report either skips staleness or uses arbitrary thresholds.",
     },
     {
-        "id": "system_id_tracking",
+        "id": "remediation_available",
         "file": "/solution/report.md",
-        "question": "Does the report track system UUIDs or system_id values (not just hostnames) to enable programmatic remediation follow-up?",
-        "reference": "A skilled report captures machine-usable system identifiers (UUIDs) that can be passed to remediation APIs. An unskilled report only lists human-readable hostnames without actionable identifiers.",
+        "question": "Does the report reference the remediation_available flag for filtering which vulnerabilities have actionable remediation?",
+        "reference": "A skilled report filters by remediation_available to identify CVEs that can be patched. An unskilled report doesn't know this field exists and treats all CVEs the same.",
     },
     {
-        "id": "compliance_readiness",
+        "id": "get_cve_systems_tool",
         "file": "/solution/report.md",
-        "question": "Does the report flag systems running unsupported or end-of-life RHEL versions as compliance risks?",
-        "reference": "A skilled report identifies EOL RHEL versions as compliance gaps requiring upgrade or decommission. An unskilled report lists versions without highlighting support status.",
+        "question": "Does the report reference the get_cve_systems tool or use uppercase CVE-YYYY-NNNNN format for querying affected systems?",
+        "reference": "A skilled report uses get_cve_systems with CVE IDs in uppercase CVE-YYYY-NNNNN format. An unskilled report uses wrong tools or doesn't know the correct CVE ID format.",
     },
 ]
 

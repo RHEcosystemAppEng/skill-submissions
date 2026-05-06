@@ -1,11 +1,7 @@
 """
 Tests for rh-sre__fleet-inventory per-skill evaluation.
 
-Skill-specific knowledge tested:
-- Stale = <7 days check-in (stale boolean field, last_seen)
-- Per-system CVE status strings: Vulnerable, Patched, Not Affected
-- System UUID tracking for remediation follow-up
-- get_host_details for fleet vs get_cve_systems for CVE queries
+Exact-field tests: require API field names and status strings that only SKILL.md teaches.
 """
 import os
 import pytest
@@ -36,83 +32,52 @@ class TestBaseline:
 
 
 class TestSkillDependent:
-    def test_stale_7_day_heuristic(self):
-        """Skill: Stale systems are those that haven't checked in within 7
-        days (stale boolean field, last_seen timestamp). Without skill,
-        agents use arbitrary thresholds or skip staleness checks."""
-        c = read_report().lower()
-        has_stale = any(t in c for t in [
-            "stale", "last_seen", "last seen",
-            "last check-in", "last checkin",
-        ])
-        has_threshold = any(t in c for t in [
-            "7 day", "7 days", "seven day", "week",
-        ])
-        assert has_stale and has_threshold, (
-            "should flag stale systems using <7 day check-in heuristic "
-            "(skill: stale boolean field, 7-day threshold)"
+    def test_exact_vulnerability_status_strings(self):
+        """Skill teaches exact case-sensitive status strings from
+        get_cve_systems: 'Vulnerable', 'Patched', 'Not Affected'.
+        Without skill, agents use lowercase generic terms."""
+        c = read_report()
+        exact_count = sum(1 for s in ["Vulnerable", "Patched", "Not Affected"] if s in c)
+        assert exact_count >= 2, (
+            "must use exact status strings: Vulnerable, Patched, Not Affected "
+            "(case-sensitive as returned by API)"
         )
 
-    def test_per_system_vulnerability_status(self):
-        """Skill: Per-system CVE status uses specific strings: Vulnerable,
-        Patched, Not Affected. Without skill, agents use generic terms."""
-        c = read_report().lower()
-        status_strings = sum(1 for t in [
-            "vulnerable", "patched", "not affected",
-        ] if t in c)
-        assert status_strings >= 2, (
-            "should use specific per-system vulnerability status strings: "
-            "Vulnerable, Patched, Not Affected (skill: get_cve_systems response)"
+    def test_stale_field(self):
+        """Skill teaches the 'stale' boolean field from get_host_details
+        and that stale means check-in older than 7 days.
+        Without skill, agents don't know this field name."""
+        c = read_report()
+        has_stale_field = "stale" in c.lower()
+        has_last_seen = "last_seen" in c
+        assert has_stale_field and has_last_seen, (
+            "must reference both stale flag and last_seen field from API"
         )
 
-    def test_system_uuid_tracking(self):
-        """Skill: Track system UUIDs (not just hostnames) to enable
-        programmatic remediation API calls. Without skill, agents
-        only list display names."""
-        c = read_report().lower()
-        has_uuid = any(t in c for t in [
-            "system_id", "system id", "uuid", "system_uuid",
-            "identifier",
-        ])
-        has_followup = any(t in c for t in [
-            "remediat", "follow-up", "follow up", "action",
-            "track", "subsequent",
-        ])
-        assert has_uuid and has_followup, (
-            "should track system UUIDs for remediation follow-up "
-            "(skill: system_id for API calls)"
+    def test_remediation_available_flag(self):
+        """Skill teaches remediation_available flag on per-system CVE data
+        for filtering actionable vulnerabilities.
+        Without skill, agents don't know this field exists."""
+        c = read_report()
+        assert "remediation_available" in c, (
+            "must reference remediation_available field for filtering"
         )
 
-    def test_rhel_version_distribution(self):
-        """Skill: Report RHEL version distribution across fleet."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "rhel 7", "rhel 8", "rhel 9",
-            "rhel7", "rhel8", "rhel9",
-            "el7", "el8", "el9",
-            "version distribution", "rhel version",
-        ]), (
-            "should report RHEL version distribution across the fleet"
+    def test_get_cve_systems_tool(self):
+        """Skill teaches get_cve_systems with uppercase CVE-YYYY-NNNNN format
+        for querying affected systems per CVE.
+        Without skill, agents use wrong tool or parameter format."""
+        c = read_report()
+        has_tool = "get_cve_systems" in c
+        has_cve_format = "CVE-" in c
+        assert has_tool or has_cve_format, (
+            "must reference get_cve_systems tool or CVE-YYYY-NNNNN format"
         )
 
-    def test_unsupported_rhel_flagged(self):
-        """Skill: Flag systems running unsupported/EOL RHEL versions as
-        compliance risks."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "unsupported", "end of life", "eol", "end-of-life",
-            "deprecated", "out of support",
-        ]), (
-            "should flag unsupported RHEL versions as compliance risk"
-        )
-
-    def test_next_steps_offered(self):
-        """Skill: Offer transition to remediation workflow for vulnerable
-        systems."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "next step", "remediate", "playbook",
-            "remediation", "action item",
-        ]), (
-            "should offer next steps for remediation of vulnerable systems"
+    def test_display_name_and_fqdn(self):
+        """Skill teaches display_name and fqdn as host identification fields
+        from get_host_details. Without skill, agents use generic 'hostname'."""
+        c = read_report()
+        assert "display_name" in c or "fqdn" in c, (
+            "must reference display_name or fqdn field from get_host_details"
         )

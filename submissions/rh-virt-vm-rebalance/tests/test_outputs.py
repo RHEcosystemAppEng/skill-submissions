@@ -38,12 +38,17 @@ class TestSkillDependent:
             "must reference spec.domain.cpu field path for VM CPU allocation"
         )
 
-    def test_node_capacity_field_path(self):
-        """Skill teaches node total from status.capacity.cpu and
-        status.capacity.memory. Without skill, agents use runtime usage."""
+    def test_kvm_allocatable_field(self):
+        """Skill teaches checking status.allocatable for
+        devices.kubevirt.io/kvm to confirm node can run VMs.
+        status.capacity.cpu/memory is standard K8s — no uplift."""
         c = read_report()
-        assert "status.capacity" in c or "capacity.cpu" in c or "capacity.memory" in c, (
-            "must reference status.capacity field path for node resources"
+        has_allocatable_kvm = (
+            "allocatable" in c.lower() and "devices.kubevirt.io/kvm" in c
+        )
+        has_kvm_capacity = "devices.kubevirt.io/kvm" in c
+        assert has_allocatable_kvm or has_kvm_capacity, (
+            "must reference devices.kubevirt.io/kvm in allocatable/capacity"
         )
 
     def test_kvm_device_label(self):

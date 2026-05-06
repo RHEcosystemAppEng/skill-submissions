@@ -36,11 +36,13 @@ class TestSkillDependent:
         atomic restart call. Without skill, agents use one restart command."""
         c = read_report().lower()
         has_stop = "stop" in c
-        has_wait = any(t in c for t in ["wait", "5 second", "delay", "pause"])
         has_start = "start" in c
+        has_explicit_wait = "5" in c and any(
+            t in c for t in ["second", "sec", "s wait", "s delay", "s pause"]
+        )
         has_sequence = has_stop and has_start
-        assert has_sequence and has_wait, (
-            "must decompose restart into stop/wait/start sequence"
+        assert has_sequence and has_explicit_wait, (
+            "must decompose restart into stop/wait 5s/start sequence"
         )
 
     def test_printable_status_polling(self):

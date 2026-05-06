@@ -39,16 +39,15 @@ class TestSkillDependent:
             "must reference advisory_available field for remediatability"
         )
 
-    def test_not_rules_array(self):
-        """Skill teaches that rules[] emptiness does NOT mean no remediation.
-        Without skill, agents use rules[] as the source of truth."""
-        c = read_report().lower()
-        if "rules" in c:
-            has_advisory = "advisory_available" in read_report()
-            assert has_advisory, (
-                "if mentioning rules[], must also reference advisory_available "
-                "as the correct remediatability check"
-            )
+    def test_advisory_over_rules(self):
+        """Skill teaches that rules[] emptiness does NOT mean no remediation;
+        advisory_available is the correct check. Must always reference
+        advisory_available unconditionally."""
+        c = read_report()
+        assert "advisory_available" in c, (
+            "must reference advisory_available as the remediatability check "
+            "(not rules[] which can be empty even when remediation exists)"
+        )
 
     def test_remediation_available_gate(self):
         """Skill teaches remediation_available: true or validation_status:
@@ -62,10 +61,10 @@ class TestSkillDependent:
 
     def test_advisories_list_field(self):
         """Skill teaches using advisories_list for remediation details.
-        Without skill, agents don't know this field exists."""
+        Generic 'advisories' is too loose."""
         c = read_report()
-        assert "advisories_list" in c or "advisories" in c.lower(), (
-            "must reference advisories_list field"
+        assert "advisories_list" in c, (
+            "must reference advisories_list field (not generic 'advisories')"
         )
 
     def test_absolute_playbook_path(self):

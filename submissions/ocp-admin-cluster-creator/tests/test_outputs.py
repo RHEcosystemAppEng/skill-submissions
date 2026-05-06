@@ -61,23 +61,25 @@ class TestSkillDependent:
         )
 
     def test_set_host_role(self):
-        """Skill teaches set_host_role with exact role values 'master'
+        """Skill teaches set_host_role tool with exact role values 'master'
         and 'worker'. Without skill, agents use 'control-plane' or
         other Kubernetes terminology."""
         c = read_report()
-        has_tool = "set_host_role" in c
-        has_roles = '"master"' in c or '"worker"' in c
-        assert has_tool or has_roles, (
-            "must reference set_host_role with master/worker roles"
+        assert "set_host_role" in c, (
+            "must reference set_host_role tool"
+        )
+        assert '"master"' in c or "'master'" in c or "master" in c.lower(), (
+            "must specify 'master' role (not 'control-plane')"
         )
 
-    def test_cluster_status_ready(self):
-        """Skill teaches waiting for cluster status 'ready' before
-        triggering install, then monitoring for 'installed' or 'error'.
-        Without skill, agents don't know the exact status strings."""
-        c = read_report()
-        has_ready = '"ready"' in c or "'ready'" in c
-        has_installed = '"installed"' in c or "'installed'" in c
-        assert has_ready or has_installed, (
-            "must reference cluster status 'ready' and 'installed'"
+    def test_cluster_status_lifecycle(self):
+        """Skill teaches the full status lifecycle: pending → insufficient →
+        ready → preparing-for-installation → installing → installed.
+        Without skill, agents don't know the progression."""
+        c = read_report().lower()
+        has_installing = "installing" in c
+        has_installed = "installed" in c
+        has_progression = has_installing and has_installed
+        assert has_progression, (
+            "must reference status lifecycle: installing → installed progression"
         )

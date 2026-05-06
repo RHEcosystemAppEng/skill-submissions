@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "volume_snapshot_class", "file": "/solution/report.md", "question": "Does the report check for VolumeSnapshotClass as a prerequisite for CSI snapshot support?", "reference": "A skilled report verifies VolumeSnapshotClass exists. An unskilled report attempts snapshots without checking prerequisites."},
-  {"id": "hot_plugged_blocker", "file": "/solution/report.md", "question": "Does the report note that hot-plugged volumes block snapshot creation entirely?", "reference": "A skilled report checks for hot-plugged volumes. An unskilled report doesn't know about this blocker."},
-  {"id": "consistency_levels", "file": "/solution/report.md", "question": "Does the report distinguish application-consistent (GuestAgent) from crash-consistent (Online only) snapshots?", "reference": "A skilled report checks status.indications for GuestAgent presence. An unskilled report doesn't distinguish consistency levels."}
+    {
+        "id": "guest_agent_consistency",
+        "file": "/solution/report.md",
+        "question": "Does the report explain that GuestAgent presence (in status.indications or AgentConnected condition) determines whether the snapshot is application-consistent (with filesystem freeze/thaw) vs crash-consistent?",
+        "reference": "A skilled report checks for GuestAgent in status.indications: if present, the snapshot is application-consistent (filesystem quiesce). If Online without GuestAgent, it's crash-consistent only. An unskilled report doesn't check guest agent status or doesn't distinguish consistency levels.",
+    },
+    {
+        "id": "hot_plug_blocker",
+        "file": "/solution/report.md",
+        "question": "Does the report identify hot-plugged volumes as a blocker that prevents snapshot creation entirely?",
+        "reference": "A skilled report warns that hot-plugged volumes (attached after VM creation without restart) block snapshot creation and must be made permanent or removed first. An unskilled report doesn't mention this blocker.",
+    },
+    {
+        "id": "volume_snapshot_class",
+        "file": "/solution/report.md",
+        "question": "Does the report verify VolumeSnapshotClass exists as a prerequisite before attempting snapshot creation?",
+        "reference": "A skilled report checks for VolumeSnapshotClass matching the CSI driver as a mandatory prerequisite. An unskilled report attempts to create snapshots without verifying storage snapshot support.",
+    },
+    {
+        "id": "snapshot_monitoring",
+        "file": "/solution/report.md",
+        "question": "Does the report describe monitoring snapshot progress via status.phase (InProgress/Succeeded/Failed) and readyToUse indicator?",
+        "reference": "A skilled report explains the snapshot status lifecycle: InProgress during creation, Succeeded when complete, readyToUse=true when consumable, and status.indications for consistency metadata. An unskilled report doesn't explain monitoring.",
+    },
 ]
 
 SYSTEM_PROMPT = (

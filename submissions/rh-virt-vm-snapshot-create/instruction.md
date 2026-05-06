@@ -1,15 +1,17 @@
 # VM Snapshot Creation Task
 
-You are an OpenShift Virtualization administrator. Create a snapshot of VM `production-db` in namespace `prod-vms`.
+You are an OpenShift Virtualization administrator. Create a snapshot of a running VM `production-db` in namespace `prod-vms` before applying a critical patch.
+
+## Scenario
+The VM `production-db` is a database server that is currently running. It may or may not have the QEMU guest agent installed. It has multiple disks including some that may have been hot-plugged. You need to plan and execute a snapshot while understanding exactly what consistency level you will achieve and what blockers might prevent the snapshot.
 
 ## Requirements
-- **Prerequisites**: Verify the cluster supports snapshots (VolumeSnapshotClass exists for the CSI driver). Check whether the QEMU guest agent is running on the VM to determine if application-consistent snapshots are possible, or only crash-consistent.
-- **Hot-plug check**: Determine if the VM has any hot-plugged volumes, as these can block snapshot creation.
-- **Snapshot specification**: Define the VirtualMachineSnapshot CR with the correct apiVersion, kind, and spec.source referencing the target VM.
-- **Consistency levels**: Explain the difference between application-consistent (quiesce/freeze via guest agent) and crash-consistent snapshots. Document which level applies to this VM and why.
-- **Monitoring**: Describe how to monitor snapshot progress — status phases (InProgress, Succeeded, Failed), readyToUse indicator, and status.indications fields.
-- **Failure modes**: Document what can go wrong (storage full, guest agent not responding, hot-plug blockers) and how to handle each.
+- Check all prerequisites that must exist before a snapshot can be created
+- Determine the snapshot consistency level you will achieve for this specific VM and explain your reasoning
+- Identify any conditions that would block snapshot creation entirely
+- Define the snapshot CR specification
+- Describe how to monitor snapshot progress and interpret the results
 
-Use MCP tools to examine the cluster. Work autonomously — do not wait for user confirmation at any step. Document your methodology, findings, and snapshot plan in `/solution/report.md`.
+Write your complete snapshot plan in `/solution/report.md`.
 
-If reference documentation or skills are available in this environment, consult them before beginning work.
+Use MCP tools to examine the cluster. If reference documentation or skills are available in this environment, consult them before beginning work. Complete the entire analysis autonomously — do not stop for user confirmation.

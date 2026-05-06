@@ -12,34 +12,28 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "allocation_based_capacity",
+        "id": "cpu_allocation_field",
         "file": "/solution/report.md",
-        "question": "Does the report calculate node utilization percentages based on VM resource ALLOCATIONS (vCPUs, memory requests) vs node capacity, rather than using runtime metrics from nodes_top?",
-        "reference": "A skilled report sums VM allocations (spec.domain.cpu, spec.domain.memory.guest) and divides by node capacity (status.capacity) to get utilization. An unskilled report uses nodes_top runtime usage, which shows low numbers for idle VMs and gives misleading rebalance decisions.",
+        "question": "Does the report reference the exact field path spec.domain.cpu (sockets/cores/threads) for per-VM CPU allocation calculations?",
+        "reference": "A skilled report uses spec.domain.cpu.sockets * cores * threads from VirtualMachineInstance to calculate VM CPU allocations. An unskilled report uses nodes_top runtime metrics which show misleadingly low numbers for idle VMs.",
     },
     {
-        "id": "rwo_cold_only",
+        "id": "node_capacity_field",
         "file": "/solution/report.md",
-        "question": "Does the report identify that VMs with RWO (ReadWriteOnce) storage cannot be live migrated and must use cold migration?",
-        "reference": "A skilled report checks PVC access modes and flags RWO as requiring cold migration (stop, move, start). An unskilled report attempts live migration on all VMs regardless of storage type, or doesn't check storage at all.",
+        "question": "Does the report reference status.capacity (cpu, memory) for node resource totals, computing allocation percentages as allocated/capacity?",
+        "reference": "A skilled report divides summed VM allocations by status.capacity.cpu and status.capacity.memory. An unskilled report uses runtime utilization from nodes_top.",
     },
     {
-        "id": "overcommit_detection",
+        "id": "vmim_cr",
         "file": "/solution/report.md",
-        "question": "Does the report check whether any node would exceed 100% allocated capacity after rebalancing, and warn about overcommit if so?",
-        "reference": "A skilled report calculates post-migration allocated capacity and warns if any node exceeds 100% (CPU throttling risk, memory eviction risk). An unskilled report moves VMs without verifying the target node can handle the additional allocations.",
+        "question": "Does the report reference VirtualMachineInstanceMigration as the KubeVirt CR for executing live migrations?",
+        "reference": "A skilled report creates a VirtualMachineInstanceMigration CR to trigger live migration. An unskilled report uses generic kubectl drain or doesn't specify the migration mechanism.",
     },
     {
-        "id": "cold_migration_procedure",
+        "id": "kvm_node_filter",
         "file": "/solution/report.md",
-        "question": "Does the report describe the correct cold migration procedure: stop VM, set nodeAffinity to target node, then start VM?",
-        "reference": "A skilled report follows the correct cold migration sequence: stop the VM, update nodeAffinity in the VM spec to pin it to the target, then start it. An unskilled report either just restarts hoping for different placement or uses only kubectl drain.",
-    },
-    {
-        "id": "migration_type_distinction",
-        "file": "/solution/report.md",
-        "question": "Does the report clearly distinguish between live migration (RWX, near-zero downtime) and cold migration (RWO, brief downtime) for different VMs?",
-        "reference": "A skilled report assigns the correct migration type per VM based on storage access mode: live for RWX (VirtualMachineInstanceMigration), cold for RWO (stop/affinity/start). An unskilled report uses a single migration method for all VMs.",
+        "question": "Does the report filter eligible target nodes using devices.kubevirt.io/kvm or kubevirt.io/schedulable labels?",
+        "reference": "A skilled report checks devices.kubevirt.io/kvm > 0 and kubevirt.io/schedulable=true to identify KVM-capable worker nodes. An unskilled report assumes all worker nodes can host VMs.",
     },
 ]
 

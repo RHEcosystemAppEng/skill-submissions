@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "protected_label", "file": "/solution/report.md", "question": "Does the report check for protected: true label that blocks deletion?", "reference": "A skilled report checks protection labels. An unskilled report attempts deletion without safety checks."},
-  {"id": "storage_scope", "file": "/solution/report.md", "question": "Does the report distinguish VM-only vs VM+storage deletion and warn about orphaned PVCs?", "reference": "A skilled report offers storage scope choice. An unskilled report deletes everything without distinction."},
-  {"id": "typed_confirmation", "file": "/solution/report.md", "question": "Does the report require typed VM name confirmation (exact, case-sensitive) before deletion?", "reference": "A skilled report requires exact name match confirmation. An unskilled report uses yes/no confirmation."}
+    {
+        "id": "protected_label",
+        "file": "/solution/report.md",
+        "question": "Does the report check for a 'protected: true' label on the VM and refuse deletion if it is present?",
+        "reference": "A skilled report checks metadata.labels for protected='true' and explicitly refuses to proceed with deletion until the label is removed. An unskilled report skips this check or attempts deletion regardless of protection labels.",
+    },
+    {
+        "id": "typed_name_confirmation",
+        "file": "/solution/report.md",
+        "question": "Does the report require the user to type the exact VM name (case-sensitive) to confirm deletion, rather than a simple yes/no prompt?",
+        "reference": "A skilled report requires typed name confirmation (e.g. 'Type legacy-app to confirm') with exact case-sensitive matching. An unskilled report uses generic 'Are you sure? y/n' confirmation which is less safe.",
+    },
+    {
+        "id": "no_force_delete",
+        "file": "/solution/report.md",
+        "question": "Does the report explicitly state that --force or --grace-period=0 should NOT be used, or avoid recommending force deletion entirely?",
+        "reference": "A skilled report follows a 'No Force Delete' policy and handles stuck deletions via finalizer removal instead. An unskilled report suggests --force or --grace-period=0 as a first resort.",
+    },
+    {
+        "id": "storage_scope",
+        "file": "/solution/report.md",
+        "question": "Does the report distinguish between VM-only deletion (preserving storage) and VM+storage deletion (removing DataVolumes and PVCs)?",
+        "reference": "A skilled report presents explicit options: delete VM only (preserve DataVolumes/PVCs for later) or delete VM + all associated storage. An unskilled report deletes everything without explaining the scope choice.",
+    },
 ]
 
 SYSTEM_PROMPT = (

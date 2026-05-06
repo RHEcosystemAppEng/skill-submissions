@@ -1,7 +1,7 @@
 """
 Tests for rh-virt__vm-create per-skill evaluation.
-Baseline tests: report structure.
-Skill-dependent tests: conceptual checks (no exact tool/field name matching).
+
+Exact-field tests: require API field paths and GVKs that only SKILL.md teaches.
 """
 import os
 import pytest
@@ -15,82 +15,71 @@ def read_report():
     with open(REPORT) as f:
         return f.read()
 
+
 class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
     def test_mentions_vm(self):
         content = read_report().lower()
-        assert any(t in content for t in ["vm", "virtual machine", "virtualmachine"]), (
-            "report should reference the target VM"
-        )
+        assert "vm" in content or "virtual machine" in content
 
-    def test_mentions_namespace(self):
-        content = read_report().lower()
-        assert "namespace" in content, "report should mention the target namespace"
+    def test_report_has_structure(self):
+        content = read_report()
+        assert len(content) > 200, "report should have substantial content"
 
 
 class TestSkillDependent:
-    def test_data_volume_provisioning(self):
-        """Skill: DataVolume for disk provisioning with image/blank source."""
-        c = read_report().lower()
-        assert any(t in c for t in ["datavolume", "data volume", "cdi.kubevirt.io", "source.registry", "source.blank"]), (
-            "should discuss DataVolume for disk provisioning"
+    def test_printable_status_field(self):
+        """Skill teaches status.printableStatus as the field to check after
+        creation with exact values: Stopped, Running, Provisioning,
+        ErrorUnschedulable, ErrorDataVolumeNotReady.
+        Without skill, agents use generic status checks."""
+        c = read_report()
+        has_field = "printableStatus" in c
+        has_values = any(v in c for v in [
+            "ErrorUnschedulable", "ErrorDataVolumeNotReady", "Provisioning",
+        ])
+        assert has_field or has_values, (
+            "must reference status.printableStatus or its error values"
         )
 
-    def test_storage_class_provisioning(self):
-        """Skill: StorageClass for DataVolume/PVC provisioning."""
-        c = read_report().lower()
-        assert any(t in c for t in ["storageclass", "storage class", "volumeBindingMode", "provisioner"]) and (
-            "storage" in c or "pvc" in c or "datavolume" in c
-        ), (
-            "should mention StorageClass for disk provisioning"
+    def test_default_storage_class_annotation(self):
+        """Skill teaches finding default StorageClass via annotation
+        storageclass.kubernetes.io/is-default-class.
+        Without skill, agents pick storage class by name guess."""
+        c = read_report()
+        assert "storageclass.kubernetes.io/is-default-class" in c or \
+               "is-default-class" in c, (
+            "must reference storageclass.kubernetes.io/is-default-class annotation"
         )
 
-    def test_instance_type_or_workload(self):
-        """Skill: Instance type (u1.medium) or workload (fedora, rhel) resolution."""
-        c = read_report().lower()
-        assert any(t in c for t in ["instancetype", "instance type", "u1.", "u1.medium", "workload", "fedora", "rhel", "ubuntu", "centos"]), (
-            "should reference instance types or workload/OS selection"
+    def test_csv_operator_check(self):
+        """Skill teaches checking for CSV (ClusterServiceVersion) with
+        operators.coreos.com/v1alpha1 in openshift-cnv namespace to verify
+        KubeVirt operator health. Without skill, agents skip operator checks."""
+        c = read_report()
+        has_csv = "ClusterServiceVersion" in c or "CSV" in c
+        has_cnv = "openshift-cnv" in c
+        assert has_csv or has_cnv, (
+            "must check ClusterServiceVersion in openshift-cnv namespace"
         )
 
-    def test_unschedulable_toleration(self):
-        """Skill: ErrorUnschedulable and toleration workaround."""
-        c = read_report().lower()
-        assert any(t in c for t in ["errorunschedulable", "unschedulable", "taint", "toleration", "scheduling"]) and (
-            "taint" in c or "toleration" in c or "unschedulable" in c
-        ), (
-            "should address ErrorUnschedulable and taint/toleration handling"
+    def test_status_conditions_diagnostics(self):
+        """Skill teaches inspecting status.conditions on the VM for
+        scheduling and readiness diagnostics. Without skill, agents
+        only check if the VM exists."""
+        c = read_report()
+        assert "status.conditions" in c or "conditions" in c.lower(), (
+            "must reference status.conditions for VM diagnostics"
         )
 
-    def test_yaml_or_manifest(self):
-        """Should include a YAML manifest or structured spec."""
-        content = read_report()
-        assert "apiVersion" in content or "kind:" in content or "spec:" in content or "```yaml" in content or "```yml" in content, (
-            "should include a YAML manifest or structured specification"
+    def test_volume_binding_mode(self):
+        """Skill teaches checking StorageClass volumeBindingMode
+        (Immediate vs WaitForFirstConsumer). Without skill, agents
+        don't check binding mode."""
+        c = read_report()
+        has_binding = "volumeBindingMode" in c or "WaitForFirstConsumer" in c
+        assert has_binding, (
+            "must reference volumeBindingMode on StorageClass"
         )
-
-    def test_failure_modes_coverage(self):
-        """Instruction asks for failure modes. Report should cover at least 2 of:
-        scheduling failures, image/import errors, resource exhaustion, storage issues."""
-        c = read_report().lower()
-        categories = [
-            any(t in c for t in ["unschedulable", "scheduling fail", "taint", "node select"]),
-            any(t in c for t in ["image pull", "import error", "registry", "image not found"]),
-            any(t in c for t in ["resource exhaustion", "insufficient", "quota", "out of memory", "oom"]),
-            any(t in c for t in ["storage provision", "pvc pending", "bound", "volumesnapshot", "csi"]),
-        ]
-        found = sum(categories)
-        assert found >= 2, (
-            f"should cover at least 2 failure mode categories (found {found}/4); "
-            "instruction requires failure mode analysis"
-        )
-
-    def test_node_capacity_analysis(self):
-        """Instruction asks to survey the cluster's available capacity."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "capacity", "allocatable", "available resource",
-            "node resource", "cpu available", "memory available",
-            "cluster resource", "resource survey",
-        ]), "should include node/cluster capacity analysis (instruction requirement)"

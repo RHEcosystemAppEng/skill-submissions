@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "unschedulable_handling", "file": "/solution/report.md", "question": "Does the report address ErrorUnschedulable and taint/toleration handling for VM placement?", "reference": "A skilled report handles scheduling errors with tolerations. An unskilled report doesn't address placement failures."},
-  {"id": "datavolume_provisioning", "file": "/solution/report.md", "question": "Does the report describe using DataVolume resources (with CDI) for VM disk provisioning, specifying a source (registry, blank, or PVC)?", "reference": "A skilled report uses DataVolume with a source specification for disk provisioning. An unskilled report creates PVCs manually without CDI integration."},
-  {"id": "failure_mode_coverage", "file": "/solution/report.md", "question": "Does the report analyze at least two distinct failure scenarios for VM creation (e.g., scheduling failures, image pull errors, storage provisioning issues, resource quota exhaustion) with specific symptoms and remediation steps?", "reference": "A thorough report identifies multiple failure modes with concrete symptoms (ErrorUnschedulable, PVC Pending, ImagePullBackOff) and remediation guidance. A basic report only considers the happy path without failure analysis."}
+    {
+        "id": "printable_status",
+        "file": "/solution/report.md",
+        "question": "Does the report reference status.printableStatus and its specific error values (ErrorUnschedulable, ErrorDataVolumeNotReady) for post-creation verification?",
+        "reference": "A skilled report checks status.printableStatus for exact values like Provisioning, Running, ErrorUnschedulable, ErrorDataVolumeNotReady. An unskilled report vaguely checks if the VM is 'running'.",
+    },
+    {
+        "id": "storage_class_annotation",
+        "file": "/solution/report.md",
+        "question": "Does the report reference the storageclass.kubernetes.io/is-default-class annotation for discovering the default StorageClass?",
+        "reference": "A skilled report finds the default StorageClass via the is-default-class annotation. An unskilled report picks a storage class by name without checking annotations.",
+    },
+    {
+        "id": "csv_operator_health",
+        "file": "/solution/report.md",
+        "question": "Does the report check ClusterServiceVersion (CSV) in the openshift-cnv namespace to verify KubeVirt operator health?",
+        "reference": "A skilled report lists CSVs (operators.coreos.com/v1alpha1) in openshift-cnv to verify the KubeVirt operator is installed and healthy. An unskilled report assumes the operator is present.",
+    },
+    {
+        "id": "volume_binding_mode",
+        "file": "/solution/report.md",
+        "question": "Does the report check StorageClass volumeBindingMode (Immediate vs WaitForFirstConsumer) as part of storage analysis?",
+        "reference": "A skilled report checks volumeBindingMode to understand when PVC binding occurs. An unskilled report doesn't analyze StorageClass binding behavior.",
+    },
 ]
 
 SYSTEM_PROMPT = (

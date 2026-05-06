@@ -1,0 +1,8 @@
+name: ocp-admin-cluster-creator
+description: Create self-managed OpenShift clusters via Assisted Installer API
+persona: ocp-admin
+version: "0.1.0"
+tags:
+  - openshift
+  - cluster-creation
+  - assisted-installer

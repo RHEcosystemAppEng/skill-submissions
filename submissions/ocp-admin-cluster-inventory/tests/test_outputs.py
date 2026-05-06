@@ -76,13 +76,16 @@ class TestSkillDependent:
         )
 
     def test_status_filter_vocabulary(self):
-        """Skill teaches exact status filter strings: ready, installed,
-        installing, error, pending-for-input.
-        Without skill, agents use generic status descriptions."""
+        """Skill teaches exact status filter strings including the
+        skill-specific 'pending-for-input'. Generic strings like 'ready',
+        'error' appear naturally — only pending-for-input discriminates."""
         c = read_report()
-        exact_count = sum(1 for s in [
-            "ready", "installed", "installing", "error", "pending-for-input",
+        assert "pending-for-input" in c.lower(), (
+            "must reference pending-for-input status (skill-specific filter)"
+        )
+        other_count = sum(1 for s in [
+            "ready", "installed", "installing", "error",
         ] if s in c.lower())
-        assert exact_count >= 3, (
-            "must reference exact status strings: ready, installed, installing, etc."
+        assert other_count >= 2, (
+            "must reference at least 2 additional status strings alongside pending-for-input"
         )

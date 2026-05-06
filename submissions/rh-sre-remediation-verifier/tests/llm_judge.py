@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "inventory_24h_lag", "file": "/solution/report.md", "question": "Does the report note that Lightspeed inventory can take up to 24 hours to update and recommend insights-client --check-results for re-sync?", "reference": "A skilled report warns about inventory lag. An unskilled report expects immediate updates."},
-  {"id": "system_profile_checks", "file": "/solution/report.md", "question": "Does the report use get_host_details with include_system_profile for installed packages and service health verification?", "reference": "A skilled report uses system profile data. An unskilled report only checks CVE status."},
-  {"id": "three_verification_layers", "file": "/solution/report.md", "question": "Does the report verify at least 2 of: CVE status, package version, service health?", "reference": "A skilled report performs defense-in-depth verification. An unskilled report only checks one layer."}
+    {
+        "id": "insights_client_resync",
+        "file": "/solution/report.md",
+        "question": "Does the report recommend running 'insights-client --check-results' to trigger inventory re-sync before verification?",
+        "reference": "A skilled report recommends insights-client --check-results to push fresh system data to Red Hat Lightspeed, ensuring verification queries reflect post-remediation state. An unskilled report queries the API directly without refreshing inventory data.",
+    },
+    {
+        "id": "inventory_24h_lag",
+        "file": "/solution/report.md",
+        "question": "Does the report warn that Red Hat Lightspeed inventory can take up to 24 hours to update after remediation?",
+        "reference": "A skilled report explicitly notes the up-to-24-hour lag and explains this affects CVE status verification accuracy. An unskilled report expects immediate API updates and may misinterpret stale data as remediation failure.",
+    },
+    {
+        "id": "system_profile_usage",
+        "file": "/solution/report.md",
+        "question": "Does the report use get_host_details with include_system_profile=true to access installed_packages and enabled_services for verification?",
+        "reference": "A skilled report requests the full system profile to compare installed package versions against expected fixed versions and verify service health. An unskilled report only checks CVE status without deep package/service verification.",
+    },
+    {
+        "id": "multi_layer_verification",
+        "file": "/solution/report.md",
+        "question": "Does the report perform at least two of these three verification checks: CVE vulnerability status, package version comparison, and service health?",
+        "reference": "A skilled report performs defense-in-depth verification with multiple independent checks. An unskilled report relies on a single verification method.",
+    },
 ]
 
 SYSTEM_PROMPT = (

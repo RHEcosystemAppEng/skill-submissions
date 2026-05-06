@@ -69,14 +69,21 @@ class TestSkillDependent:
         """Skill explicitly forbids --force and --grace-period=0.
         Without skill, agents suggest force deletion for stuck VMs."""
         c = read_report().lower()
-        uses_force = "--force" in c or "--grace-period=0" in c
-        if uses_force:
-            has_no_force = any(t in c for t in [
-                "never", "no force", "do not", "must not", "avoid",
-            ])
-            assert has_no_force, (
-                "must NOT recommend --force or --grace-period=0"
-            )
+        rejection_phrases = [
+            "do not use --force", "never use --force", "avoid --force",
+            "must not.*--force", "no.*--force", "without --force",
+            "not recommended.*force", "force.*not", "force.*avoid",
+            "grace-period=0.*not", "do not.*grace-period",
+        ]
+        has_rejection = any(p in c for p in [
+            "do not use --force", "never use --force", "avoid --force",
+            "without --force", "not.*force",
+        ]) or ("force" in c and any(t in c for t in [
+            "never", "do not", "must not", "avoid", "should not",
+        ]))
+        assert has_rejection, (
+            "must actively reject --force and --grace-period=0 deletion"
+        )
 
     def test_resources_delete_gvk(self):
         """Skill teaches using resources_delete with kubevirt.io/v1

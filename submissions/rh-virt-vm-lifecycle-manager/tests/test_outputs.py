@@ -1,7 +1,7 @@
 """
 Tests for rh-virt__vm-lifecycle-manager per-skill evaluation.
-Baseline tests: report structure.
-Skill-dependent tests: conceptual checks (no exact tool/field name matching).
+
+Exact-field tests: require procedure details that only SKILL.md teaches.
 """
 import os
 import pytest
@@ -15,61 +15,66 @@ def read_report():
     with open(REPORT) as f:
         return f.read()
 
+
 class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
     def test_mentions_operations(self):
-        c = read_report().lower()
-        assert ("stop" in c or "halt" in c) and ("restart" in c or "start" in c), (
-            "report should discuss stop and restart operations"
-        )
+        content = read_report().lower()
+        assert "stop" in content or "start" in content or "restart" in content
 
-    def test_mentions_vms(self):
-        c = read_report().lower()
-        assert any(t in c for t in ["vm", "virtual machine", "virtualmachine"]), (
-            "report should reference the target VMs"
-        )
+    def test_report_has_structure(self):
+        content = read_report()
+        assert len(content) > 200, "report should have substantial content"
 
 
 class TestSkillDependent:
-    def test_two_step_restart(self):
-        """Skill: Restart = stop then start (not single atomic); resourceVersion conflict."""
+    def test_decomposed_restart(self):
+        """Skill teaches restart must be decomposed into stop -> verify
+        Stopped -> wait 5s -> start -> verify Running. NOT a single
+        atomic restart call. Without skill, agents use one restart command."""
         c = read_report().lower()
-        assert ("stop" in c and "start" in c) and any(t in c for t in ["two", "separate", "sequence", "then", "first", "resourceversion", "conflict"]), (
-            "should explain restart as stop-then-start, not single operation"
+        has_stop = "stop" in c
+        has_wait = any(t in c for t in ["wait", "5 second", "delay", "pause"])
+        has_start = "start" in c
+        has_sequence = has_stop and has_start
+        assert has_sequence and has_wait, (
+            "must decompose restart into stop/wait/start sequence"
         )
 
-    def test_run_strategy_control(self):
-        """Skill: RunStrategy Always/Halted for start/stop; not generic power state."""
-        c = read_report().lower()
-        assert any(t in c for t in ["runstrategy", "run strategy", "always", "halted"]) and (
-            "start" in c or "stop" in c
-        ), (
-            "should map start/stop to RunStrategy (Always/Halted)"
+    def test_printable_status_polling(self):
+        """Skill teaches polling status.printableStatus for 'Stopped'
+        before proceeding to start. Without skill, agents don't verify
+        the intermediate state."""
+        c = read_report()
+        assert "printableStatus" in c, (
+            "must poll printableStatus to verify Stopped/Running state"
         )
 
-    def test_ready_verification(self):
-        """Skill: Verify status.printableStatus Stopped/Running after each step."""
-        c = read_report().lower()
-        assert any(t in c for t in ["printablestatus", "printable status", "status", "stopped", "running"]) and (
-            any(t in c for t in ["verify", "check", "poll", "wait", "before start"])
-        ), (
-            "should verify VM reached expected state before proceeding"
+    def test_resource_version_conflict(self):
+        """Skill teaches that restart must decompose to avoid
+        resourceVersion conflicts. Without skill, agents don't know
+        about this Kubernetes concurrency issue."""
+        c = read_report()
+        assert "resourceVersion" in c, (
+            "must mention resourceVersion conflict avoidance as reason for decomposed restart"
+        )
+
+    def test_run_strategy_mapping(self):
+        """Skill teaches RunStrategy outcomes: start->Always, stop->Halted,
+        restart->Always. Without skill, agents don't know the mapping."""
+        c = read_report()
+        has_halted = "Halted" in c
+        has_always = "Always" in c
+        assert has_halted and has_always, (
+            "must reference RunStrategy values: Halted (stop) and Always (start/restart)"
         )
 
     def test_vm_lifecycle_tool(self):
-        """Skill: vm_lifecycle MCP tool for start/stop/restart."""
-        c = read_report().lower()
-        assert any(t in c for t in ["vm_lifecycle", "vm lifecycle", "lifecycle tool", "mcp"]), (
-            "should reference vm_lifecycle or MCP lifecycle tool"
-        )
-
-    def test_restart_composite(self):
-        """Skill: Restart implemented as stop → verify stopped → wait → start."""
-        c = read_report().lower()
-        has_stop_start = "stop" in c and "start" in c
-        has_wait = any(t in c for t in ["wait", "5 second", "poll", "verify stopped"])
-        assert has_stop_start and has_wait, (
-            "should include wait/verify between stop and start for restart"
+        """Skill teaches using vm_lifecycle MCP tool with action parameter.
+        Without skill, agents use generic kubectl commands."""
+        c = read_report()
+        assert "vm_lifecycle" in c, (
+            "must reference vm_lifecycle tool for operations"
         )

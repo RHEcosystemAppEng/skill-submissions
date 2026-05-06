@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "two_step_restart", "file": "/solution/report.md", "question": "Does the report implement restart as stop→verify stopped→start rather than a single atomic operation?", "reference": "A skilled report separates stop and start to avoid resourceVersion conflicts. An unskilled report uses a single restart command."},
-  {"id": "run_strategy_mapping", "file": "/solution/report.md", "question": "Does the report map start to RunStrategy: Always and stop to RunStrategy: Halted?", "reference": "A skilled report uses RunStrategy for lifecycle control. An unskilled report uses power state concepts."},
-  {"id": "state_verification", "file": "/solution/report.md", "question": "Does the report verify VM reached expected state (Stopped/Running) before proceeding to the next operation?", "reference": "A skilled report verifies printableStatus between operations. An unskilled report assumes instant state changes."}
+    {
+        "id": "decomposed_restart",
+        "file": "/solution/report.md",
+        "question": "Does the report decompose restart into stop -> verify Stopped -> wait -> start -> verify Running, rather than using a single atomic restart?",
+        "reference": "A skilled report decomposes restart: stop, poll printableStatus until Stopped, wait ~5 seconds, start, verify Running. This avoids resourceVersion conflicts. An unskilled report uses a single restart command.",
+    },
+    {
+        "id": "printable_status_poll",
+        "file": "/solution/report.md",
+        "question": "Does the report reference polling printableStatus to verify the VM reached Stopped state before proceeding to start?",
+        "reference": "A skilled report polls status.printableStatus for 'Stopped' as the gate between stop and start. An unskilled report doesn't verify the intermediate state.",
+    },
+    {
+        "id": "resource_version",
+        "file": "/solution/report.md",
+        "question": "Does the report mention resourceVersion conflicts as the reason for decomposing restart rather than using an atomic operation?",
+        "reference": "A skilled report explains that Kubernetes resourceVersion conflicts can occur if start is issued too quickly after stop. An unskilled report doesn't mention this concurrency issue.",
+    },
+    {
+        "id": "run_strategy",
+        "file": "/solution/report.md",
+        "question": "Does the report describe RunStrategy outcomes: start sets Always, stop sets Halted?",
+        "reference": "A skilled report maps operations to RunStrategy values: start->Always, stop->Halted. An unskilled report doesn't explain the RunStrategy changes.",
+    },
 ]
 
 SYSTEM_PROMPT = (

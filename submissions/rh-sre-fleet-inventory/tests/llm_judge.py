@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "system_id_for_remediation", "file": "/solution/report.md", "question": "Does the report track individual system identifiers (system_uuid, system_id, or host UUID) and link them to specific remediation follow-up actions, rather than just listing hostnames?", "reference": "A skilled report captures system UUIDs or identifiers to enable programmatic remediation API calls. An unskilled report lists hostnames or display names without machine-usable identifiers for follow-up."},
-  {"id": "classification_methodology", "file": "/solution/report.md", "question": "Does the report reference a classification methodology, classification criteria, or vulnerability classification framework for interpreting CVE status, rather than using ad-hoc severity labeling?", "reference": "A skilled report consults or references CVE classification criteria or methodology documentation before interpreting vulnerability data. An unskilled report classifies CVEs based on general knowledge without referencing established criteria."},
-  {"id": "stale_and_unsupported_detection", "file": "/solution/report.md", "question": "Does the report explicitly flag stale systems (not checking in or inactive) and systems running unsupported or end-of-life RHEL versions as compliance risks?", "reference": "A thorough fleet inventory flags stale or non-reporting systems and identifies unsupported RHEL versions as compliance gaps. A basic report lists systems without highlighting these operational risks."}
+    {
+        "id": "stale_detection",
+        "file": "/solution/report.md",
+        "question": "Does the report flag stale systems using a specific threshold (7 days or similar) based on last check-in time?",
+        "reference": "A skilled report uses the stale boolean field or last_seen timestamp with a 7-day threshold to identify non-reporting systems. An unskilled report either uses an arbitrary threshold, doesn't check staleness, or just lists all systems without freshness assessment.",
+    },
+    {
+        "id": "vulnerability_status_strings",
+        "file": "/solution/report.md",
+        "question": "Does the report use specific per-system vulnerability status classifications like 'Vulnerable', 'Patched', and 'Not Affected'?",
+        "reference": "A skilled report uses the exact status strings from get_cve_systems: Vulnerable (unpatched), Patched (remediated), Not Affected (not vulnerable). An unskilled report uses generic terms like 'at risk' or 'safe' without the specific API status values.",
+    },
+    {
+        "id": "system_id_tracking",
+        "file": "/solution/report.md",
+        "question": "Does the report track system UUIDs or system_id values (not just hostnames) to enable programmatic remediation follow-up?",
+        "reference": "A skilled report captures machine-usable system identifiers (UUIDs) that can be passed to remediation APIs. An unskilled report only lists human-readable hostnames without actionable identifiers.",
+    },
+    {
+        "id": "compliance_readiness",
+        "file": "/solution/report.md",
+        "question": "Does the report flag systems running unsupported or end-of-life RHEL versions as compliance risks?",
+        "reference": "A skilled report identifies EOL RHEL versions as compliance gaps requiring upgrade or decommission. An unskilled report lists versions without highlighting support status.",
+    },
 ]
 
 SYSTEM_PROMPT = (

@@ -1,7 +1,11 @@
 """
 Tests for rh-sre__fleet-inventory per-skill evaluation.
-Baseline tests: report structure.
-Skill-dependent tests: conceptual checks (no exact tool/field name matching).
+
+Skill-specific knowledge tested:
+- Stale = <7 days check-in (stale boolean field, last_seen)
+- Per-system CVE status strings: Vulnerable, Patched, Not Affected
+- System UUID tracking for remediation follow-up
+- get_host_details for fleet vs get_cve_systems for CVE queries
 """
 import os
 import pytest
@@ -22,70 +26,93 @@ class TestBaseline:
 
     def test_mentions_topic(self):
         content = read_report().lower()
-        assert any(t in content for t in ['system', 'host', 'fleet', 'inventory']), (
+        assert any(t in content for t in ["system", "host", "fleet", "inventory"]), (
             "report should mention key topic"
         )
 
     def test_report_has_structure(self):
         content = read_report()
-        assert len(content) > 150, "report should have substantial content"
+        assert len(content) > 200, "report should have substantial content"
 
 
 class TestSkillDependent:
-    def test_system_identifier_tracking(self):
-        """Skill teaches tracking system identifiers for follow-up actions.
-        Without skill, agents list systems without identifiers for remediation."""
+    def test_stale_7_day_heuristic(self):
+        """Skill: Stale systems are those that haven't checked in within 7
+        days (stale boolean field, last_seen timestamp). Without skill,
+        agents use arbitrary thresholds or skip staleness checks."""
         c = read_report().lower()
-        assert any(t in c for t in [
-            "system id", "system_id", "system_uuid", "uuid", "identifier",
-        ]) and any(t in c for t in [
-            "remediat", "follow-up", "subsequent", "action", "track",
-        ]), (
-            "should track system identifiers for follow-up remediation actions"
+        has_stale = any(t in c for t in [
+            "stale", "last_seen", "last seen",
+            "last check-in", "last checkin",
+        ])
+        has_threshold = any(t in c for t in [
+            "7 day", "7 days", "seven day", "week",
+        ])
+        assert has_stale and has_threshold, (
+            "should flag stale systems using <7 day check-in heuristic "
+            "(skill: stale boolean field, 7-day threshold)"
         )
 
-    def test_remediation_transition_offer(self):
-        """Skill: Offer transition to a remediation workflow for CVE remediation."""
+    def test_per_system_vulnerability_status(self):
+        """Skill: Per-system CVE status uses specific strings: Vulnerable,
+        Patched, Not Affected. Without skill, agents use generic terms."""
         c = read_report().lower()
-        assert any(t in c for t in [
-            "next step", "remediate", "playbook",
-            "remediation workflow", "remediation action",
-        ]), "should offer next steps for remediation"
+        status_strings = sum(1 for t in [
+            "vulnerable", "patched", "not affected",
+        ] if t in c)
+        assert status_strings >= 2, (
+            "should use specific per-system vulnerability status strings: "
+            "Vulnerable, Patched, Not Affected (skill: get_cve_systems response)"
+        )
 
-    def test_classification_criteria_reference(self):
-        """Skill/docs teach consulting classification criteria or reference
-        documentation before interpreting vulnerability data. Without skill,
-        agents classify CVEs based on general knowledge alone."""
+    def test_system_uuid_tracking(self):
+        """Skill: Track system UUIDs (not just hostnames) to enable
+        programmatic remediation API calls. Without skill, agents
+        only list display names."""
         c = read_report().lower()
-        assert any(t in c for t in [
-            "classification criteria", "classification methodology",
-            "vulnerability classification", "cve classification",
-        ]) or (
-            "classification" in c and any(t in c for t in [
-                "consult", "reference", "methodology", "criteria",
-            ])
-        ), "should reference CVE classification criteria or methodology"
+        has_uuid = any(t in c for t in [
+            "system_id", "system id", "uuid", "system_uuid",
+            "identifier",
+        ])
+        has_followup = any(t in c for t in [
+            "remediat", "follow-up", "follow up", "action",
+            "track", "subsequent",
+        ])
+        assert has_uuid and has_followup, (
+            "should track system UUIDs for remediation follow-up "
+            "(skill: system_id for API calls)"
+        )
 
-    def test_patch_status_reported(self):
-        """Instruction requires patch status per system."""
+    def test_rhel_version_distribution(self):
+        """Skill: Report RHEL version distribution across fleet."""
         c = read_report().lower()
         assert any(t in c for t in [
-            "patch", "patched", "unpatched", "patch status",
-            "patch level", "up to date", "out of date",
-        ]), "should report patch status for systems (instruction requirement)"
-
-    def test_stale_systems_flagged(self):
-        """Instruction requires flagging stale systems not checking in."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "stale", "not checking in", "last check-in",
-            "inactive", "unreachable", "offline",
-        ]), "should flag stale or non-reporting systems (instruction requirement)"
+            "rhel 7", "rhel 8", "rhel 9",
+            "rhel7", "rhel8", "rhel9",
+            "el7", "el8", "el9",
+            "version distribution", "rhel version",
+        ]), (
+            "should report RHEL version distribution across the fleet"
+        )
 
     def test_unsupported_rhel_flagged(self):
-        """Instruction requires flagging systems running unsupported RHEL versions."""
+        """Skill: Flag systems running unsupported/EOL RHEL versions as
+        compliance risks."""
         c = read_report().lower()
         assert any(t in c for t in [
             "unsupported", "end of life", "eol", "end-of-life",
             "deprecated", "out of support",
-        ]), "should flag unsupported RHEL versions (instruction requirement)"
+        ]), (
+            "should flag unsupported RHEL versions as compliance risk"
+        )
+
+    def test_next_steps_offered(self):
+        """Skill: Offer transition to remediation workflow for vulnerable
+        systems."""
+        c = read_report().lower()
+        assert any(t in c for t in [
+            "next step", "remediate", "playbook",
+            "remediation", "action item",
+        ]), (
+            "should offer next steps for remediation of vulnerable systems"
+        )

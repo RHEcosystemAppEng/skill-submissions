@@ -1,7 +1,7 @@
 """
 Tests for rh-virt__vm-snapshot-list per-skill evaluation.
-Baseline tests: report structure.
-Skill-dependent tests: conceptual checks (no exact tool/field name matching).
+
+Exact-field tests: require API field paths and GVKs that only SKILL.md teaches.
 """
 import os
 import pytest
@@ -15,48 +15,62 @@ def read_report():
     with open(REPORT) as f:
         return f.read()
 
+
 class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
-    def test_mentions_snapshots(self):
+    def test_mentions_snapshot(self):
         content = read_report().lower()
-        assert "snapshot" in content, "report should mention snapshots"
+        assert "snapshot" in content
 
-    def test_has_structured_output(self):
+    def test_report_has_structure(self):
         content = read_report()
-        assert "|" in content or "- " in content, "report should have structured output (table or list)"
+        assert len(content) > 200, "report should have substantial content"
 
 
 class TestSkillDependent:
-    def test_ready_to_use_status(self):
-        """Skill: readyToUse status for restore readiness."""
-        c = read_report().lower()
-        assert any(t in c for t in ["readytouse", "ready to use", "ready for restore"]), (
-            "should reference readyToUse status for snapshot readiness"
-        )
-
-    def test_creation_timestamp(self):
-        """Skill: metadata.creationTimestamp or creation time."""
-        c = read_report().lower()
-        assert any(t in c for t in ["creationtimestamp", "creation timestamp", "created", "when"]), (
-            "should show creation timestamp for each snapshot"
-        )
-
-    def test_phase_status(self):
-        """Skill: status.phase (Succeeded, Failed, InProgress)."""
-        c = read_report().lower()
-        assert any(t in c for t in ["succeeded", "failed", "inprogress", "status.phase", "phase"]) and (
-            "succeeded" in c or "failed" in c or "phase" in c
-        ), (
-            "should show phase (Succeeded/Failed/InProgress)"
-        )
-
-    def test_label_selector_for_vm_filtering(self):
-        """Skill teaches using vm.kubevirt.io/name label selector to
-        filter snapshots by source VM. Without skill, agents list all
-        snapshots without label-based filtering."""
+    def test_snapshot_gvk(self):
+        """Skill teaches snapshot.kubevirt.io/v1beta1 as the apiVersion
+        for VirtualMachineSnapshot listing."""
         c = read_report()
-        assert "vm.kubevirt.io" in c or "labelSelector" in c or "label selector" in c.lower(), (
-            "should reference vm.kubevirt.io/name label for snapshot filtering"
+        assert "snapshot.kubevirt.io/v1beta1" in c, (
+            "must reference snapshot.kubevirt.io/v1beta1 GVK"
+        )
+
+    def test_ready_to_use_field(self):
+        """Skill teaches status.readyToUse as the field that indicates
+        whether a snapshot can be used for restore. Without skill,
+        agents only check status.phase."""
+        c = read_report()
+        assert "readyToUse" in c, (
+            "must reference status.readyToUse field"
+        )
+
+    def test_label_selector_with_fallback(self):
+        """Skill teaches using vm.kubevirt.io/name labelSelector first,
+        then falling back to filtering by spec.source.name if labels
+        are missing. Without skill, agents use only one method."""
+        c = read_report()
+        has_label = "vm.kubevirt.io/name" in c
+        has_source = "spec.source.name" in c
+        assert has_label or has_source, (
+            "must use vm.kubevirt.io/name label or spec.source.name for discovery"
+        )
+
+    def test_status_phase_values(self):
+        """Skill teaches exact status.phase values: InProgress, Succeeded,
+        Failed. Without skill, agents use generic status descriptions."""
+        c = read_report()
+        exact_count = sum(1 for v in ["InProgress", "Succeeded", "Failed"] if v in c)
+        assert exact_count >= 2, (
+            "must reference exact phase values: InProgress, Succeeded, Failed"
+        )
+
+    def test_status_conditions_troubleshooting(self):
+        """Skill teaches inspecting status.conditions on the snapshot
+        for error details when readyToUse is false."""
+        c = read_report()
+        assert "status.conditions" in c or "conditions" in c.lower(), (
+            "must reference status.conditions for troubleshooting failed snapshots"
         )

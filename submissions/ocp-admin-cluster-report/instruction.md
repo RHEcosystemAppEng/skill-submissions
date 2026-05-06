@@ -1,17 +1,16 @@
 # Cluster Report Task
 
-You are an OpenShift cluster administrator. Your operations lead has requested a comprehensive infrastructure health snapshot for the weekly review. Your environment has multiple cluster contexts configured.
+You are an OpenShift cluster administrator. Your operations lead needs a comprehensive infrastructure health snapshot for the weekly review.
+
+## Scenario
+Your environment has multiple cluster contexts configured — some are OpenShift, some may be vanilla Kubernetes, and some may be unreachable. You must accurately classify each context and produce a structured report for the accessible OpenShift clusters.
 
 ## Requirements
-- Discover all available cluster contexts in your environment
-- For each accessible OpenShift cluster, report:
-  - Cluster version and API server URL
-  - All nodes with their status (Ready/NotReady), roles, and resource utilization (CPU and memory usage vs capacity)
-  - All projects/namespaces with their status
-  - Workload counts: total pods, running vs failing, and any pods in error states
-- Explicitly note any contexts that are not OpenShift clusters or could not be reached, and explain why
-- Highlight any issues that need attention (unhealthy nodes, resource pressure, failing workloads)
+- Discover all available cluster contexts
+- Determine which contexts are OpenShift vs non-OpenShift vs unreachable
+- For each accessible OpenShift cluster: report version, nodes, projects, and workload health
+- Explicitly classify contexts that are not OpenShift or cannot be reached
 
-Use MCP tools to examine the clusters. Write the complete cluster report in `/solution/report.md`.
+Write the complete cluster report in `/solution/report.md`.
 
-If reference documentation or skills are available in this environment, consult them before beginning work.
+Use MCP tools to examine the clusters. If reference documentation or skills are available in this environment, consult them before beginning work. Complete the entire analysis autonomously — do not stop for user confirmation.

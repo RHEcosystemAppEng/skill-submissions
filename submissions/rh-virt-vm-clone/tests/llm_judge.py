@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "firmware_uuid_regeneration", "file": "/solution/report.md", "question": "Does the report address firmware UUID/serial regeneration to avoid identity conflicts between source and clone?", "reference": "A skilled report regenerates domain.firmware.uuid and serial in the clone spec. An unskilled report clones without addressing firmware identity."},
-  {"id": "storage_clone_strategy", "file": "/solution/report.md", "question": "Does the report discuss DataVolume clone strategy using source.pvc and StorageClass considerations?", "reference": "A skilled report uses DataVolume with source.pvc and considers CSI clone support. An unskilled report copies data manually."},
-  {"id": "halted_run_strategy", "file": "/solution/report.md", "question": "Does the report set runStrategy: Halted for the cloned VM to start in Stopped state?", "reference": "A skilled report ensures the clone starts halted. An unskilled report starts the clone immediately, risking conflicts."}
+    {
+        "id": "run_strategy_halted",
+        "file": "/solution/report.md",
+        "question": "Does the report specify setting runStrategy: Halted on the cloned VM so it starts in Stopped state?",
+        "reference": "A skilled report sets runStrategy: Halted on the clone spec to prevent it from starting immediately. An unskilled report either starts the clone immediately or doesn't specify the run strategy.",
+    },
+    {
+        "id": "firmware_regeneration",
+        "file": "/solution/report.md",
+        "question": "Does the report mention regenerating domain.firmware.uuid and/or domain.firmware.serial in the clone spec?",
+        "reference": "A skilled report regenerates domain.firmware.uuid and domain.firmware.serial to avoid identity collision with the source VM. An unskilled report clones without changing firmware identifiers.",
+    },
+    {
+        "id": "metadata_stripping",
+        "file": "/solution/report.md",
+        "question": "Does the report mention stripping server-managed fields (uid, resourceVersion, creationTimestamp) from the cloned VM spec?",
+        "reference": "A skilled report removes uid, resourceVersion, creationTimestamp, and status from the source manifest before creating the clone. An unskilled report applies the full source manifest as-is.",
+    },
+    {
+        "id": "datavolume_discovery",
+        "file": "/solution/report.md",
+        "question": "Does the report use the vm.kubevirt.io/name labelSelector to discover source DataVolumes for cloning?",
+        "reference": "A skilled report uses labelSelector vm.kubevirt.io/name=<vm-name> on DataVolume resources to find all associated storage. An unskilled report manually lists volumes or hardcodes them.",
+    },
 ]
 
 SYSTEM_PROMPT = (

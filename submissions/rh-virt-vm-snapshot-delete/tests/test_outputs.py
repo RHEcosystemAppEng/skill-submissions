@@ -50,7 +50,7 @@ class TestSkillDependent:
         """Skill teaches reading spec.source.name to identify the source VM
         of a snapshot. Without skill, agents guess from the snapshot name."""
         c = read_report()
-        assert "spec.source.name" in c or "spec.source" in c, (
+        assert "spec.source.name" in c, (
             "must reference spec.source.name to identify source VM"
         )
 
@@ -65,10 +65,9 @@ class TestSkillDependent:
         )
 
     def test_rbac_check(self):
-        """Skill teaches verifying delete permission on
-        snapshot.kubevirt.io/virtualmachinesnapshots."""
+        """Skill teaches verifying delete permission on the specific
+        snapshot.kubevirt.io resource, not just generic can-i."""
         c = read_report()
-        has_rbac = "virtualmachinesnapshots" in c.lower() or "can-i" in c
-        assert has_rbac, (
-            "must verify RBAC for deleting virtualmachinesnapshots"
+        assert "virtualmachinesnapshots" in c.lower(), (
+            "must verify RBAC for snapshot.kubevirt.io/virtualmachinesnapshots"
         )

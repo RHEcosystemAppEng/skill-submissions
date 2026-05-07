@@ -12,28 +12,34 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "advisory_available",
+        "id": "orchestration_order",
         "file": "/solution/report.md",
-        "question": "Does the report use advisory_available (not rules[]) to determine if a CVE has automated remediation?",
-        "reference": "A skilled report checks advisory_available=true for remediatability. An unskilled report checks rules[] which can be empty even when remediation exists.",
+        "question": "Does the report show a clear 6-step orchestration: impact analysis -> CVE validation -> system context -> playbook generation -> execution -> verification?",
+        "reference": "A skilled report follows the exact 6-skill sequence. An unskilled report does ad-hoc steps, skips phases, or doesn't show structured orchestration.",
     },
     {
-        "id": "remediation_gate",
+        "id": "skill_invocation",
         "file": "/solution/report.md",
-        "question": "Does the report reference remediation_available or validation_status as the gate before proceeding with remediation?",
-        "reference": "A skilled report gates on remediation_available=true or validation_status='valid' before generating playbooks. An unskilled report proceeds without validation.",
+        "question": "Does the report invoke sub-skills via the Skill tool rather than 'Task Output', or mention the 'No task found' anti-pattern?",
+        "reference": "A skilled report uses the Skill tool for invocations. An unskilled report may use Task Output which causes 'No task found with ID: cve-validation' errors.",
     },
     {
-        "id": "advisories_list",
+        "id": "advisory_gate",
         "file": "/solution/report.md",
-        "question": "Does the report reference the advisories_list field for CVE remediation details?",
-        "reference": "A skilled report uses advisories_list to determine available patches. An unskilled report doesn't know this field.",
+        "question": "Does the report use advisory_available as the remediatability gate rather than rules[]?",
+        "reference": "A skilled report trusts advisory_available from cve-validation output. An unskilled report checks rules[] which can be empty even when an advisory exists.",
     },
     {
-        "id": "absolute_playbook_path",
+        "id": "validator_results",
         "file": "/solution/report.md",
-        "question": "Does the report specify playbook files using absolute repo paths (not relative paths)?",
-        "reference": "A skilled report uses absolute paths like <repo>/playbooks/remediation/<file> for playbook locations. An unskilled report uses relative paths which cause write errors.",
+        "question": "Does the report show explicit MCP validator results (PASSED/FAILED/PARTIAL) before proceeding with the workflow?",
+        "reference": "A skilled report runs mcp-lightspeed-validator and mcp-aap-validator, shows their status, and proceeds only on PASSED. An unskilled report skips validation entirely.",
+    },
+    {
+        "id": "graceful_failure",
+        "file": "/solution/report.md",
+        "question": "Does the report handle partial failures gracefully (warn and continue) rather than aborting on first error?",
+        "reference": "A skilled report warns on partial failures and offers to continue. An unskilled report either ignores errors or aborts the entire workflow.",
     },
 ]
 

@@ -1,16 +1,13 @@
-# CVE Remediation Workflow Task
+# CVE Remediation Task
 
-You are a Red Hat SRE. CVE-2026-1234 has been reported as Critical (CVSS 9.8).
+You are an SRE leading a security response. CVE-2024-6387 has been identified on host `ip-172-31-32-201.ec2.internal` and your team needs a complete remediation workflow executed end-to-end.
 
 ## Scenario
-A critical CVE has been identified affecting systems in your managed fleet. You need to validate the CVE, determine which systems are affected, and produce a remediation plan including a playbook for automated patching.
+The security team has confirmed CVE-2024-6387 (OpenSSH regreSSHion) affects a production RHEL host. You have access to Red Hat Lightspeed for CVE data and Ansible Automation Platform for playbook execution. You need to orchestrate the full remediation — from initial assessment through execution to verification.
 
-## Requirements
-- Validate the CVE and determine if automated remediation exists
-- Identify affected systems
-- Produce a remediation playbook for the affected systems
-- Provide an execution recommendation
+## Goal
+Produce a complete remediation report documenting every step of the workflow: what you validated, what you found, what playbook was generated, how execution went, and verification results.
 
-Write the complete remediation report to `/solution/report.md`.
+Write the complete report in `/solution/report.md`.
 
-Use MCP tools to query data. If reference documentation or skills are available in this environment, consult them before beginning work. Complete the entire analysis autonomously — do not stop for user confirmation.
+Use MCP tools to interact with Lightspeed and AAP. If reference documentation or skills are available in this environment, consult them before beginning work. Complete the entire analysis autonomously — do not stop for user confirmation.

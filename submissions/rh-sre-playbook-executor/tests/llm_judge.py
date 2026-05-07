@@ -12,34 +12,34 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "no_launch_override",
+        "id": "git_flow_before_launch",
         "file": "/solution/report.md",
-        "question": "Does the report explicitly state that AAP does NOT support overriding the playbook at launch time, and that the playbook must be in the SCM repository before launching?",
-        "reference": "A skilled report explicitly states there is no way to specify a different playbook at job launch time — AAP executes whatever the synced project contains. An unskilled report assumes you can pass a playbook path when launching a job template.",
-    },
-    {
-        "id": "git_flow_blocking",
-        "file": "/solution/report.md",
-        "question": "Does the report describe Git commit/push/sync as a mandatory BLOCKING prerequisite before launching any job (including dry-run)?",
-        "reference": "A skilled report treats Git Flow (commit, push, project sync) as a hard blocker — no job launch until sync is confirmed. An unskilled report either skips Git entirely or treats it as optional/post-launch.",
-    },
-    {
-        "id": "path_mismatch_handling",
-        "file": "/solution/report.md",
-        "question": "Does the report identify that the existing template points to a different playbook (cve-remediation.yml) and explain how to resolve this mismatch?",
-        "reference": "A skilled report identifies the path mismatch between the template's playbook and the generated playbook, then explains writing the new content to the template's expected path (or updating it) and syncing. An unskilled report ignores the mismatch or claims it can override at launch.",
+        "question": "Does the report show Git Flow (write -> commit -> push -> sync complete) BEFORE launching any job, rather than launching directly from local files?",
+        "reference": "A skilled report performs Git Flow before launch. An unskilled report launches directly or tries to override the playbook at launch time.",
     },
     {
         "id": "dry_run_check_mode",
         "file": "/solution/report.md",
-        "question": "Does the report specify that dry-run is done by launching the same job template with job_type 'check' (Ansible check mode)?",
-        "reference": "A skilled report uses job_type 'check' on the same launch API for dry-run. An unskilled report invents a separate dry-run API or skips explaining the mechanism.",
+        "question": "Does the report use job_type: 'check' for dry-run rather than CLI --check or skipping dry-run entirely?",
+        "reference": "A skilled report uses job_type check in job_templates_launch_retrieve. An unskilled report either skips dry-run or uses CLI arguments.",
     },
     {
-        "id": "relaunch_failed_hosts",
+        "id": "job_polling",
         "file": "/solution/report.md",
-        "question": "Does the report describe relaunching only the failed hosts (not all hosts) after a partial failure?",
-        "reference": "A skilled report uses relaunch with hosts='failed' to retry only failed hosts. An unskilled report suggests re-running the entire job on all hosts.",
+        "question": "Does the report use jobs_retrieve for polling and jobs_job_events_list for event details, rather than parsing stdout?",
+        "reference": "A skilled report uses the correct MCP tools for job monitoring. An unskilled report parses stdout or checks once.",
+    },
+    {
+        "id": "host_summaries",
+        "file": "/solution/report.md",
+        "question": "Does the report collect per-host results using jobs_job_host_summaries_list?",
+        "reference": "A skilled report uses the host summaries API. An unskilled report parses console output for host results.",
+    },
+    {
+        "id": "synced_project_requirement",
+        "file": "/solution/report.md",
+        "question": "Does the report mention that AAP runs from the synced project only — no playbook override at launch time?",
+        "reference": "A skilled report knows AAP requires project sync. An unskilled report tries to override playbook content at launch.",
     },
 ]
 

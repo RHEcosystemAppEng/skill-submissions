@@ -62,3 +62,9 @@ Environment variables are defined in `mcps.json` using `${...}` placeholders onl
 4. **Use validators when prerequisites matter** — run `/mcp-lightspeed-validator` before Lightspeed-dependent work and `/mcp-aap-validator` before AAP execution when the skill requires it.
 5. **Prefer `/remediation` for end-to-end CVE remediation** — avoid skipping validation or verification steps unless the user clearly scoped a single standalone task.
 6. **Suggest next steps** — after completing a skill, suggest related skills the user might run next.
+
+## Documentation Discovery
+
+A reference documentation library is available at `/docs/`. Before consulting individual docs, read `/docs/.ai-index/semantic-index.json` (~200 tokens) for a lightweight index of all available documents with semantic keywords, task mappings, and token estimates. Use it to find the right doc for your current task instead of guessing or reading every file.
+
+For cross-document navigation, check `/docs/.ai-index/cross-reference-graph.json` after reading any doc to find related documents.

@@ -12,28 +12,34 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "exact_status_strings",
+        "id": "status_strings",
         "file": "/solution/report.md",
-        "question": "Does the report use the exact case-sensitive status strings 'Vulnerable', 'Patched', and 'Not Affected' when reporting per-system CVE status?",
-        "reference": "A skilled report uses the exact API strings: Vulnerable, Patched, Not Affected (case-sensitive). An unskilled report uses generic lowercase terms like 'affected' or 'fixed'.",
+        "question": "Does the report use exact case-sensitive status strings: 'Vulnerable', 'Patched', 'Not Affected' (with capital letters)?",
+        "reference": "A skilled report uses exact case: Vulnerable, Patched, Not Affected. An unskilled report uses lowercase or generic terms.",
     },
     {
-        "id": "stale_last_seen",
+        "id": "stale_detection",
         "file": "/solution/report.md",
-        "question": "Does the report reference the 'stale' boolean field and 'last_seen' timestamp from the API to identify systems with outdated check-ins?",
-        "reference": "A skilled report checks the stale boolean and last_seen timestamp, knowing stale means >7 days since check-in. An unskilled report either skips staleness or uses arbitrary thresholds.",
+        "question": "Does the report define stale systems using last_seen timestamp with a 7-day threshold?",
+        "reference": "A skilled report checks last_seen and marks systems stale if >7 days. An unskilled report doesn't define staleness.",
     },
     {
-        "id": "remediation_available",
+        "id": "remediation_flag",
         "file": "/solution/report.md",
-        "question": "Does the report reference the remediation_available flag for filtering which vulnerabilities have actionable remediation?",
-        "reference": "A skilled report filters by remediation_available to identify CVEs that can be patched. An unskilled report doesn't know this field exists and treats all CVEs the same.",
+        "question": "Does the report use remediation_available as a per-system-per-CVE flag rather than checking advisory status globally?",
+        "reference": "A skilled report uses remediation_available per host per CVE. An unskilled report checks advisories at the CVE level only.",
     },
     {
-        "id": "get_cve_systems_tool",
+        "id": "host_identifiers",
         "file": "/solution/report.md",
-        "question": "Does the report reference the get_cve_systems tool or use uppercase CVE-YYYY-NNNNN format for querying affected systems?",
-        "reference": "A skilled report uses get_cve_systems with CVE IDs in uppercase CVE-YYYY-NNNNN format. An unskilled report uses wrong tools or doesn't know the correct CVE ID format.",
+        "question": "Does the report identify hosts by display_name and fqdn fields (not generic hostname)?",
+        "reference": "A skilled report uses display_name and fqdn. An unskilled report uses hostname or IP addresses.",
+    },
+    {
+        "id": "mcp_tools",
+        "file": "/solution/report.md",
+        "question": "Does the report use get_host_details and get_cve_systems as the MCP tools for fleet queries?",
+        "reference": "A skilled report uses the correct Lightspeed MCP tools. An unskilled report uses generic API calls or wrong tool names.",
     },
 ]
 

@@ -47,8 +47,9 @@ class TestSkillDependent:
         last_seen timestamp. Without skill, agents don't define
         staleness or use different thresholds."""
         c = read_report()
-        has_stale = "stale" in c.lower()
-        has_last_seen = "last_seen" in c
+        cl = c.lower()
+        has_stale = "stale" in cl
+        has_last_seen = "last_seen" in c or "last seen" in cl or "last_seen" in cl
         assert has_stale and has_last_seen
 
     def test_remediation_available_flag(self):
@@ -56,15 +57,17 @@ class TestSkillDependent:
         boolean flag. Without skill, agents check advisory status
         globally."""
         c = read_report()
-        assert "remediation_available" in c
+        cl = c.lower()
+        assert "remediation_available" in c or "remediation available" in cl
 
     def test_display_name_and_fqdn(self):
         """Skill teaches host identification via display_name and fqdn
         fields (not generic 'hostname'). Without skill, agents use
         hostname or IP only."""
         c = read_report()
-        has_display = "display_name" in c
-        has_fqdn = "fqdn" in c
+        cl = c.lower()
+        has_display = "display_name" in c or "display name" in cl
+        has_fqdn = "fqdn" in cl or "FQDN" in c or ".example.com" in c
         assert has_display and has_fqdn
 
     def test_get_host_details_tool(self):

@@ -77,6 +77,8 @@ def judge_criterion(client, model, criterion):
                 )}],
             )
             text = response.content[0].text.strip()
+            if not text:
+                raise ValueError("Empty response from LLM")
             if "{" in text:
                 text = text[text.index("{"):text.rindex("}") + 1]
             result = json.loads(text)

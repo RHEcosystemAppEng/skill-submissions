@@ -35,6 +35,18 @@ CRITERIA = [
         "question": "Does the report describe monitoring status.complete on the VirtualMachineRestore to track restore progress?",
         "reference": "A skilled report polls status.complete (true = done, false = in progress) with a timeout. An unskilled report doesn't describe restore monitoring.",
     },
+    {
+        "id": "vm_stop_requirement",
+        "file": "/solution/report.md",
+        "question": "Does the report require the VM to be stopped before restoring from a snapshot, warning about data corruption on running VMs?",
+        "reference": "A skilled report checks printableStatus, stops the VM using vm_lifecycle if running, and explains that restoring to a running VM causes data corruption. An unskilled report attempts restore without checking VM state.",
+    },
+    {
+        "id": "vm_lifecycle_tool",
+        "file": "/solution/report.md",
+        "question": "Does the report use the vm_lifecycle MCP tool to stop the VM before restore rather than generic kubectl?",
+        "reference": "A skilled report calls vm_lifecycle(action='stop') to gracefully stop the VM before creating the VirtualMachineRestore. An unskilled report uses kubectl or skips the stop step.",
+    },
 ]
 
 SYSTEM_PROMPT = (

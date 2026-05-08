@@ -77,3 +77,40 @@ class TestSkillDependent:
         assert "readyToUse" in c, (
             "must verify snapshot readyToUse before restore"
         )
+
+    def test_vm_must_be_stopped(self):
+        """Skill teaches that VMs MUST be stopped before restore to
+        prevent data corruption. The skill provides stop-and-restore vs
+        cancel options. Without skill, agents attempt restore on running
+        VMs."""
+        c = read_report().lower()
+        has_stop_req = any(t in c for t in [
+            "must be stopped", "stop before", "stop the vm",
+            "stop-and-restore", "vm stopped",
+        ])
+        has_corruption = "corruption" in c or "data loss" in c
+        assert has_stop_req or has_corruption, (
+            "must require VM to be stopped before restore"
+        )
+
+    def test_vm_lifecycle_stop_tool(self):
+        """Skill teaches using vm_lifecycle MCP tool to stop the VM
+        before restore if it's running. Without skill, agents don't know
+        the vm_lifecycle tool exists."""
+        c = read_report()
+        assert "vm_lifecycle" in c, (
+            "must use vm_lifecycle MCP tool to stop VM before restore"
+        )
+
+    def test_status_restore_time(self):
+        """Skill teaches monitoring status.restoreTime on the
+        VirtualMachineRestore to capture completion timing. Without
+        skill, agents only check status.complete."""
+        c = read_report()
+        has_restore_time = "restoreTime" in c
+        has_timing = any(t in c.lower() for t in [
+            "restore time", "completion time", "elapsed",
+        ])
+        assert has_restore_time or has_timing, (
+            "must reference status.restoreTime or capture completion timing"
+        )

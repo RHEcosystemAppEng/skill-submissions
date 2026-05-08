@@ -13,4 +13,6 @@ The team has requested a Single Node OpenShift (SNO) cluster named `edge-site-01
 
 Write your complete provisioning plan in `/solution/report.md`.
 
-Use MCP tools to interact with the Assisted Installer API. If reference documentation or skills are available in this environment, consult them before beginning work. Complete the entire analysis autonomously — do not stop for user confirmation.
+**Important**: Before starting, check whether this environment provides reference documentation, skills, or other resources that can guide your approach. If tools, documentation, or structured workflows are available, use them to inform your analysis rather than working from general knowledge alone.
+
+Use MCP tools to interact with the Assisted Installer API. Complete the entire analysis autonomously — do not stop for user confirmation.

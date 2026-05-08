@@ -78,3 +78,34 @@ class TestSkillDependent:
         assert has_interfaces or has_ip, (
             "must reference status.interfaces[].ipAddress for VM IP"
         )
+
+    def test_exclude_non_pvc_volumes(self):
+        """Skill teaches excluding container disks and cloud-init from
+        storage calculations - only PVC-backed volumes count. Without
+        skill, agents include all volumes or skip storage entirely."""
+        c = read_report().lower()
+        has_exclusion = any(t in c for t in [
+            "container disk", "containerdisk", "cloudinit", "cloud-init",
+            "exclude", "pvc-backed", "pvc backed",
+        ])
+        assert has_exclusion, (
+            "must mention excluding container disks / cloud-init from storage"
+        )
+
+    def test_live_migratable_condition(self):
+        """Skill teaches reporting three VMI conditions: Ready,
+        AgentConnected, and LiveMigratable. Without skill, agents miss
+        LiveMigratable which indicates migration feasibility."""
+        c = read_report()
+        assert "LiveMigratable" in c, (
+            "must report LiveMigratable condition from VMI"
+        )
+
+    def test_printable_status_field(self):
+        """Skill teaches using status.printableStatus for the VM status
+        column (Running, Stopped, Migrating, etc). Without skill, agents
+        derive status from phase or conditions unreliably."""
+        c = read_report()
+        assert "printableStatus" in c, (
+            "must reference printableStatus for VM status display"
+        )

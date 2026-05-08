@@ -35,6 +35,18 @@ CRITERIA = [
         "question": "Does the report describe RunStrategy outcomes: start sets Always, stop sets Halted?",
         "reference": "A skilled report maps operations to RunStrategy values: start->Always, stop->Halted. An unskilled report doesn't explain the RunStrategy changes.",
     },
+    {
+        "id": "state_verification",
+        "file": "/solution/report.md",
+        "question": "Does the report describe using resources_get to verify the VM actually reached the desired state (printableStatus) after a vm_lifecycle action?",
+        "reference": "A skilled report verifies state transitions by calling resources_get and checking printableStatus == 'Stopped' or 'Running' after each vm_lifecycle action. An unskilled report assumes the operation succeeded without verification.",
+    },
+    {
+        "id": "already_in_state",
+        "file": "/solution/report.md",
+        "question": "Does the report handle the case where a VM is already in the desired state (e.g., already running when start is requested)?",
+        "reference": "A skilled report detects the current state before acting and informs the user when no action is needed. An unskilled report blindly issues the lifecycle command regardless of current state.",
+    },
 ]
 
 SYSTEM_PROMPT = (

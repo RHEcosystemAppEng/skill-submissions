@@ -80,3 +80,43 @@ class TestSkillDependent:
         assert "vm_lifecycle" in c, (
             "must reference vm_lifecycle tool for operations"
         )
+
+    def test_resources_get_state_verification(self):
+        """Skill teaches using resources_get after vm_lifecycle to verify
+        the VM actually transitioned (printableStatus == 'Stopped' or
+        'Running'). Without skill, agents assume the action succeeded."""
+        c = read_report()
+        has_get = "resources_get" in c
+        has_verify = any(t in c.lower() for t in [
+            "verify", "confirm", "check status", "poll",
+        ])
+        assert has_get or (has_verify and "printableStatus" in c), (
+            "must use resources_get to verify state transition after vm_lifecycle"
+        )
+
+    def test_already_in_state_awareness(self):
+        """Skill teaches detecting when a VM is already in the desired
+        state ('Already Running', 'Already Stopped') and reporting it
+        instead of executing a redundant action. Without skill, agents
+        blindly issue the command."""
+        c = read_report().lower()
+        has_already = any(t in c for t in [
+            "already running", "already stopped", "already in",
+            "desired state", "no action",
+        ])
+        assert has_already, (
+            "must handle already-in-desired-state scenario"
+        )
+
+    def test_error_doc_reference(self):
+        """Skill references lifecycle-errors.md and scheduling-errors.md
+        for troubleshooting stuck transitions and start failures.
+        Without skill, agents have no error playbook."""
+        c = read_report().lower()
+        has_ref = any(t in c for t in [
+            "lifecycle-errors", "scheduling-errors",
+            "errorunschedulable", "stuck",
+        ])
+        assert has_ref, (
+            "must reference troubleshooting docs for error scenarios"
+        )

@@ -90,7 +90,7 @@ Orchestrate VM migrations across OpenShift cluster nodes for load balancing, mai
 
 **Document Consultation** (REQUIRED - Execute FIRST):
 1. Read [REBALANCE_MANUAL.md](./REBALANCE_MANUAL.md) using Read tool
-2. Output: "I consulted [REBALANCE_MANUAL.md](/skills/vm-rebalance/REBALANCE_MANUAL.md) to understand the manual migration workflow."
+2. Output: "I consulted [REBALANCE_MANUAL.md](rh-virt/skills/vm-rebalance/REBALANCE_MANUAL.md) to understand the manual migration workflow."
 3. **Then execute**: Follow workflow in REBALANCE_MANUAL.md
 
 ---
@@ -99,7 +99,7 @@ Orchestrate VM migrations across OpenShift cluster nodes for load balancing, mai
 
 **Document Consultation** (REQUIRED - Execute FIRST):
 1. Read [REBALANCE_AUTOMATIC.md](./REBALANCE_AUTOMATIC.md) using Read tool
-2. Output: "I consulted [REBALANCE_AUTOMATIC.md](/skills/vm-rebalance/REBALANCE_AUTOMATIC.md) to understand the automatic rebalancing workflow."
+2. Output: "I consulted [REBALANCE_AUTOMATIC.md](rh-virt/skills/vm-rebalance/REBALANCE_AUTOMATIC.md) to understand the automatic rebalancing workflow."
 3. **Then execute**: Follow workflow in REBALANCE_AUTOMATIC.md
 
 ## Common Validation Logic
@@ -142,7 +142,7 @@ Orchestrate VM migrations across OpenShift cluster nodes for load balancing, mai
 
 **Errors**: Not found → "Node doesn't exist" | Not Ready → "Choose different target" | Cordoned → "Uncordon or choose different target"
 
-**Reference**: [/workspace/supportive/docs/troubleshooting/scheduling-errors.md](/workspace/supportive/docs/troubleshooting/scheduling-errors.md)
+**Reference**: [../../docs/troubleshooting/scheduling-errors.md](../../docs/troubleshooting/scheduling-errors.md)
 
 ## Node Selection for Automatic Rebalancing
 
@@ -271,12 +271,12 @@ If any node's CPU or Memory percentage **exceeds 100%** after rebalancing:
 ### Error 1: Live Migration Fails - Storage Not RWX
 **Symptom**: "Cannot live migrate: PVC access mode is ReadWriteOnce"
 **Solution**: Use cold migration OR convert PVC to RWX
-**Reference**: [/workspace/supportive/docs/troubleshooting/storage-errors.md](/workspace/supportive/docs/troubleshooting/storage-errors.md)
+**Reference**: [../../docs/troubleshooting/storage-errors.md](../../docs/troubleshooting/storage-errors.md)
 
 ### Error 2: VM Stuck ErrorUnschedulable After Cold Migration
 **Symptom**: "VM cannot be scheduled: ErrorUnschedulable"
 **Solution**: Check node capacity (`nodes_top`), verify no blocking taints (`resources_get` Node), add tolerations, choose different target, remove nodeSelector
-**Reference**: [/workspace/supportive/docs/troubleshooting/scheduling-errors.md](/workspace/supportive/docs/troubleshooting/scheduling-errors.md)
+**Reference**: [../../docs/troubleshooting/scheduling-errors.md](../../docs/troubleshooting/scheduling-errors.md)
 
 ### Error 3: Live Migration Times Out
 **Symptom**: "Migration exceeded timeout: 150s per GiB"
@@ -330,10 +330,10 @@ If any node's CPU or Memory percentage **exceeds 100%** after rebalancing:
 - [references/production-considerations.md](./references/production-considerations.md) - HA, capacity, security
 
 **Troubleshooting**:
-- [/workspace/supportive/docs/troubleshooting/INDEX.md](/workspace/supportive/docs/troubleshooting/INDEX.md) - Master index
-- [/workspace/supportive/docs/troubleshooting/scheduling-errors.md](/workspace/supportive/docs/troubleshooting/scheduling-errors.md) - ErrorUnschedulable, taints
-- [/workspace/supportive/docs/troubleshooting/storage-errors.md](/workspace/supportive/docs/troubleshooting/storage-errors.md) - PVC access modes
-- [/workspace/supportive/docs/troubleshooting/lifecycle-errors.md](/workspace/supportive/docs/troubleshooting/lifecycle-errors.md) - VM start/stop
+- [../../docs/troubleshooting/INDEX.md](../../docs/troubleshooting/INDEX.md) - Master index
+- [../../docs/troubleshooting/scheduling-errors.md](../../docs/troubleshooting/scheduling-errors.md) - ErrorUnschedulable, taints
+- [../../docs/troubleshooting/storage-errors.md](../../docs/troubleshooting/storage-errors.md) - PVC access modes
+- [../../docs/troubleshooting/lifecycle-errors.md](../../docs/troubleshooting/lifecycle-errors.md) - VM start/stop
 
 **Official Documentation**:
 - [OpenShift Virt - Live Migration](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html-single/virtualization/index#virt-live-migration)

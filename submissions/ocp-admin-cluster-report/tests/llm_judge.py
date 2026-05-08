@@ -47,6 +47,12 @@ CRITERIA = [
         "question": "Does the report show a verification or discovery step where each context is classified before collecting detailed data?",
         "reference": "A skilled report starts with a 'Cluster Discovery' or 'Verification' section showing which contexts are OpenShift, non-OpenShift, or unreachable. An unskilled report jumps directly to querying resources without verification.",
     },
+    {
+        "id": "nodes_top_metrics",
+        "file": "/solution/report.md",
+        "question": "Does the report include actual CPU and memory utilization data (from nodes_top or Metrics Server) alongside static capacity, showing usage percentages?",
+        "reference": "A skilled report uses nodes_top to show actual resource utilization (e.g., 'CPU: 4200m / 8000m = 52.5%'). An unskilled report only shows allocatable/capacity without runtime utilization data.",
+    },
 ]
 
 SYSTEM_PROMPT = (

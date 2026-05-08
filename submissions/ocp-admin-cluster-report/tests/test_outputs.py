@@ -122,3 +122,17 @@ class TestSkillDependent:
         assert has_verify, (
             "must include a cluster verification/discovery section"
         )
+
+    def test_nodes_top_metrics(self):
+        """Skill teaches using nodes_top MCP tool for actual CPU and memory
+        utilization alongside static capacity from nodes_list. Without
+        skill, agents only report allocatable resources or skip metrics."""
+        c = read_report()
+        has_nodes_top = "nodes_top" in c
+        has_utilization = any(t in c.lower() for t in [
+            "utilization", "usage %", "cpu usage", "memory usage",
+            "actual usage",
+        ])
+        assert has_nodes_top or has_utilization, (
+            "must reference nodes_top or actual resource utilization metrics"
+        )

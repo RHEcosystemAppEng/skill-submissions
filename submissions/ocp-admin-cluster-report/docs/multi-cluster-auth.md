@@ -1,3 +1,23 @@
+---
+title: Multi-Cluster Authentication with Service Account Tokens
+category: authentication
+sources:
+  - title: Understanding authentication
+    url: https://docs.openshift.com/container-platform/latest/authentication/understanding-authentication.html
+    date_accessed: 2026-03-31
+  - title: Using service accounts
+    url: https://docs.openshift.com/container-platform/latest/authentication/using-service-accounts-in-applications.html
+    date_accessed: 2026-03-31
+  - title: Advanced Cluster Management for Kubernetes
+    url: https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes
+    date_accessed: 2026-03-31
+tags: [multi-cluster, authentication, service-accounts, kubeconfig, cluster-report]
+semantic_keywords: [multi-cluster authentication, service account tokens, long-lived tokens, non-interactive auth, merged kubeconfig, fleet authentication]
+use_cases: [cluster-report, multi-cluster-management, fleet-operations]
+related_docs: [credentials-management.md, rbac.md, quick-reference.md]
+last_updated: 2026-03-31
+---
+
 # Multi-Cluster Authentication with Service Account Tokens
 
 Set up non-interactive, long-lived authentication for running `cluster-report` across many OpenShift clusters without repeated `oc login` sessions.

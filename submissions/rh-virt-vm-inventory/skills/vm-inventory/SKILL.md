@@ -189,7 +189,7 @@ Required: VM name, Namespace (ask if not provided)
 
 **Step 3: Interpret Status and Conditions (Optional)**
 
-**OPTIONAL**: If VM has error status (ErrorUnschedulable, ErrorDataVolumeNotReady, CrashLoopBackOff), consult [troubleshooting/INDEX.md](/workspace/supportive/docs/troubleshooting/INDEX.md) using Read tool. Output: "Consulted INDEX.md to interpret status."
+**OPTIONAL**: If VM has error status (ErrorUnschedulable, ErrorDataVolumeNotReady, CrashLoopBackOff), consult [troubleshooting/INDEX.md](../../docs/troubleshooting/INDEX.md) using Read tool. Output: "Consulted INDEX.md to interpret status."
 
 **When to consult**: VM status is Error/Warning or stuck state (CrashLoopBackOff, Terminating)
 **When NOT to consult**: VM status is normal (Running, Stopped, Provisioning)
@@ -318,7 +318,7 @@ Display with explanation: `## 📋 VMs with label 'app=web'` + list/table using 
 - `vm-troubleshooter` (planned) - Diagnose problematic VMs from inventory
 
 ### Reference Documentation
-- [Troubleshooting INDEX](/workspace/supportive/docs/troubleshooting/INDEX.md) - VM status interpretation (optionally consulted when displaying VM details with error states)
+- [Troubleshooting INDEX](../../docs/troubleshooting/INDEX.md) - VM status interpretation (optionally consulted when displaying VM details with error states)
 - [OpenShift Virtualization Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html-single/virtualization/index#virt/about_virt/about-virt.html)
 - [KubeVirt VirtualMachine API](https://kubevirt.io/api-reference/)
 - [Accessing VMs](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html-single/virtualization/index#virt/virtual_machines/virt-accessing-vm-consoles.html)

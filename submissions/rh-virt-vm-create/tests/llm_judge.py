@@ -35,6 +35,12 @@ CRITERIA = [
         "question": "Does the report check StorageClass volumeBindingMode (Immediate vs WaitForFirstConsumer) as part of storage analysis?",
         "reference": "A skilled report checks volumeBindingMode to understand when PVC binding occurs. An unskilled report doesn't analyze StorageClass binding behavior.",
     },
+    {
+        "id": "performance_instance_type",
+        "file": "/solution/report.md",
+        "question": "Does the report reference KubeVirt performance profiles or instance type prefixes (u1, c1, m1, o1) for VM sizing?",
+        "reference": "A skilled report uses KubeVirt instance type prefixes: u1 (general purpose), c1 (compute-optimized), m1 (memory-optimized), o1 (overcommitted). An unskilled report uses raw vCPU/memory numbers without referencing the instance type system.",
+    },
 ]
 
 SYSTEM_PROMPT = (

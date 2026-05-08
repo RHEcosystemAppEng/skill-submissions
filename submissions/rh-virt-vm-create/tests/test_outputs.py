@@ -88,3 +88,15 @@ class TestSkillDependent:
         assert has_binding, (
             "must reference volumeBindingMode on StorageClass"
         )
+
+    def test_performance_instance_type(self):
+        """Skill teaches 4 performance profiles: u1 (general purpose),
+        c1 (compute), m1 (memory), o1 (overcommitted). Without skill,
+        agents don't know these KubeVirt instance type prefixes."""
+        c = read_report()
+        profiles = ["u1", "c1", "m1", "o1"]
+        has_profile = any(p in c for p in profiles)
+        has_instance_type = "instance" in c.lower() and "type" in c.lower()
+        assert has_profile or has_instance_type, (
+            "must reference performance profiles (u1/c1/m1/o1) or instance types"
+        )

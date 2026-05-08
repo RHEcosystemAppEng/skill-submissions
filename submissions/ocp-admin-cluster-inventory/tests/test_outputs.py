@@ -89,3 +89,32 @@ class TestSkillDependent:
         assert other_count >= 2, (
             "must reference at least 2 additional status strings alongside pending-for-input"
         )
+
+    def test_list_clusters_tool(self):
+        """Skill teaches using list_clusters MCP tool from both servers
+        as the primary discovery mechanism. Without skill, agents use
+        kubectl or generic API calls."""
+        c = read_report()
+        assert "list_clusters" in c, (
+            "must use list_clusters MCP tool for cluster discovery"
+        )
+
+    def test_cluster_info_tool(self):
+        """Skill teaches using cluster_info MCP tool for detail queries,
+        routed to the correct server based on source field.
+        Without skill, agents don't know this tool exists."""
+        c = read_report()
+        assert "cluster_info" in c, (
+            "must use cluster_info MCP tool for detailed cluster data"
+        )
+
+    def test_sno_detection(self):
+        """Skill teaches detecting SNO (Single Node OpenShift) via
+        platform == none AND single_node == true, distinct from regular
+        OCP. Without skill, agents miss SNO classification."""
+        c = read_report()
+        has_sno = "SNO" in c or "Single Node" in c
+        has_single = "single_node" in c.lower()
+        assert has_sno or has_single, (
+            "must detect and report SNO (Single Node OpenShift) clusters"
+        )

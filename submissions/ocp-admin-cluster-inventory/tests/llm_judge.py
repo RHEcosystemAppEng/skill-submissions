@@ -35,6 +35,18 @@ CRITERIA = [
         "question": "Does the report mention that cluster_events and cluster_logs are only available for self-managed clusters, not ROSA/ARO/OSD?",
         "reference": "A skilled report notes that cluster_events and cluster_logs_download_url exist only on openshift-self-managed. An unskilled report tries these on all clusters.",
     },
+    {
+        "id": "list_clusters_tool",
+        "file": "/solution/report.md",
+        "question": "Does the report use the list_clusters MCP tool from both servers as the primary fleet discovery mechanism?",
+        "reference": "A skilled report calls list_clusters on both openshift-self-managed and openshift-ocm-managed to get complete fleet data. An unskilled report uses kubectl or a single generic API call.",
+    },
+    {
+        "id": "sno_detection",
+        "file": "/solution/report.md",
+        "question": "Does the report detect and classify SNO (Single Node OpenShift) clusters by checking platform and single_node fields?",
+        "reference": "A skilled report identifies SNO clusters via platform='none' and single_node=true, classifying them separately from regular OCP multi-node clusters. An unskilled report groups SNO with regular OCP.",
+    },
 ]
 
 SYSTEM_PROMPT = (

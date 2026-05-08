@@ -1,0 +1,197 @@
+{
+  "index_version": "1.0.0",
+  "last_updated": "2026-05-01",
+  "description": "Semantic index for ocp-admin documentation - maps skills and topics to relevant documentation files",
+
+  "documents": [
+    {
+      "file": "INDEX.md",
+      "title": "Documentation Index",
+      "category": "navigation",
+      "keywords": ["index", "navigation", "overview", "documentation map"],
+      "use_cases": ["navigation", "topic-discovery", "general-guidance"],
+      "token_estimate": 400,
+      "skills": ["all"]
+    },
+    {
+      "file": "SOURCES.md",
+      "title": "Documentation Sources",
+      "category": "meta",
+      "keywords": ["sources", "references", "origin"],
+      "use_cases": ["attribution", "source-verification"],
+      "token_estimate": 200,
+      "skills": ["all"]
+    },
+    {
+      "file": "troubleshooting.md",
+      "title": "Cluster Troubleshooting",
+      "category": "troubleshooting",
+      "keywords": ["errors", "diagnosis", "cluster status", "installation failures", "validation errors", "event analysis"],
+      "use_cases": ["installation-failure", "cluster-status-diagnosis", "event-interpretation"],
+      "token_estimate": 2000,
+      "skills": ["cluster-creator", "cluster-inventory"]
+    },
+    {
+      "file": "networking.md",
+      "title": "Network Configuration",
+      "category": "networking",
+      "keywords": ["VIPs", "CIDR", "machine network", "service network", "cluster network", "SDN", "OVN", "DNS"],
+      "use_cases": ["network-planning", "VIP-configuration", "CIDR-selection"],
+      "token_estimate": 2500,
+      "skills": ["cluster-creator"]
+    },
+    {
+      "file": "static-networking-guide.md",
+      "title": "Static Networking (NMState)",
+      "category": "networking",
+      "keywords": ["NMState", "static IP", "YAML", "bond", "VLAN", "bridge", "network-config"],
+      "use_cases": ["static-network-setup", "NMState-configuration", "air-gapped-networking"],
+      "token_estimate": 3000,
+      "skills": ["cluster-creator"]
+    },
+    {
+      "file": "host-requirements.md",
+      "title": "Host Hardware Requirements",
+      "category": "prerequisites",
+      "keywords": ["CPU", "memory", "disk", "hardware", "SNO requirements", "HA requirements", "minimum specs"],
+      "use_cases": ["hardware-validation", "capacity-planning", "host-readiness"],
+      "token_estimate": 1500,
+      "skills": ["cluster-creator"]
+    },
+    {
+      "file": "platforms.md",
+      "title": "OpenShift Platform Types",
+      "category": "reference",
+      "keywords": ["SNO", "OCP", "ROSA", "ARO", "OSD", "platform comparison", "cluster types"],
+      "use_cases": ["platform-selection", "cluster-type-comparison"],
+      "token_estimate": 1200,
+      "skills": ["cluster-creator", "cluster-inventory"]
+    },
+    {
+      "file": "providers.md",
+      "title": "Infrastructure Providers",
+      "category": "reference",
+      "keywords": ["baremetal", "vsphere", "nutanix", "oci", "provider configuration"],
+      "use_cases": ["provider-selection", "infrastructure-setup"],
+      "token_estimate": 1200,
+      "skills": ["cluster-creator"]
+    },
+    {
+      "file": "input-validation-guide.md",
+      "title": "Input Validation Rules",
+      "category": "reference",
+      "keywords": ["validation", "cluster name", "base domain", "SSH key", "pull secret", "parameter rules"],
+      "use_cases": ["parameter-validation", "input-checking"],
+      "token_estimate": 1500,
+      "skills": ["cluster-creator"]
+    },
+    {
+      "file": "credentials-management.md",
+      "title": "Credentials Management",
+      "category": "security",
+      "keywords": ["KUBECONFIG", "OFFLINE_TOKEN", "authentication", "service accounts", "credentials"],
+      "use_cases": ["credential-setup", "authentication-configuration"],
+      "token_estimate": 1200,
+      "skills": ["cluster-creator", "cluster-report"]
+    },
+    {
+      "file": "multi-cluster-auth.md",
+      "title": "Multi-Cluster Authentication",
+      "category": "security",
+      "keywords": ["multi-cluster", "service account", "kubeconfig merge", "context switching"],
+      "use_cases": ["multi-cluster-setup", "kubeconfig-management"],
+      "token_estimate": 1500,
+      "skills": ["cluster-report"]
+    },
+    {
+      "file": "rbac.md",
+      "title": "RBAC and Security Context",
+      "category": "security",
+      "keywords": ["RBAC", "roles", "ClusterRole", "SCC", "permissions", "access control"],
+      "use_cases": ["access-control", "security-configuration"],
+      "token_estimate": 1500,
+      "skills": ["cluster-creator", "cluster-report"]
+    },
+    {
+      "file": "certificate-management.md",
+      "title": "Certificate Management",
+      "category": "security",
+      "keywords": ["TLS", "certificates", "CA", "cert-manager", "certificate lifecycle"],
+      "use_cases": ["certificate-setup", "TLS-configuration"],
+      "token_estimate": 1200,
+      "skills": ["cluster-creator"]
+    },
+    {
+      "file": "certificate-rotation.md",
+      "title": "Certificate Rotation",
+      "category": "security",
+      "keywords": ["rotation", "renewal", "expiry", "certificate refresh"],
+      "use_cases": ["certificate-renewal", "expiry-handling"],
+      "token_estimate": 1000,
+      "skills": ["cluster-creator"]
+    },
+    {
+      "file": "security-checklist.md",
+      "title": "Security Checklist",
+      "category": "security",
+      "keywords": ["security", "post-install", "hardening", "verification", "checklist"],
+      "use_cases": ["security-verification", "post-install-checks"],
+      "token_estimate": 1000,
+      "skills": ["cluster-creator"]
+    },
+    {
+      "file": "idp.md",
+      "title": "Identity Providers",
+      "category": "security",
+      "keywords": ["HTPasswd", "LDAP", "OIDC", "GitHub", "identity provider", "authentication"],
+      "use_cases": ["authentication-setup", "IDP-configuration"],
+      "token_estimate": 1500,
+      "skills": ["cluster-creator"]
+    },
+    {
+      "file": "storage.md",
+      "title": "Storage Configuration",
+      "category": "infrastructure",
+      "keywords": ["storage class", "PV", "PVC", "ODF", "local storage", "CSI"],
+      "use_cases": ["storage-selection", "storage-configuration"],
+      "token_estimate": 1200,
+      "skills": ["cluster-creator"]
+    },
+    {
+      "file": "backup-restore.md",
+      "title": "Backup and Restore",
+      "category": "operations",
+      "keywords": ["backup", "restore", "etcd", "disaster recovery", "OADP"],
+      "use_cases": ["disaster-recovery", "backup-planning"],
+      "token_estimate": 1500,
+      "skills": ["cluster-report"]
+    },
+    {
+      "file": "day-2-operations.md",
+      "title": "Day-2 Operations",
+      "category": "operations",
+      "keywords": ["day-2", "scaling", "upgrades", "maintenance", "monitoring"],
+      "use_cases": ["post-install-operations", "cluster-maintenance"],
+      "token_estimate": 2000,
+      "skills": ["cluster-report"]
+    },
+    {
+      "file": "examples.md",
+      "title": "Configuration Examples",
+      "category": "reference",
+      "keywords": ["examples", "HA cluster", "SNO", "static networking", "air-gapped"],
+      "use_cases": ["configuration-reference", "example-lookup"],
+      "token_estimate": 2000,
+      "skills": ["cluster-creator"]
+    },
+    {
+      "file": "quick-reference.md",
+      "title": "Quick Reference",
+      "category": "reference",
+      "keywords": ["quick reference", "cheat sheet", "commands", "common tasks"],
+      "use_cases": ["quick-lookup", "command-reference"],
+      "token_estimate": 800,
+      "skills": ["all"]
+    }
+  ]
+}

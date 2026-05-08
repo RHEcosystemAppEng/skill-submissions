@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "openshift-self-managed": {
+      "command": "python3",
+      "args": [
+        "/workspace/supportive/mcp-servers/mock-assisted-installer-mcp.py"
+      ]
+    }
+  }
+}

@@ -35,6 +35,18 @@ CRITERIA = [
         "question": "Does the report describe the cluster status lifecycle: waiting for 'ready' before install, then monitoring for 'installed' or 'error'?",
         "reference": "A skilled report monitors cluster status: 'ready' = can trigger install, 'installed' = success, 'error' = failure. An unskilled report doesn't describe the status lifecycle.",
     },
+    {
+        "id": "iso_discovery_workflow",
+        "file": "/solution/report.md",
+        "question": "Does the report describe the discovery ISO workflow: generating an ISO via cluster_iso_download_url, booting hosts from it, and waiting for host discovery?",
+        "reference": "A skilled report describes the Assisted Installer's ISO-based discovery: generate ISO, boot bare metal hosts, wait for discovery. An unskilled report skips the ISO generation step or doesn't know about the host discovery process.",
+    },
+    {
+        "id": "install_cluster_trigger",
+        "file": "/solution/report.md",
+        "question": "Does the report reference install_cluster as an explicit API call to trigger the installation after hosts are validated and cluster is ready?",
+        "reference": "A skilled report calls install_cluster explicitly after readiness validation. An unskilled report assumes installation starts automatically or doesn't describe the trigger mechanism.",
+    },
 ]
 
 SYSTEM_PROMPT = (

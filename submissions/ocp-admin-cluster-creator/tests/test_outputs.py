@@ -83,3 +83,23 @@ class TestSkillDependent:
         assert has_progression, (
             "must reference status lifecycle: installing → installed progression"
         )
+
+    def test_iso_generation_workflow(self):
+        """Skill teaches cluster_iso_download_url as the tool to generate
+        a discovery ISO that hosts must boot from. Without skill, agents
+        don't know the Assisted Installer ISO-based discovery workflow."""
+        c = read_report()
+        has_iso_tool = "cluster_iso_download_url" in c
+        has_iso = "discovery iso" in c.lower() or "boot" in c.lower() and "iso" in c.lower()
+        assert has_iso_tool or has_iso, (
+            "must reference cluster_iso_download_url or discovery ISO boot process"
+        )
+
+    def test_install_cluster_tool(self):
+        """Skill teaches install_cluster as a separate explicit tool call
+        to trigger installation after readiness validation. Without skill,
+        agents don't know installation requires an explicit API trigger."""
+        c = read_report()
+        assert "install_cluster" in c, (
+            "must reference install_cluster tool for triggering installation"
+        )

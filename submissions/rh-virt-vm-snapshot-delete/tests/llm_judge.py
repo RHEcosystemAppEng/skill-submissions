@@ -35,6 +35,18 @@ CRITERIA = [
         "question": "Does the report use vm.kubevirt.io/name labelSelector or spec.source.name filtering to find sibling snapshots?",
         "reference": "A skilled report finds sibling snapshots via labelSelector vm.kubevirt.io/name or by filtering on spec.source.name. An unskilled report doesn't check for other recovery points.",
     },
+    {
+        "id": "last_snapshot_warning",
+        "file": "/solution/report.md",
+        "question": "Does the report warn the user when the snapshot being deleted is the ONLY snapshot for the VM, meaning no recovery points will remain?",
+        "reference": "A skilled report counts sibling snapshots and displays a prominent warning when this is the last one: 'This is the ONLY snapshot for VM. After deletion, no snapshot recovery points will exist.' An unskilled report deletes without regard for remaining recovery options.",
+    },
+    {
+        "id": "resources_delete_tool",
+        "file": "/solution/report.md",
+        "question": "Does the report use the resources_delete MCP tool with the snapshot.kubevirt.io/v1beta1 GVK rather than generic kubectl?",
+        "reference": "A skilled report calls resources_delete with apiVersion=snapshot.kubevirt.io/v1beta1, kind=VirtualMachineSnapshot for deletion. An unskilled report uses kubectl delete or a generic API call.",
+    },
 ]
 
 SYSTEM_PROMPT = (

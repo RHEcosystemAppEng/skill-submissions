@@ -71,3 +71,30 @@ class TestSkillDependent:
         assert "virtualmachinesnapshots" in c.lower(), (
             "must verify RBAC for snapshot.kubevirt.io/virtualmachinesnapshots"
         )
+
+    def test_last_snapshot_warning(self):
+        """Skill teaches counting sibling snapshots and warning when this
+        is the ONLY snapshot for the VM - after deletion no recovery
+        points exist. Without skill, agents delete without considering
+        whether other snapshots remain."""
+        c = read_report().lower()
+        has_last = any(t in c for t in [
+            "only snapshot", "last snapshot", "no snapshot",
+            "no recovery", "sole snapshot",
+        ])
+        has_count = any(t in c for t in [
+            "count snapshot", "snapshot count", "remaining snapshot",
+            "other snapshot",
+        ])
+        assert has_last or has_count, (
+            "must warn about last-snapshot-for-VM scenario"
+        )
+
+    def test_resources_delete_tool_usage(self):
+        """Skill teaches using resources_delete MCP tool with the exact
+        snapshot.kubevirt.io/v1beta1 GVK for deletion. Without skill,
+        agents use generic kubectl delete."""
+        c = read_report()
+        assert "resources_delete" in c, (
+            "must use resources_delete MCP tool for snapshot deletion"
+        )

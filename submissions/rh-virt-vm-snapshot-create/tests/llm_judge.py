@@ -35,6 +35,18 @@ CRITERIA = [
         "question": "Does the report identify hot-plugged volumes as blocking snapshot creation and explain persistence into spec.template.spec.volumes?",
         "reference": "A skilled report warns hot-plugged volumes block snapshots and recommends persisting them in spec.template.spec.volumes. An unskilled report doesn't mention this blocker.",
     },
+    {
+        "id": "consistency_levels",
+        "file": "/solution/report.md",
+        "question": "Does the report distinguish between application-consistent snapshots (with GuestAgent/filesystem freeze) and crash-consistent snapshots (Online without GuestAgent)?",
+        "reference": "A skilled report explains two consistency levels: GuestAgent indication means filesystem freeze/thaw (application-consistent), while Online without GuestAgent means crash-consistent only. An unskilled report treats all snapshots as equivalent.",
+    },
+    {
+        "id": "storage_prereq_analysis",
+        "file": "/solution/report.md",
+        "question": "Does the report describe a pre-snapshot storage analysis checking volumeSnapshotStatuses, CSI driver capabilities, and VolumeSnapshotClass compatibility?",
+        "reference": "A skilled report performs a 9-step storage analysis: check volumeSnapshotStatuses, verify storage class, find VolumeSnapshotClass, validate CSI driver snapshot support. An unskilled report skips storage validation entirely.",
+    },
 ]
 
 SYSTEM_PROMPT = (

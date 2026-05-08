@@ -75,3 +75,42 @@ class TestSkillDependent:
         assert "VolumeSnapshotClass" in c, (
             "must reference VolumeSnapshotClass prerequisite check"
         )
+
+    def test_hot_plugged_volume_blocker(self):
+        """Skill teaches that hot-plugged volumes block snapshot creation
+        and must be persisted into spec.template.spec.volumes first.
+        Without skill, agents don't know this prerequisite."""
+        c = read_report().lower()
+        has_hot_plug = any(t in c for t in [
+            "hot-plug", "hotplug", "hot plug",
+        ])
+        assert has_hot_plug, (
+            "must check for hot-plugged volumes as snapshot blocker"
+        )
+
+    def test_online_crash_consistent_distinction(self):
+        """Skill teaches that Online snapshot WITHOUT GuestAgent indication
+        is only crash-consistent (no filesystem freeze), while WITH
+        GuestAgent it is application-consistent. Without skill, agents
+        don't distinguish consistency levels."""
+        c = read_report().lower()
+        has_crash = "crash" in c and "consistent" in c
+        has_app = "application" in c and "consistent" in c
+        has_freeze = "freeze" in c or "thaw" in c or "quiesce" in c
+        assert has_crash or has_app or has_freeze, (
+            "must distinguish crash-consistent vs application-consistent snapshots"
+        )
+
+    def test_volume_snapshot_statuses_field(self):
+        """Skill teaches saving status.volumeSnapshotStatuses from the VM
+        for storage analysis before creating a snapshot. Without skill,
+        agents skip pre-snapshot storage validation."""
+        c = read_report()
+        has_field = "volumeSnapshotStatus" in c
+        has_storage_analysis = any(t in c.lower() for t in [
+            "storage analysis", "storage validation", "storage class",
+            "csi driver",
+        ])
+        assert has_field or has_storage_analysis, (
+            "must reference volumeSnapshotStatuses or perform storage analysis"
+        )

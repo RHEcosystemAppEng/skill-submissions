@@ -75,3 +75,21 @@ class TestSkillDependent:
         assert has_rwo and has_cold, (
             "must identify RWO storage as blocking live migration"
         )
+
+    def test_migration_concurrency_limit(self):
+        """Reference live-migration-best-practices.md teaches
+        parallelMigrationsPerCluster=5 (cluster-wide) and
+        parallelOutboundMigrationsPerNode=2 (per-node) as the default
+        concurrent migration limits from HyperConverged CR.
+        Without references, agents don't know these constraints."""
+        c = read_report()
+        has_parallel = "parallelMigrations" in c
+        has_limit = any(t in c for t in [
+            "concurrent migrat", "parallel migrat", "migration limit",
+            "5 migrat", "5 concurrent", "2 per node",
+        ])
+        has_hyperconverged = "HyperConverged" in c
+        assert has_parallel or has_limit or has_hyperconverged, (
+            "must reference concurrent migration limits "
+            "(parallelMigrationsPerCluster/parallelOutboundMigrationsPerNode)"
+        )

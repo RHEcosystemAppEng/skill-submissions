@@ -35,6 +35,12 @@ CRITERIA = [
         "question": "Does the report filter eligible target nodes using devices.kubevirt.io/kvm or kubevirt.io/schedulable labels?",
         "reference": "A skilled report checks devices.kubevirt.io/kvm > 0 and kubevirt.io/schedulable=true to identify KVM-capable worker nodes. An unskilled report assumes all worker nodes can host VMs.",
     },
+    {
+        "id": "migration_concurrency_limit",
+        "file": "/solution/report.md",
+        "question": "Does the report mention concurrent migration limits such as parallelMigrationsPerCluster (default 5) or parallelOutboundMigrationsPerNode (default 2) from the HyperConverged CR?",
+        "reference": "A skilled report references the HyperConverged CR's liveMigrationConfig with parallelMigrationsPerCluster=5 and parallelOutboundMigrationsPerNode=2 as constraints on how many VMs can migrate simultaneously. An unskilled report ignores concurrency limits entirely.",
+    },
 ]
 
 SYSTEM_PROMPT = (

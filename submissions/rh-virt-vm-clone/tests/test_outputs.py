@@ -74,3 +74,31 @@ class TestSkillDependent:
         assert "cdi.kubevirt.io/v1beta1" in c, (
             "must reference cdi.kubevirt.io/v1beta1 for DataVolume GVK"
         )
+
+    def test_clone_source_pvc_field(self):
+        """Skill teaches DataVolume cloning uses source.pvc (with
+        namespace and name) to reference the original PVC as the clone
+        source. Without skill, agents don't know the CDI clone spec."""
+        c = read_report()
+        has_source_pvc = "source.pvc" in c or "source: pvc" in c.lower()
+        has_clone_source = "cloneFrom" in c or ("source" in c and "pvc" in c.lower())
+        assert has_source_pvc or has_clone_source, (
+            "must reference source.pvc in DataVolume for clone source"
+        )
+
+    def test_metadata_cleanup_on_clone(self):
+        """Skill teaches removing uid, resourceVersion, and
+        creationTimestamp from cloned VM metadata to avoid conflicts.
+        Without skill, agents copy the full spec including server-set
+        fields, causing creation errors."""
+        c = read_report()
+        has_uid = "uid" in c.lower()
+        has_rv = "resourceVersion" in c
+        has_cleanup = any(t in c.lower() for t in [
+            "remove uid", "strip metadata", "clear metadata",
+            "remove resourceversion", "server-set",
+        ])
+        assert has_rv or has_cleanup or has_uid, (
+            "must reference removing uid/resourceVersion/creationTimestamp "
+            "from cloned metadata"
+        )

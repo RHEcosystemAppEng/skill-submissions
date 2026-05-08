@@ -35,6 +35,12 @@ CRITERIA = [
         "question": "Does the report use the vm.kubevirt.io/name labelSelector to discover source DataVolumes for cloning?",
         "reference": "A skilled report uses labelSelector vm.kubevirt.io/name=<vm-name> on DataVolume resources to find all associated storage. An unskilled report manually lists volumes or hardcodes them.",
     },
+    {
+        "id": "clone_source_pvc",
+        "file": "/solution/report.md",
+        "question": "Does the report describe creating a DataVolume with source.pvc referencing the original PVC as the clone source for storage duplication?",
+        "reference": "A skilled report creates a DataVolume with source.pvc containing the source PVC namespace and name. An unskilled report tries to copy files or share PVCs directly without the CDI cloning mechanism.",
+    },
 ]
 
 SYSTEM_PROMPT = (

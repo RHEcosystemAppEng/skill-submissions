@@ -13,4 +13,6 @@ The cluster has VMs spread across multiple namespaces. Some are running, some st
 
 Write the inventory report in `/solution/report.md`.
 
-Use MCP tools to gather VM data. If reference documentation or skills are available in this environment, consult them before beginning work. Complete the entire analysis autonomously — do not stop for user confirmation.
+**Important**: Before starting, check whether this environment provides reference documentation, skills, or other resources that can guide your approach. If tools, documentation, or structured workflows are available, use them to inform your analysis rather than working from general knowledge alone.
+
+Use MCP tools to gather VM data. Complete the entire analysis autonomously — do not stop for user confirmation.

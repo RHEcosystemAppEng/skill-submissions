@@ -78,3 +78,32 @@ class TestSkillDependent:
         assert has_ready_false, (
             "must reference readyToUse == false as troubleshooting trigger"
         )
+
+    def test_creation_timestamp_age(self):
+        """Skill teaches calculating and displaying Age from
+        metadata.creationTimestamp. Without skill, agents show raw
+        timestamps or omit age entirely."""
+        c = read_report().lower()
+        has_age = "age" in c
+        has_timestamp = "creationtimestamp" in c
+        assert has_age or has_timestamp, (
+            "must display age calculated from metadata.creationTimestamp"
+        )
+
+    def test_table_display_format(self):
+        """Skill teaches a specific table format with columns: Snapshot
+        Name, VM Name, Status, Created, Age, ReadyToUse. Without skill,
+        agents present data as unstructured text."""
+        c = read_report()
+        pipe_count = c.count("|")
+        assert pipe_count >= 6, (
+            "must present snapshots in a structured table format"
+        )
+
+    def test_resources_list_tool(self):
+        """Skill teaches using resources_list MCP tool with the snapshot
+        GVK. Without skill, agents use kubectl or generic API calls."""
+        c = read_report()
+        assert "resources_list" in c, (
+            "must use resources_list MCP tool for snapshot discovery"
+        )

@@ -35,6 +35,18 @@ CRITERIA = [
         "question": "Does the report reference the exact status.phase values InProgress, Succeeded, and/or Failed?",
         "reference": "A skilled report uses exact phase strings: InProgress, Succeeded, Failed. An unskilled report uses generic status descriptions.",
     },
+    {
+        "id": "age_from_timestamp",
+        "file": "/solution/report.md",
+        "question": "Does the report display an 'Age' column calculated from metadata.creationTimestamp for each snapshot?",
+        "reference": "A skilled report calculates human-readable age (e.g., '2 days', '3 hours') from metadata.creationTimestamp. An unskilled report shows raw timestamps or omits age.",
+    },
+    {
+        "id": "resources_list_tool",
+        "file": "/solution/report.md",
+        "question": "Does the report use the resources_list MCP tool to query VirtualMachineSnapshot resources rather than kubectl?",
+        "reference": "A skilled report calls resources_list with apiVersion=snapshot.kubevirt.io/v1beta1, kind=VirtualMachineSnapshot. An unskilled report uses kubectl get or a generic API approach.",
+    },
 ]
 
 SYSTEM_PROMPT = (

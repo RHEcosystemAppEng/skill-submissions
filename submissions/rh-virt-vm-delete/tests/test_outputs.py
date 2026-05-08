@@ -87,3 +87,31 @@ class TestSkillDependent:
         assert "kubevirt.io/v1" in c or "resources_delete" in c, (
             "must reference kubevirt.io/v1 GVK or resources_delete for VM deletion"
         )
+
+    def test_storage_cleanup_options(self):
+        """Skill teaches two deletion options: VM-only (preserves storage
+        for reuse) vs VM+Storage (deletes DataVolumes and PVCs).
+        Without skill, agents delete everything or nothing."""
+        c = read_report().lower()
+        has_preserve = any(t in c for t in [
+            "preserve", "vm only", "vm-only", "keep storage", "reuse",
+        ])
+        has_complete = any(t in c for t in [
+            "vm + storage", "vm+storage", "complete cleanup",
+            "delete storage", "free storage",
+        ])
+        assert has_preserve or has_complete, (
+            "must present storage cleanup options (preserve vs delete)"
+        )
+
+    def test_finalizer_stuck_handling(self):
+        """Skill and lifecycle-errors.md reference teach that VMs stuck
+        in Terminating state require checking and removing finalizers
+        via resources_create_or_update. Without skill, agents don't know
+        about Kubernetes finalizer mechanics for VMs."""
+        c = read_report().lower()
+        has_finalizer = "finalizer" in c
+        has_terminating = "terminating" in c
+        assert has_finalizer or has_terminating, (
+            "must reference finalizer handling or Terminating state diagnosis"
+        )

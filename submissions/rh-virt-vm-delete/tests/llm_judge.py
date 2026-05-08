@@ -35,6 +35,18 @@ CRITERIA = [
         "question": "Does the report explicitly forbid or avoid --force and --grace-period=0 for VM deletion?",
         "reference": "A skilled report follows a 'No Force Delete' policy: never uses --force or --grace-period=0, instead handles stuck deletions via finalizer inspection. An unskilled report suggests force deletion as a troubleshooting step.",
     },
+    {
+        "id": "storage_options",
+        "file": "/solution/report.md",
+        "question": "Does the report describe two distinct deletion options: VM-only (preserving storage for reuse) and VM+Storage (complete cleanup including DataVolumes and PVCs)?",
+        "reference": "A skilled report presents both options: delete VM only (storage preserved for reattachment) and delete VM+Storage (DataVolumes and PVCs removed, storage freed). An unskilled report deletes everything indiscriminately or doesn't mention preserving storage.",
+    },
+    {
+        "id": "finalizer_handling",
+        "file": "/solution/report.md",
+        "question": "Does the report describe handling VMs stuck in Terminating state by inspecting and potentially removing finalizers?",
+        "reference": "A skilled report explains that finalizers can block deletion, and teaches using resources_get to check finalizers and resources_create_or_update to remove them as a last resort. An unskilled report either ignores stuck deletions or suggests --force.",
+    },
 ]
 
 SYSTEM_PROMPT = (

@@ -18,28 +18,22 @@ CRITERIA = [
         "reference": "A skilled report sets runStrategy: Halted on the clone spec to prevent it from starting immediately. An unskilled report either starts the clone immediately or doesn't specify the run strategy.",
     },
     {
-        "id": "firmware_regeneration",
-        "file": "/solution/report.md",
-        "question": "Does the report mention regenerating domain.firmware.uuid and/or domain.firmware.serial in the clone spec?",
-        "reference": "A skilled report regenerates domain.firmware.uuid and domain.firmware.serial to avoid identity collision with the source VM. An unskilled report clones without changing firmware identifiers.",
-    },
-    {
         "id": "metadata_stripping",
         "file": "/solution/report.md",
         "question": "Does the report mention stripping server-managed fields (uid, resourceVersion, creationTimestamp) from the cloned VM spec?",
         "reference": "A skilled report removes uid, resourceVersion, creationTimestamp, and status from the source manifest before creating the clone. An unskilled report applies the full source manifest as-is.",
     },
     {
-        "id": "datavolume_discovery",
-        "file": "/solution/report.md",
-        "question": "Does the report use the vm.kubevirt.io/name labelSelector to discover source DataVolumes for cloning?",
-        "reference": "A skilled report uses labelSelector vm.kubevirt.io/name=<vm-name> on DataVolume resources to find all associated storage. An unskilled report manually lists volumes or hardcodes them.",
-    },
-    {
         "id": "clone_source_pvc",
         "file": "/solution/report.md",
         "question": "Does the report describe creating a DataVolume with source.pvc referencing the original PVC as the clone source for storage duplication?",
         "reference": "A skilled report creates a DataVolume with source.pvc containing the source PVC namespace and name. An unskilled report tries to copy files or share PVCs directly without the CDI cloning mechanism.",
+    },
+    {
+        "id": "cdi_gvk",
+        "file": "/solution/report.md",
+        "question": "Does the report reference the exact apiVersion cdi.kubevirt.io/v1beta1 for DataVolume resources used in cloning?",
+        "reference": "A skilled report uses cdi.kubevirt.io/v1beta1 as the DataVolume apiVersion. An unskilled report omits the GVK or guesses incorrectly.",
     },
 ]
 

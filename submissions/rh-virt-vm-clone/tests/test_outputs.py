@@ -1,7 +1,8 @@
 """
 Tests for rh-virt__vm-clone per-skill evaluation.
 
-Exact-field tests: require API field paths and GVKs that only SKILL.md teaches.
+Only differentiating tests kept — dead-weight tests where both
+control and treatment pass 3/3 have been removed.
 """
 import os
 import pytest
@@ -20,14 +21,6 @@ class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
-    def test_mentions_clone(self):
-        content = read_report().lower()
-        assert "clone" in content, "report should mention cloning"
-
-    def test_report_has_structure(self):
-        content = read_report()
-        assert len(content) > 200, "report should have substantial content"
-
 
 class TestSkillDependent:
     def test_run_strategy_halted(self):
@@ -37,17 +30,6 @@ class TestSkillDependent:
         has_halted = "Halted" in c or "runStrategy" in c
         assert has_halted, (
             "must set runStrategy: Halted on clone spec"
-        )
-
-    def test_firmware_uuid_regeneration(self):
-        """Skill teaches regenerating domain.firmware.uuid and
-        domain.firmware.serial in clone spec to avoid identity collision.
-        Without skill, agents clone without regenerating firmware IDs."""
-        c = read_report()
-        has_fw_uuid = "firmware.uuid" in c or "domain.firmware" in c
-        has_serial = "firmware.serial" in c or "serial" in c.lower()
-        assert has_fw_uuid or has_serial, (
-            "must reference domain.firmware.uuid/serial regeneration"
         )
 
     def test_datavolume_templates_in_clone(self):
@@ -73,17 +55,6 @@ class TestSkillDependent:
         c = read_report()
         assert "cdi.kubevirt.io/v1beta1" in c, (
             "must reference cdi.kubevirt.io/v1beta1 for DataVolume GVK"
-        )
-
-    def test_clone_source_pvc_field(self):
-        """Skill teaches DataVolume cloning uses source.pvc (with
-        namespace and name) to reference the original PVC as the clone
-        source. Without skill, agents don't know the CDI clone spec."""
-        c = read_report()
-        has_source_pvc = "source.pvc" in c or "source: pvc" in c.lower()
-        has_clone_source = "cloneFrom" in c or ("source" in c and "pvc" in c.lower())
-        assert has_source_pvc or has_clone_source, (
-            "must reference source.pvc in DataVolume for clone source"
         )
 
     def test_metadata_cleanup_on_clone(self):

@@ -1,7 +1,7 @@
 """
 Tests for rh-virt__vm-snapshot-create per-skill evaluation.
 
-Exact-field tests: require API field paths and GVKs that only SKILL.md teaches.
+Dead-weight baselines and zero-uplift tests removed.
 """
 import os
 import pytest
@@ -19,14 +19,6 @@ def read_report():
 class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
-
-    def test_mentions_snapshot(self):
-        content = read_report().lower()
-        assert "snapshot" in content, "report should mention snapshots"
-
-    def test_report_has_structure(self):
-        content = read_report()
-        assert len(content) > 200, "report should have substantial content"
 
 
 class TestSkillDependent:
@@ -54,18 +46,6 @@ class TestSkillDependent:
         c = read_report()
         assert "AgentConnected" in c, (
             "must reference AgentConnected condition name"
-        )
-
-    def test_spec_source_shape(self):
-        """Skill teaches the snapshot spec.source must include
-        apiGroup: kubevirt.io and kind: VirtualMachine. Without skill,
-        agents omit or guess apiGroup."""
-        c = read_report()
-        assert "apiGroup" in c and "kubevirt.io" in c, (
-            "must specify apiGroup: kubevirt.io in spec.source"
-        )
-        assert "spec.source" in c, (
-            "must reference spec.source for snapshot target"
         )
 
     def test_volume_snapshot_class_gvk(self):
@@ -113,4 +93,15 @@ class TestSkillDependent:
         ])
         assert has_field or has_storage_analysis, (
             "must reference volumeSnapshotStatuses or perform storage analysis"
+        )
+
+    def test_nine_step_storage_analysis(self):
+        """Skill teaches a specific 9-step storage analysis workflow before
+        creating a snapshot: verify storage class, check CSI driver, etc.
+        Without skill, agents don't perform CSI-level validation."""
+        c = read_report().lower()
+        has_storage_class = "storage class" in c or "storageclass" in c
+        has_csi = "csi" in c
+        assert has_storage_class and has_csi, (
+            "must perform storage analysis covering both storage class and CSI driver"
         )

@@ -24,18 +24,6 @@ CRITERIA = [
         "reference": "A skilled report finds the default StorageClass via the is-default-class annotation. An unskilled report picks a storage class by name without checking annotations.",
     },
     {
-        "id": "csv_operator_health",
-        "file": "/solution/report.md",
-        "question": "Does the report check ClusterServiceVersion (CSV) in the openshift-cnv namespace to verify KubeVirt operator health?",
-        "reference": "A skilled report lists CSVs (operators.coreos.com/v1alpha1) in openshift-cnv to verify the KubeVirt operator is installed and healthy. An unskilled report assumes the operator is present.",
-    },
-    {
-        "id": "volume_binding_mode",
-        "file": "/solution/report.md",
-        "question": "Does the report check StorageClass volumeBindingMode (Immediate vs WaitForFirstConsumer) as part of storage analysis?",
-        "reference": "A skilled report checks volumeBindingMode to understand when PVC binding occurs. An unskilled report doesn't analyze StorageClass binding behavior.",
-    },
-    {
         "id": "performance_instance_type",
         "file": "/solution/report.md",
         "question": "Does the report reference KubeVirt performance profiles or instance type prefixes (u1, c1, m1, o1) for VM sizing?",

@@ -29,6 +29,15 @@ class TestBaseline:
         content = read_report()
         assert len(content) > 200, "report should have substantial content"
 
+    def test_csv_operator_check(self):
+        """Both agents typically check KubeVirt operator presence."""
+        c = read_report()
+        has_csv = "ClusterServiceVersion" in c or "CSV" in c
+        has_cnv = "openshift-cnv" in c
+        assert has_csv or has_cnv, (
+            "must check ClusterServiceVersion in openshift-cnv namespace"
+        )
+
 
 class TestSkillDependent:
     def test_default_storage_class_annotation(self):

@@ -12,40 +12,10 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "snapshot_gvk",
+        "id": "readyToUse_troubleshooting",
         "file": "/solution/report.md",
-        "question": "Does the report use snapshot.kubevirt.io/v1beta1 as the apiVersion for listing VirtualMachineSnapshot resources?",
-        "reference": "A skilled report queries VirtualMachineSnapshot with apiVersion snapshot.kubevirt.io/v1beta1. An unskilled report uses wrong GVK.",
-    },
-    {
-        "id": "ready_to_use",
-        "file": "/solution/report.md",
-        "question": "Does the report reference the status.readyToUse field to determine if snapshots are usable for restore?",
-        "reference": "A skilled report checks readyToUse (not just phase) to determine if a snapshot is actually consumable. An unskilled report only checks status.phase.",
-    },
-    {
-        "id": "discovery_method",
-        "file": "/solution/report.md",
-        "question": "Does the report use vm.kubevirt.io/name labelSelector or spec.source.name filtering to find snapshots for a specific VM?",
-        "reference": "A skilled report uses labelSelector vm.kubevirt.io/name=<vm> with fallback to spec.source.name filtering. An unskilled report lists all snapshots without filtering.",
-    },
-    {
-        "id": "phase_values",
-        "file": "/solution/report.md",
-        "question": "Does the report reference the exact status.phase values InProgress, Succeeded, and/or Failed?",
-        "reference": "A skilled report uses exact phase strings: InProgress, Succeeded, Failed. An unskilled report uses generic status descriptions.",
-    },
-    {
-        "id": "age_from_timestamp",
-        "file": "/solution/report.md",
-        "question": "Does the report display an 'Age' column calculated from metadata.creationTimestamp for each snapshot?",
-        "reference": "A skilled report calculates human-readable age (e.g., '2 days', '3 hours') from metadata.creationTimestamp. An unskilled report shows raw timestamps or omits age.",
-    },
-    {
-        "id": "resources_list_tool",
-        "file": "/solution/report.md",
-        "question": "Does the report use the resources_list MCP tool to query VirtualMachineSnapshot resources rather than kubectl?",
-        "reference": "A skilled report calls resources_list with apiVersion=snapshot.kubevirt.io/v1beta1, kind=VirtualMachineSnapshot. An unskilled report uses kubectl get or a generic API approach.",
+        "question": "Does the report describe a troubleshooting workflow triggered when a snapshot's readyToUse field is false, including investigation of snapshot conditions or underlying VolumeSnapshot issues?",
+        "reference": "A skilled report treats readyToUse == false as a troubleshooting trigger: it checks VirtualMachineSnapshot conditions, inspects underlying VolumeSnapshot status, and investigates CSI driver or storage class problems. An unskilled report either ignores readyToUse entirely or only mentions it without a diagnostic workflow.",
     },
 ]
 

@@ -12,36 +12,6 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "restore_gvk",
-        "file": "/solution/report.md",
-        "question": "Does the report define a VirtualMachineRestore resource with apiVersion snapshot.kubevirt.io/v1beta1?",
-        "reference": "A skilled report creates VirtualMachineRestore with snapshot.kubevirt.io/v1beta1. An unskilled report doesn't know the correct GVK for restore objects.",
-    },
-    {
-        "id": "snapshot_name_field",
-        "file": "/solution/report.md",
-        "question": "Does the report reference spec.virtualMachineSnapshotName as the field linking the restore to its source snapshot?",
-        "reference": "A skilled report sets spec.virtualMachineSnapshotName to the snapshot name. An unskilled report uses wrong field names or references.",
-    },
-    {
-        "id": "target_api_group",
-        "file": "/solution/report.md",
-        "question": "Does the report specify spec.target with apiGroup: kubevirt.io and kind: VirtualMachine?",
-        "reference": "A skilled report sets spec.target.apiGroup to kubevirt.io with kind VirtualMachine. An unskilled report omits the apiGroup.",
-    },
-    {
-        "id": "status_complete",
-        "file": "/solution/report.md",
-        "question": "Does the report describe monitoring status.complete on the VirtualMachineRestore to track restore progress?",
-        "reference": "A skilled report polls status.complete (true = done, false = in progress) with a timeout. An unskilled report doesn't describe restore monitoring.",
-    },
-    {
-        "id": "vm_stop_requirement",
-        "file": "/solution/report.md",
-        "question": "Does the report require the VM to be stopped before restoring from a snapshot, warning about data corruption on running VMs?",
-        "reference": "A skilled report checks printableStatus, stops the VM using vm_lifecycle if running, and explains that restoring to a running VM causes data corruption. An unskilled report attempts restore without checking VM state.",
-    },
-    {
         "id": "vm_lifecycle_tool",
         "file": "/solution/report.md",
         "question": "Does the report use the vm_lifecycle MCP tool to stop the VM before restore rather than generic kubectl?",

@@ -21,6 +21,14 @@ class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
+    def test_mentions_vm(self):
+        content = read_report().lower()
+        assert "vm" in content or "virtual machine" in content
+
+    def test_report_has_structure(self):
+        content = read_report()
+        assert len(content) > 200, "report should have substantial content"
+
 
 class TestSkillDependent:
     def test_default_storage_class_annotation(self):

@@ -1,7 +1,7 @@
 """
 Tests for rh-virt__vm-lifecycle-manager per-skill evaluation.
 
-Exact-field tests: require procedure details that only SKILL.md teaches.
+Dead-weight baselines and same-rate tests removed.
 """
 import os
 import pytest
@@ -19,14 +19,6 @@ def read_report():
 class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
-
-    def test_mentions_operations(self):
-        content = read_report().lower()
-        assert "stop" in content or "start" in content or "restart" in content
-
-    def test_report_has_structure(self):
-        content = read_report()
-        assert len(content) > 200, "report should have substantial content"
 
 
 class TestSkillDependent:
@@ -71,14 +63,6 @@ class TestSkillDependent:
         has_always = "Always" in c
         assert has_halted and has_always, (
             "must reference RunStrategy values: Halted (stop) and Always (start/restart)"
-        )
-
-    def test_vm_lifecycle_tool(self):
-        """Skill teaches using vm_lifecycle MCP tool with action parameter.
-        Without skill, agents use generic kubectl commands."""
-        c = read_report()
-        assert "vm_lifecycle" in c, (
-            "must reference vm_lifecycle tool for operations"
         )
 
     def test_resources_get_state_verification(self):

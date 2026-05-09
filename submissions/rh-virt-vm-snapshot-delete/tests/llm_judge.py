@@ -12,18 +12,6 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "snapshot_gvk",
-        "file": "/solution/report.md",
-        "question": "Does the report reference the exact apiVersion snapshot.kubevirt.io/v1beta1 for VirtualMachineSnapshot resources?",
-        "reference": "A skilled report uses snapshot.kubevirt.io/v1beta1 as the GVK. An unskilled report uses wrong or missing apiVersions.",
-    },
-    {
-        "id": "restore_check",
-        "file": "/solution/report.md",
-        "question": "Does the report check for active VirtualMachineRestore resources that might reference the snapshot before deletion?",
-        "reference": "A skilled report lists VirtualMachineRestore resources to ensure no active restore depends on the snapshot. An unskilled report deletes without checking for in-use references.",
-    },
-    {
         "id": "spec_source",
         "file": "/solution/report.md",
         "question": "Does the report reference spec.source.name to identify the source VM of a snapshot?",
@@ -40,12 +28,6 @@ CRITERIA = [
         "file": "/solution/report.md",
         "question": "Does the report warn the user when the snapshot being deleted is the ONLY snapshot for the VM, meaning no recovery points will remain?",
         "reference": "A skilled report counts sibling snapshots and displays a prominent warning when this is the last one: 'This is the ONLY snapshot for VM. After deletion, no snapshot recovery points will exist.' An unskilled report deletes without regard for remaining recovery options.",
-    },
-    {
-        "id": "resources_delete_tool",
-        "file": "/solution/report.md",
-        "question": "Does the report use the resources_delete MCP tool with the snapshot.kubevirt.io/v1beta1 GVK rather than generic kubectl?",
-        "reference": "A skilled report calls resources_delete with apiVersion=snapshot.kubevirt.io/v1beta1, kind=VirtualMachineSnapshot for deletion. An unskilled report uses kubectl delete or a generic API call.",
     },
 ]
 

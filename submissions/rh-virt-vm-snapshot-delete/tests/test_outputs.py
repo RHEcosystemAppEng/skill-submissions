@@ -1,9 +1,10 @@
 """
 Tests for rh-virt__vm-snapshot-delete per-skill evaluation.
 
-Exact-field tests: require API field paths and GVKs that only SKILL.md teaches.
+Dead-weight tests where both control and treatment pass 3/3 removed.
 """
 import os
+import re
 import pytest
 
 REPORT = "/solution/report.md"
@@ -20,32 +21,8 @@ class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
-    def test_mentions_snapshot(self):
-        content = read_report().lower()
-        assert "snapshot" in content
-
-    def test_report_has_structure(self):
-        content = read_report()
-        assert len(content) > 200, "report should have substantial content"
-
 
 class TestSkillDependent:
-    def test_snapshot_gvk(self):
-        """Skill teaches snapshot.kubevirt.io/v1beta1 as the apiVersion
-        for VirtualMachineSnapshot resources."""
-        c = read_report()
-        assert "snapshot.kubevirt.io/v1beta1" in c, (
-            "must reference snapshot.kubevirt.io/v1beta1 GVK"
-        )
-
-    def test_restore_in_use_check(self):
-        """Skill teaches checking for active VirtualMachineRestore resources
-        before deleting a snapshot. Without skill, agents skip this check."""
-        c = read_report()
-        assert "VirtualMachineRestore" in c, (
-            "must check VirtualMachineRestore for in-use snapshots"
-        )
-
     def test_spec_source_name(self):
         """Skill teaches reading spec.source.name to identify the source VM
         of a snapshot. Without skill, agents guess from the snapshot name."""
@@ -62,14 +39,6 @@ class TestSkillDependent:
         has_fallback = "spec.source.name" in c
         assert has_label or has_fallback, (
             "must use vm.kubevirt.io/name label or spec.source.name for sibling discovery"
-        )
-
-    def test_rbac_check(self):
-        """Skill teaches verifying delete permission on the specific
-        snapshot.kubevirt.io resource, not just generic can-i."""
-        c = read_report()
-        assert "virtualmachinesnapshots" in c.lower(), (
-            "must verify RBAC for snapshot.kubevirt.io/virtualmachinesnapshots"
         )
 
     def test_last_snapshot_warning(self):
@@ -90,11 +59,20 @@ class TestSkillDependent:
             "must warn about last-snapshot-for-VM scenario"
         )
 
-    def test_resources_delete_tool_usage(self):
-        """Skill teaches using resources_delete MCP tool with the exact
-        snapshot.kubevirt.io/v1beta1 GVK for deletion. Without skill,
-        agents use generic kubectl delete."""
-        c = read_report()
-        assert "resources_delete" in c, (
-            "must use resources_delete MCP tool for snapshot deletion"
+    def test_snapshot_count_before_delete(self):
+        """Skill teaches counting remaining snapshots for the VM and
+        presenting the count before deletion. Without skill, agents
+        don't enumerate recovery points."""
+        c = read_report().lower()
+        has_number_near_snapshot = bool(re.search(
+            r'\d+\s*(?:snapshot|recovery point|remaining)', c
+        )) or bool(re.search(
+            r'(?:snapshot|recovery point)s?\s*(?:remaining|left|found|exist|count)\s*[:\s]*\d+', c
+        ))
+        has_count_phrase = any(t in c for t in [
+            "snapshot count", "number of snapshot",
+            "remaining snapshot", "snapshots found",
+        ])
+        assert has_number_near_snapshot or has_count_phrase, (
+            "must present snapshot count before deletion"
         )

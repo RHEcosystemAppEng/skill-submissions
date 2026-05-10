@@ -2,7 +2,10 @@
 Tests for rh-virt__vm-snapshot-create evaluation.
 
 6 tests: 2 padding (both agents pass) + 4 skill-dependent.
-Each test worth ~16.7% of pytest score.
+
+Skill-dependent tests target knowledge ONLY available through the
+SKILL.md and docs/troubleshooting/ — NOT from general KubeVirt
+knowledge or mock MCP data exploration.
 """
 import os
 import pytest
@@ -21,51 +24,68 @@ class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
-    def test_mentions_production_db(self):
+    def test_mentions_snapshot(self):
         c = read_report().lower()
-        assert "production-db" in c or "production_db" in c, (
-            "report must reference the target VM production-db"
-        )
+        assert "snapshot" in c, "report should mention snapshots"
 
 
 class TestSkillDependent:
-    def test_snapshot_api_version(self):
-        """Skill teaches snapshot.kubevirt.io/v1beta1 as the exact apiVersion
-        for VirtualMachineSnapshot. An unskilled agent guesses wrong GVKs
-        or uses generic kubectl snapshot commands."""
-        c = read_report()
-        assert "snapshot.kubevirt.io" in c, (
-            "must reference snapshot.kubevirt.io apiVersion"
-        )
-
-    def test_agent_connected_condition(self):
-        """Skill teaches checking the AgentConnected condition on the VM to
-        verify qemu-guest-agent is running BEFORE creating the snapshot.
-        An unskilled agent mentions 'guest agent' vaguely without the
-        exact condition name."""
-        c = read_report()
-        assert "AgentConnected" in c, (
-            "must reference AgentConnected condition for guest agent verification"
-        )
-
-    def test_consistency_distinction(self):
-        """Skill teaches that Online snapshot WITHOUT guest agent indication
-        is only crash-consistent, while WITH guest agent it achieves
-        application-consistent via filesystem freeze/thaw. An unskilled
-        agent doesn't distinguish these consistency levels."""
+    def test_failed_snapshot_diagnosis(self):
+        """Instruction asks to diagnose vm-etl-prod-01-snap-failed.
+        The mock MCP shows 'VolumeSnapshot creation timed out' but a
+        skilled agent uses storage-errors.md to dig deeper: checking
+        CSIDriver capabilities, VolumeSnapshotClass matching, or
+        DataVolume/PVC issues — not just echoing the error message."""
         c = read_report().lower()
-        has_crash = "crash" in c and "consistent" in c
-        has_app = "application" in c and "consistent" in c
-        has_freeze = "freeze" in c or "thaw" in c or "quiesce" in c
-        assert has_crash or has_app or has_freeze, (
-            "must distinguish crash-consistent vs application-consistent snapshots"
+        has_failed_ref = "etl" in c and ("fail" in c or "timeout" in c)
+        has_diagnosis = any(t in c for t in [
+            "csidriver", "csi driver",
+            "volumesnapshotclass", "volume snapshot class",
+            "provisioner", "storage class",
+            "timed out",
+        ])
+        assert has_failed_ref and has_diagnosis, (
+            "must diagnose the failed snapshot vm-etl-prod-01-snap-failed "
+            "with storage-level root cause analysis"
         )
 
-    def test_hot_plugged_volume_blocker(self):
-        """Skill teaches that hot-plugged volumes BLOCK snapshot creation
-        and must be persisted into spec.template.spec.volumes first.
-        An unskilled agent doesn't know this KubeVirt-specific blocker."""
+    def test_volume_snapshot_statuses_on_vm(self):
+        """SKILL Step 2 says 'IMPORTANT: Save status.volumeSnapshotStatuses
+        for storage analysis.' This field is on the VM resource (not the
+        snapshot). The mock MCP does NOT return it, so only a skilled
+        agent would know to check/mention it."""
         c = read_report().lower()
-        assert any(t in c for t in ["hot-plug", "hotplug", "hot plug"]), (
-            "must identify hot-plugged volumes as snapshot creation blocker"
+        assert "volumesnapshotstatuses" in c, (
+            "must reference status.volumeSnapshotStatuses on the VM resource "
+            "(SKILL Step 2 prerequisite)"
+        )
+
+    def test_resources_create_or_update_tool(self):
+        """SKILL Implementation Note: 'This skill uses generic Kubernetes
+        resource tools (resources_create_or_update) to manage
+        VirtualMachineSnapshot resources. Dedicated snapshot tools do not
+        currently exist.' An unskilled agent would not know this."""
+        c = read_report().lower()
+        assert "resources_create_or_update" in c, (
+            "must mention resources_create_or_update as the tool for "
+            "creating VirtualMachineSnapshot (SKILL implementation note)"
+        )
+
+    def test_csi_driver_snapshot_capability_check(self):
+        """SKILL Step 3 mandates verifying CSI driver snapshot
+        capabilities as a distinct prerequisite — not just checking
+        if a VolumeSnapshotClass exists, but matching the CSI driver
+        (provisioner) between StorageClass and VolumeSnapshotClass."""
+        c = read_report().lower()
+        has_csi = "csi" in c
+        has_match = any(t in c for t in [
+            "openshift-storage.rbd.csi.ceph.com",
+            "provisioner", "driver",
+        ])
+        has_snapshot_class = any(t in c for t in [
+            "volumesnapshotclass", "snapshot class", "snapclass",
+        ])
+        assert has_csi and has_match and has_snapshot_class, (
+            "must verify CSI driver capabilities and match provisioner "
+            "between StorageClass and VolumeSnapshotClass (SKILL Step 3)"
         )

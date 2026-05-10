@@ -12,16 +12,43 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "consistency_level_reasoning",
+        "id": "failed_snapshot_root_cause",
         "file": "/solution/report.md",
-        "question": "Does the report reason about the snapshot consistency level for this specific VM (production-db), explaining whether it will be crash-consistent or application-consistent based on guest agent status and the indications field?",
-        "reference": "A skilled report checks the AgentConnected condition on the VM, explains that with guest agent present the snapshot achieves application-consistent level (filesystem freeze/thaw via status.indications showing GuestAgent), and without it only crash-consistent. An unskilled report either doesn't discuss consistency or mentions it without connecting it to the VM's specific guest agent status.",
+        "question": (
+            "Does the report diagnose WHY the snapshot vm-etl-prod-01-snap-failed "
+            "failed by examining storage-level prerequisites (CSI driver "
+            "capabilities, VolumeSnapshotClass matching the StorageClass "
+            "provisioner, or DataVolume/PVC issues) rather than just "
+            "echoing the 'VolumeSnapshot creation timed out' error message?"
+        ),
+        "reference": (
+            "A skilled report investigates the root cause by checking: "
+            "(1) whether a VolumeSnapshotClass exists for the CSI driver used "
+            "by the VM's StorageClass, (2) whether the CSI driver supports "
+            "snapshot operations, (3) PVC/DataVolume status. It uses knowledge "
+            "from storage-errors.md troubleshooting documentation. An unskilled "
+            "report just reports the error message without deeper analysis, or "
+            "speculates without checking storage prerequisites."
+        ),
     },
     {
-        "id": "storage_prerequisites",
+        "id": "storage_analysis_before_vm_state",
         "file": "/solution/report.md",
-        "question": "Does the report check storage prerequisites before creating the snapshot, specifically verifying VolumeSnapshotClass existence and CSI driver snapshot capabilities for the VM's storage class?",
-        "reference": "A skilled report verifies that a VolumeSnapshotClass exists for the storage provisioner, checks CSI driver capabilities, and may reference volumeSnapshotStatuses. An unskilled report proceeds to create the snapshot without any storage-level prerequisite verification.",
+        "question": (
+            "Does the report perform a comprehensive storage backend analysis "
+            "(checking VolumeSnapshotClass, CSI driver capabilities, PVC access "
+            "modes, hot-plugged volumes) BEFORE discussing whether the VM needs "
+            "to be stopped or can be snapshotted online?"
+        ),
+        "reference": (
+            "A skilled report follows the SKILL workflow: storage analysis is "
+            "marked as CRITICAL and must execute BEFORE asking about VM running "
+            "state. The storage section appears first, covering VolumeSnapshotClass, "
+            "CSI driver, volumeSnapshotStatuses, and hot-plug checks. Only after "
+            "all storage prerequisites pass does it discuss online vs offline "
+            "snapshot and consistency levels. An unskilled report may check VM "
+            "state first or intermix storage checks with VM state discussion."
+        ),
     },
 ]
 

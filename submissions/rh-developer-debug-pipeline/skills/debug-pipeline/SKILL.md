@@ -4,6 +4,7 @@ description: |
   Diagnose OpenShift Pipelines (Tekton) CI/CD failures including PipelineRun failures, TaskRun step errors, workspace/PVC binding issues, and authentication problems. Automates multi-step diagnosis: PipelineRun status, failed TaskRun analysis, step container logs, and related resource checks. Use this skill when pipelines fail, hang, or produce unexpected results. Triggers on /debug-pipeline command or phrases like "pipeline failed", "PipelineRun error", "TaskRun failed", "tekton error", "pipeline stuck", "pipeline timeout".
 model: inherit
 color: cyan
+license: Apache-2.0
 metadata:
   user_invocable: "true"
 ---
@@ -63,7 +64,7 @@ Which PipelineRun would you like me to debug?
 Select an option or enter a PipelineRun name:
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 If user selects "List failed PipelineRuns":
 Use kubernetes MCP `resources_list` with kind `PipelineRun`, filter by Failed status:
@@ -78,7 +79,7 @@ Use kubernetes MCP `resources_list` with kind `PipelineRun`, filter by Failed st
 Which PipelineRun would you like me to debug?
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user to select a PipelineRun.**
 
 ### Step 2: Get PipelineRun Status Overview
 
@@ -114,7 +115,7 @@ Use kubernetes MCP `resources_get` for the PipelineRun:
 Continue with failed TaskRun analysis? (yes/no)
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 ### Step 3: Analyze Failed TaskRun(s)
 
@@ -152,7 +153,7 @@ Continue to view step logs? (yes/no)
 
 **Note:** Tekton names step containers as `step-<step-name>` in the TaskRun pod. Use this convention with `pod_logs`.
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 ### Step 4: Get TaskRun Pod Logs
 
@@ -175,7 +176,7 @@ Use kubernetes MCP `pod_logs` for the TaskRun pod, targeting the failed step con
 Continue to check related resources? (yes/no)
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 ### Step 5: Check Related Resources
 
@@ -222,7 +223,7 @@ Check resources that could cause pipeline failures:
 Continue to full diagnosis summary? (yes/no)
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 ### Step 6: Present Diagnosis Summary
 
@@ -284,7 +285,7 @@ Would you like me to:
 Select an option:
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user to select next action.**
 
 ## Pipeline Failure Reference
 

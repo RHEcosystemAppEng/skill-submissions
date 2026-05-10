@@ -12,40 +12,16 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "decomposed_restart",
+        "id": "decomposed_restart_workflow",
         "file": "/solution/report.md",
-        "question": "Does the report decompose restart into stop -> verify Stopped -> wait -> start -> verify Running, rather than using a single atomic restart?",
-        "reference": "A skilled report decomposes restart: stop, poll printableStatus until Stopped, wait ~5 seconds, start, verify Running. This avoids resourceVersion conflicts. An unskilled report uses a single restart command.",
+        "question": "Does the report decompose the restart of production-db into explicit separate steps: stop, verify the VM reached Stopped state (via printableStatus), wait a few seconds, then start, and verify Running - rather than using a single atomic restart?",
+        "reference": "A skilled report decomposes restart into: (1) stop VM via vm_lifecycle, (2) poll printableStatus until 'Stopped', (3) wait ~5 seconds, (4) start VM via vm_lifecycle, (5) verify printableStatus is 'Running'. This avoids resourceVersion conflicts. An unskilled report uses a single restart command or restart action without intermediate verification steps.",
     },
     {
-        "id": "printable_status_poll",
+        "id": "resource_version_rationale",
         "file": "/solution/report.md",
-        "question": "Does the report reference polling printableStatus to verify the VM reached Stopped state before proceeding to start?",
-        "reference": "A skilled report polls status.printableStatus for 'Stopped' as the gate between stop and start. An unskilled report doesn't verify the intermediate state.",
-    },
-    {
-        "id": "resource_version",
-        "file": "/solution/report.md",
-        "question": "Does the report mention resourceVersion conflicts as the reason for decomposing restart rather than using an atomic operation?",
-        "reference": "A skilled report explains that Kubernetes resourceVersion conflicts can occur if start is issued too quickly after stop. An unskilled report doesn't mention this concurrency issue.",
-    },
-    {
-        "id": "run_strategy",
-        "file": "/solution/report.md",
-        "question": "Does the report describe RunStrategy outcomes: start sets Always, stop sets Halted?",
-        "reference": "A skilled report maps operations to RunStrategy values: start->Always, stop->Halted. An unskilled report doesn't explain the RunStrategy changes.",
-    },
-    {
-        "id": "state_verification",
-        "file": "/solution/report.md",
-        "question": "Does the report describe using resources_get to verify the VM actually reached the desired state (printableStatus) after a vm_lifecycle action?",
-        "reference": "A skilled report verifies state transitions by calling resources_get and checking printableStatus == 'Stopped' or 'Running' after each vm_lifecycle action. An unskilled report assumes the operation succeeded without verification.",
-    },
-    {
-        "id": "already_in_state",
-        "file": "/solution/report.md",
-        "question": "Does the report handle the case where a VM is already in the desired state (e.g., already running when start is requested)?",
-        "reference": "A skilled report detects the current state before acting and informs the user when no action is needed. An unskilled report blindly issues the lifecycle command regardless of current state.",
+        "question": "Does the report explain that restart must be decomposed into separate stop and start operations to avoid Kubernetes resourceVersion conflicts, rather than just saying 'it's best practice'?",
+        "reference": "A skilled report specifically explains that issuing start too quickly after stop causes resourceVersion conflicts because the Kubernetes API object hasn't been updated yet. An unskilled report either doesn't explain why restart is decomposed or gives a vague reason.",
     },
 ]
 

@@ -1,0 +1,13 @@
+name: rh-developer-validate-environment
+description: "rh-developer Validate Environment Skill Evaluation"
+persona: rh-developer
+version: "1.0.0"
+generation_mode: manual
+tags:
+  - rh-developer
+  - validate-environment
+cpus: 2
+memory_mb: 2048
+storage_mb: 10240
+experiment:
+  n_trials: 3

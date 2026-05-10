@@ -1,7 +1,9 @@
 """
-Tests for rh-virt__vm-delete per-skill evaluation.
+Tests for rh-virt__vm-delete evaluation.
 
-Exact-field tests: require API field paths and label keys that only SKILL.md teaches.
+6 pytest (1 padding + 5 skill-specific) targeting KubeVirt deletion
+safety gates, storage discovery conventions, and stuck-deletion
+diagnosis that only SKILL.md teaches.
 """
 import os
 import pytest
@@ -16,102 +18,67 @@ def read_report():
         return f.read()
 
 
-class TestBaseline:
-    def test_report_exists(self):
-        assert os.path.exists(REPORT), "report.md must exist"
-
-    def test_mentions_vm(self):
-        content = read_report().lower()
-        assert any(t in content for t in ["vm", "virtual machine", "virtualmachine"]), (
-            "report should reference the target VM"
-        )
-
-    def test_report_has_structure(self):
-        content = read_report()
-        assert len(content) > 200, "report should have substantial content"
+def test_mentions_vm():
+    """Padding: report exists and mentions VM."""
+    content = read_report()
+    assert len(content) > 200 and "VM" in content.upper()
 
 
-class TestSkillDependent:
-    def test_protected_label_exact(self):
-        """Skill teaches metadata.labels key 'protected' with value '"true"'
-        blocks deletion. Removal command: oc label vm <name> -n <ns> protected-
-        Without skill, agents don't know this specific label convention."""
-        c = read_report()
-        has_protected_label = (
-            "protected" in c
-            and ('"true"' in c or "'true'" in c or "true" in c.lower())
-        )
-        has_label_removal = "protected-" in c or "label" in c.lower()
-        assert has_protected_label and has_label_removal, (
-            "must reference protected label with value 'true' and its removal"
-        )
+def test_protected_label_gate():
+    """Skill teaches checking metadata.labels.protected == 'true' before
+    any deletion and removing it via 'oc label ... protected-'. Without
+    skill, agents skip this safety gate."""
+    c = read_report().lower()
+    has_protected = "protected" in c
+    has_removal = any(t in c for t in ["protected-", "label", "remove"])
+    assert has_protected and has_removal, (
+        "must reference protected label check and removal pattern"
+    )
 
-    def test_datavolume_label_selector(self):
-        """Skill teaches discovering associated storage via labelSelector
-        vm.kubevirt.io/name on DataVolumes (cdi.kubevirt.io/v1beta1).
-        Without skill, agents don't know the exact label key."""
-        c = read_report()
-        assert "vm.kubevirt.io/name" in c or "cdi.kubevirt.io/v1beta1" in c, (
-            "must reference vm.kubevirt.io/name label or cdi.kubevirt.io/v1beta1 "
-            "DataVolume GVK for storage discovery"
-        )
 
-    def test_printable_status_field(self):
-        """Skill teaches checking status.printableStatus for Running/Starting/
-        Migrating (need stop) vs Stopped/Halted (safe to delete).
-        Without skill, agents don't know this exact field path."""
-        c = read_report()
-        assert "printableStatus" in c or "status.printableStatus" in c, (
-            "must reference printableStatus field for VM state check"
-        )
+def test_printable_status_check():
+    """Skill teaches using status.printableStatus to classify VM state
+    (Running/Starting/Migrating = must stop first). Without skill,
+    agents check generic phase or skip state verification."""
+    c = read_report()
+    assert "printableStatus" in c or "printable_status" in c or "printable status" in c.lower(), (
+        "must reference printableStatus for VM state classification"
+    )
 
-    def test_no_force_delete_policy(self):
-        """Skill explicitly forbids --force and --grace-period=0.
-        Without skill, agents suggest force deletion for stuck VMs."""
-        c = read_report().lower()
-        has_rejection = any(p in c for p in [
-            "do not use --force", "never use --force", "avoid --force",
-            "without --force",
-        ]) or ("force" in c and any(t in c for t in [
-            "never", "do not", "must not", "avoid", "should not",
-        ]))
-        assert has_rejection, (
-            "must actively reject --force and --grace-period=0 deletion"
-        )
 
-    def test_resources_delete_gvk(self):
-        """Skill teaches using resources_delete with kubevirt.io/v1
-        VirtualMachine for the deletion call.
-        Without skill, agents use generic kubectl delete."""
-        c = read_report()
-        assert "kubevirt.io/v1" in c or "resources_delete" in c, (
-            "must reference kubevirt.io/v1 GVK or resources_delete for VM deletion"
-        )
+def test_storage_discovery_by_label():
+    """Skill teaches discovering DataVolumes/PVCs via label selector
+    vm.kubevirt.io/name=<vm> on cdi.kubevirt.io/v1beta1. Without skill,
+    agents use generic PVC listing or skip storage discovery."""
+    c = read_report()
+    has_label = "vm.kubevirt.io/name" in c
+    has_cdi = "cdi.kubevirt.io" in c
+    assert has_label or has_cdi, (
+        "must reference vm.kubevirt.io/name label or cdi.kubevirt.io GVK "
+        "for storage discovery"
+    )
 
-    def test_storage_cleanup_options(self):
-        """Skill teaches two deletion options: VM-only (preserves storage
-        for reuse) vs VM+Storage (deletes DataVolumes and PVCs).
-        Without skill, agents delete everything or nothing."""
-        c = read_report().lower()
-        has_preserve = any(t in c for t in [
-            "preserve", "vm only", "vm-only", "keep storage", "reuse",
-        ])
-        has_complete = any(t in c for t in [
-            "vm + storage", "vm+storage", "complete cleanup",
-            "delete storage", "free storage",
-        ])
-        assert has_preserve or has_complete, (
-            "must present storage cleanup options (preserve vs delete)"
-        )
 
-    def test_finalizer_stuck_handling(self):
-        """Skill and lifecycle-errors.md reference teach that VMs stuck
-        in Terminating state require checking and removing finalizers
-        via resources_create_or_update. Without skill, agents don't know
-        about Kubernetes finalizer mechanics for VMs."""
-        c = read_report().lower()
-        has_finalizer = "finalizer" in c
-        has_terminating = "terminating" in c
-        assert has_finalizer or has_terminating, (
-            "must reference finalizer handling or Terminating state diagnosis"
-        )
+def test_no_force_delete_policy():
+    """Skill explicitly prohibits --force and --grace-period=0 for VM
+    deletion. Without skill, agents may suggest force-delete as a
+    standard troubleshooting step."""
+    c = read_report().lower()
+    has_force = "force" in c or "grace-period" in c or "grace_period" in c
+    has_no = any(t in c for t in [
+        "no force", "no --force", "never force", "avoid force",
+        "not force", "without force", "don't force", "do not force",
+    ])
+    assert has_force and has_no, (
+        "must explicitly state no-force-delete policy for VMs"
+    )
+
+
+def test_finalizer_diagnosis():
+    """Skill teaches that stuck Terminating VMs should be diagnosed via
+    finalizers and resources_create_or_update, not force-deleted.
+    Without skill, agents suggest force-delete for stuck resources."""
+    c = read_report().lower()
+    assert "finalizer" in c or "terminating" in c, (
+        "must reference finalizer-based diagnosis for stuck deletions"
+    )

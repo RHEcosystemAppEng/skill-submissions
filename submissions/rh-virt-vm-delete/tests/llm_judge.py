@@ -12,40 +12,42 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "protected_label",
+        "id": "pre_flight_safety_gates",
         "file": "/solution/report.md",
-        "question": "Does the report check for metadata.labels key 'protected' with value 'true' and describe removal via 'oc label vm <name> protected-' or equivalent?",
-        "reference": "A skilled report checks for the exact 'protected' label with value 'true' in metadata.labels and refuses deletion until removed via 'oc label vm <name> -n <ns> protected-'. An unskilled report either skips protection checks or uses a generic approach.",
+        "question": (
+            "Does the report describe checking the 'protected' label on the VM "
+            "before deletion (with removal via label command), verifying "
+            "printableStatus to determine if the VM must be stopped first, "
+            "AND presenting VM-only vs VM+storage deletion options?"
+        ),
+        "reference": (
+            "A skilled report checks metadata.labels.protected == 'true' and "
+            "explains how to remove it (oc label ... protected-), reads "
+            "status.printableStatus to classify if VM is Running (must stop) "
+            "or Stopped, and presents explicit deletion scope choices: "
+            "VM-only (keep DV/PVC) vs VM+storage (delete DV/PVC). An unskilled "
+            "report jumps to deletion without safety checks or only offers "
+            "one deletion mode."
+        ),
     },
     {
-        "id": "datavolume_discovery",
+        "id": "stuck_deletion_and_storage_discovery",
         "file": "/solution/report.md",
-        "question": "Does the report discover associated DataVolumes using the vm.kubevirt.io/name label selector or reference cdi.kubevirt.io/v1beta1?",
-        "reference": "A skilled report finds DataVolumes via labelSelector vm.kubevirt.io/name=<vm-name> with apiVersion cdi.kubevirt.io/v1beta1. An unskilled report doesn't know the exact label key or GVK for associated storage discovery.",
-    },
-    {
-        "id": "printable_status",
-        "file": "/solution/report.md",
-        "question": "Does the report reference status.printableStatus to determine if the VM is Running/Starting/Migrating (needs stop) vs Stopped/Halted (safe to proceed)?",
-        "reference": "A skilled report checks status.printableStatus for exact values: Running/Starting/Migrating means stop first, Stopped/Halted means safe to delete. An unskilled report vaguely checks 'if running' without the exact field path.",
-    },
-    {
-        "id": "no_force_policy",
-        "file": "/solution/report.md",
-        "question": "Does the report explicitly forbid or avoid --force and --grace-period=0 for VM deletion?",
-        "reference": "A skilled report follows a 'No Force Delete' policy: never uses --force or --grace-period=0, instead handles stuck deletions via finalizer inspection. An unskilled report suggests force deletion as a troubleshooting step.",
-    },
-    {
-        "id": "storage_options",
-        "file": "/solution/report.md",
-        "question": "Does the report describe two distinct deletion options: VM-only (preserving storage for reuse) and VM+Storage (complete cleanup including DataVolumes and PVCs)?",
-        "reference": "A skilled report presents both options: delete VM only (storage preserved for reattachment) and delete VM+Storage (DataVolumes and PVCs removed, storage freed). An unskilled report deletes everything indiscriminately or doesn't mention preserving storage.",
-    },
-    {
-        "id": "finalizer_handling",
-        "file": "/solution/report.md",
-        "question": "Does the report describe handling VMs stuck in Terminating state by inspecting and potentially removing finalizers?",
-        "reference": "A skilled report explains that finalizers can block deletion, and teaches using resources_get to check finalizers and resources_create_or_update to remove them as a last resort. An unskilled report either ignores stuck deletions or suggests --force.",
+        "question": (
+            "Does the report explain that stuck Terminating VMs should be "
+            "diagnosed via finalizers (not force-deleted), AND describe "
+            "discovering VM storage via the vm.kubevirt.io/name label on "
+            "DataVolumes or PVCs (cdi.kubevirt.io/v1beta1)?"
+        ),
+        "reference": (
+            "A skilled report explains that Terminating VMs are caused by "
+            "blocking finalizers, diagnosed with resources_get and resolved "
+            "with resources_create_or_update — explicitly avoiding --force "
+            "or --grace-period=0. It discovers storage by listing DataVolumes "
+            "(cdi.kubevirt.io/v1beta1) or PVCs with label selector "
+            "vm.kubevirt.io/name=<vm>. An unskilled report suggests "
+            "force-delete and uses generic PVC listing."
+        ),
     },
 ]
 

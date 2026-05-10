@@ -11,41 +11,24 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-    {
-        "id": "cluster_version_probe_and_error_taxonomy",
-        "file": "/solution/report.md",
-        "question": (
-            "Does the report describe probing each context with the "
-            "ClusterVersion resource (config.openshift.io/v1) to detect "
-            "OpenShift, AND distinguish 403 errors (OpenShift but RBAC-denied, "
-            "include as 'unverified') from 404 errors (non-OpenShift, exclude)?"
-        ),
-        "reference": (
-            "A skilled report probes with resources_get for ClusterVersion "
-            "(config.openshift.io/v1, name: version). It classifies 403 as "
-            "'OpenShift unverified' (include in report) and 404 as "
-            "'non-OpenShift' (exclude by default). An unskilled report uses "
-            "ad-hoc checks, treats all errors the same, or omits the "
-            "classification entirely."
-        ),
-    },
-    {
-        "id": "fleet_aggregation_with_gpu_and_metrics",
-        "file": "/solution/report.md",
-        "question": (
-            "Does the report include cross-cluster aggregated totals "
-            "(total nodes, CPU, memory) with a GPU column AND actual "
-            "utilization data (from nodes_top or usage percentages), "
-            "not just static capacity?"
-        ),
-        "reference": (
-            "A skilled report produces a fleet overview table with a Total "
-            "row summing nodes, CPU, memory across clusters, includes a GPU "
-            "column, and shows runtime utilization from nodes_top alongside "
-            "allocatable capacity. An unskilled report lists clusters "
-            "independently, omits GPU, and only reports static capacity."
-        ),
-    },
+  {
+    "id": "clusterversion_verification",
+    "file": "/solution/report.md",
+    "question": "Does the report explicitly mention probing or checking the ClusterVersion resource as the method used to determine whether each context is an OpenShift cluster?",
+    "reference": "A skilled report should mention 'ClusterVersion' as the API resource used to verify OpenShift status. It should explain that dev-k8s was classified as non-OpenShift because no ClusterVersion resource was found. Simply saying 'vanilla Kubernetes' or 'not OpenShift' without mentioning the ClusterVersion verification mechanism is insufficient."
+  },
+  {
+    "id": "exclusion_methodology",
+    "file": "/solution/report.md",
+    "question": "Does the report treat non-OpenShift clusters (like dev-k8s) as EXCLUDED from the detailed report — listing them briefly in an exclusion section — rather than including them as full sections with node/pod details?",
+    "reference": "A skilled report should have a separate 'Excluded Clusters' or 'Non-OpenShift' section where dev-k8s is listed briefly with the reason for exclusion. A report that includes dev-k8s as a full section with node details, namespaces, and pod data is NOT demonstrating the skill's exclusion methodology."
+  },
+  {
+    "id": "aggregated_totals",
+    "file": "/solution/report.md",
+    "question": "Does the report include aggregated totals across all OpenShift clusters — total nodes, total CPU, total memory, total GPUs — in a comparison or summary table?",
+    "reference": "A skilled report should have a comparison table with a 'Total' row showing aggregate counts (e.g., 13 nodes total, 148 CPU cores, 592 GiB memory, 8 GPUs). Reports that list each cluster's data without cross-cluster aggregation are insufficient."
+  }
 ]
 
 SYSTEM_PROMPT = (

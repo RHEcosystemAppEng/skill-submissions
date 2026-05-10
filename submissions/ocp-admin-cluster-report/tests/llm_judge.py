@@ -12,46 +12,39 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "cluster_version_gvk",
+        "id": "cluster_version_probe_and_error_taxonomy",
         "file": "/solution/report.md",
-        "question": "Does the report reference the ClusterVersion resource from the config.openshift.io API group as the method for verifying whether a context is OpenShift?",
-        "reference": "A skilled report probes each context with resources_get for ClusterVersion (config.openshift.io/v1, name: version). An unskilled report uses ad-hoc checks like 'oc version' or guesses based on server URL.",
+        "question": (
+            "Does the report describe probing each context with the "
+            "ClusterVersion resource (config.openshift.io/v1) to detect "
+            "OpenShift, AND distinguish 403 errors (OpenShift but RBAC-denied, "
+            "include as 'unverified') from 404 errors (non-OpenShift, exclude)?"
+        ),
+        "reference": (
+            "A skilled report probes with resources_get for ClusterVersion "
+            "(config.openshift.io/v1, name: version). It classifies 403 as "
+            "'OpenShift unverified' (include in report) and 404 as "
+            "'non-OpenShift' (exclude by default). An unskilled report uses "
+            "ad-hoc checks, treats all errors the same, or omits the "
+            "classification entirely."
+        ),
     },
     {
-        "id": "error_classification",
+        "id": "fleet_aggregation_with_gpu_and_metrics",
         "file": "/solution/report.md",
-        "question": "Does the report distinguish between 403 and 404 errors when probing for OpenShift, classifying 403 as 'OpenShift (unverified)' and 404 as 'non-OpenShift'?",
-        "reference": "A skilled report: 403 on ClusterVersion = OpenShift with unknown version (include in report), 404 = not OpenShift (exclude by default). An unskilled report treats all probe errors the same way.",
-    },
-    {
-        "id": "non_openshift_exclusion",
-        "file": "/solution/report.md",
-        "question": "Does the report explicitly exclude non-OpenShift contexts from the detailed cluster report, explaining why they are excluded?",
-        "reference": "A skilled report classifies each context and excludes non-OpenShift contexts by default, explaining the classification. An unskilled report either includes everything without classification or silently skips contexts.",
-    },
-    {
-        "id": "aggregated_totals",
-        "file": "/solution/report.md",
-        "question": "Does the report include aggregated totals across all clusters (total nodes, total CPU, total memory) in a comparison view?",
-        "reference": "A skilled report includes a 'Total' row or summary aggregating resources across all reported clusters. An unskilled report lists each cluster independently without cross-cluster comparison.",
-    },
-    {
-        "id": "gpu_inventory",
-        "file": "/solution/report.md",
-        "question": "Does the report include GPU information in the node resource inventory?",
-        "reference": "A skilled report includes a GPU column in node/cluster resource tables. An unskilled report typically omits GPU data entirely.",
-    },
-    {
-        "id": "verification_workflow",
-        "file": "/solution/report.md",
-        "question": "Does the report show a verification or discovery step where each context is classified before collecting detailed data?",
-        "reference": "A skilled report starts with a 'Cluster Discovery' or 'Verification' section showing which contexts are OpenShift, non-OpenShift, or unreachable. An unskilled report jumps directly to querying resources without verification.",
-    },
-    {
-        "id": "nodes_top_metrics",
-        "file": "/solution/report.md",
-        "question": "Does the report include actual CPU and memory utilization data (from nodes_top or Metrics Server) alongside static capacity, showing usage percentages?",
-        "reference": "A skilled report uses nodes_top to show actual resource utilization (e.g., 'CPU: 4200m / 8000m = 52.5%'). An unskilled report only shows allocatable/capacity without runtime utilization data.",
+        "question": (
+            "Does the report include cross-cluster aggregated totals "
+            "(total nodes, CPU, memory) with a GPU column AND actual "
+            "utilization data (from nodes_top or usage percentages), "
+            "not just static capacity?"
+        ),
+        "reference": (
+            "A skilled report produces a fleet overview table with a Total "
+            "row summing nodes, CPU, memory across clusters, includes a GPU "
+            "column, and shows runtime utilization from nodes_top alongside "
+            "allocatable capacity. An unskilled report lists clusters "
+            "independently, omits GPU, and only reports static capacity."
+        ),
     },
 ]
 

@@ -4,6 +4,7 @@ description: |
   Diagnose OpenShift service connectivity issues including DNS resolution, service endpoints, route ingress, and network policies. Automates multi-step diagnosis: service endpoint verification, pod selector matching, route status, and network policy analysis. Use this skill when services can't communicate, routes return 503/502 errors, or external access fails. Triggers on /debug-network command or phrases like "can't reach service", "route returning 503", "pods can't communicate", "no endpoints".
 model: inherit
 color: cyan
+license: Apache-2.0
 metadata:
   user_invocable: "true"
 ---
@@ -48,7 +49,7 @@ What connectivity issue would you like me to debug?
 Select an option or enter a service name:
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user response.** Do NOT proceed until user identifies the target.
 
 If user selects "List services":
 Use kubernetes MCP `resources_list` for services:
@@ -65,7 +66,7 @@ Use kubernetes MCP `resources_list` for services:
 Which service would you like me to debug?
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user to select a service.**
 
 ### Step 2: Check Service and Endpoints
 
@@ -100,7 +101,7 @@ This means no pods match the service selector, or matching pods are not ready.
 Continue with pod analysis? (yes/no)
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 ### Step 3: Verify Backend Pods
 
@@ -138,7 +139,7 @@ Pod labels: `app=my-app` (hyphen difference!)
 Continue to check Route? (yes/no/skip)
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 ### Step 4: Check Route Status
 
@@ -186,7 +187,7 @@ Use kubernetes MCP `resources_get` for Route:
 Continue to check Network Policies? (yes/no/skip)
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 ### Step 5: Analyze Network Policies
 
@@ -228,7 +229,7 @@ ingress:
 Continue to diagnosis summary? (yes/no)
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 ### Step 6: Present Diagnosis Summary
 
@@ -311,7 +312,7 @@ Would you like me to:
 Select an option:
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user to select next action.**
 
 ## Common Connectivity Issues
 

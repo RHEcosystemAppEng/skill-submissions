@@ -12,34 +12,40 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "cpu_allocation_field",
+        "id": "allocated_vs_runtime_capacity",
         "file": "/solution/report.md",
-        "question": "Does the report reference the exact field path spec.domain.cpu (sockets/cores/threads) for per-VM CPU allocation calculations?",
-        "reference": "A skilled report uses spec.domain.cpu.sockets * cores * threads from VirtualMachineInstance to calculate VM CPU allocations. An unskilled report uses nodes_top runtime metrics which show misleadingly low numbers for idle VMs.",
+        "question": (
+            "Does the report use VMI domain spec (spec.domain.cpu with "
+            "sockets/cores/threads, spec.domain.memory.guest) and node "
+            "status.capacity for rebalance planning, rather than relying "
+            "solely on nodes_top runtime utilization?"
+        ),
+        "reference": (
+            "A skilled report computes per-VM allocated CPU from "
+            "spec.domain.cpu (sockets x cores x threads) and guest memory "
+            "from spec.domain.memory.guest, then divides by node "
+            "status.capacity to get reservation percentages. This captures "
+            "idle VMs that still reserve capacity. An unskilled report uses "
+            "only nodes_top runtime metrics, which misleads for idle VMs."
+        ),
     },
     {
-        "id": "node_capacity_field",
+        "id": "storage_aware_migration_path",
         "file": "/solution/report.md",
-        "question": "Does the report reference status.capacity (cpu, memory) for node resource totals, computing allocation percentages as allocated/capacity?",
-        "reference": "A skilled report divides summed VM allocations by status.capacity.cpu and status.capacity.memory. An unskilled report uses runtime utilization from nodes_top.",
-    },
-    {
-        "id": "vmim_cr",
-        "file": "/solution/report.md",
-        "question": "Does the report reference VirtualMachineInstanceMigration as the KubeVirt CR for executing live migrations?",
-        "reference": "A skilled report creates a VirtualMachineInstanceMigration CR to trigger live migration. An unskilled report uses generic kubectl drain or doesn't specify the migration mechanism.",
-    },
-    {
-        "id": "kvm_node_filter",
-        "file": "/solution/report.md",
-        "question": "Does the report filter eligible target nodes using devices.kubevirt.io/kvm or kubevirt.io/schedulable labels?",
-        "reference": "A skilled report checks devices.kubevirt.io/kvm > 0 and kubevirt.io/schedulable=true to identify KVM-capable worker nodes. An unskilled report assumes all worker nodes can host VMs.",
-    },
-    {
-        "id": "migration_concurrency_limit",
-        "file": "/solution/report.md",
-        "question": "Does the report mention concurrent migration limits such as parallelMigrationsPerCluster (default 5) or parallelOutboundMigrationsPerNode (default 2) from the HyperConverged CR?",
-        "reference": "A skilled report references the HyperConverged CR's liveMigrationConfig with parallelMigrationsPerCluster=5 and parallelOutboundMigrationsPerNode=2 as constraints on how many VMs can migrate simultaneously. An unskilled report ignores concurrency limits entirely.",
+        "question": (
+            "Does the report check PVC access modes (RWX vs RWO) to "
+            "determine whether each VM can live-migrate or must use the "
+            "cold migration path (stop, re-fetch, set nodeAffinity, start)?"
+        ),
+        "reference": (
+            "A skilled report inspects PersistentVolumeClaim.spec.accessModes "
+            "for each VM: RWX allows live migration via "
+            "VirtualMachineInstanceMigration; RWO blocks live migration and "
+            "requires the cold path (vm_lifecycle stop, re-read VM for fresh "
+            "resourceVersion, set required nodeAffinity to target, start). "
+            "An unskilled report assumes all VMs can live-migrate or uses "
+            "kubectl drain without checking storage constraints."
+        ),
     },
 ]
 

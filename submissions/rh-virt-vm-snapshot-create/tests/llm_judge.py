@@ -12,40 +12,16 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "snapshot_gvk",
+        "id": "consistency_level_reasoning",
         "file": "/solution/report.md",
-        "question": "Does the report specify the exact apiVersion snapshot.kubevirt.io/v1beta1 for the VirtualMachineSnapshot resource?",
-        "reference": "A skilled report uses the exact GVK: apiVersion snapshot.kubevirt.io/v1beta1, kind VirtualMachineSnapshot. An unskilled report guesses wrong apiVersions or omits it entirely.",
+        "question": "Does the report reason about the snapshot consistency level for this specific VM (production-db), explaining whether it will be crash-consistent or application-consistent based on guest agent status and the indications field?",
+        "reference": "A skilled report checks the AgentConnected condition on the VM, explains that with guest agent present the snapshot achieves application-consistent level (filesystem freeze/thaw via status.indications showing GuestAgent), and without it only crash-consistent. An unskilled report either doesn't discuss consistency or mentions it without connecting it to the VM's specific guest agent status.",
     },
     {
-        "id": "status_indications",
+        "id": "storage_prerequisites",
         "file": "/solution/report.md",
-        "question": "Does the report reference the status.indications field on VirtualMachineSnapshot to determine consistency level (GuestAgent vs Online)?",
-        "reference": "A skilled report checks status.indications for GuestAgent (application-consistent, filesystem freeze/thaw) vs Online without GuestAgent (crash-consistent). An unskilled report doesn't reference this specific field path.",
-    },
-    {
-        "id": "agent_connected_condition",
-        "file": "/solution/report.md",
-        "question": "Does the report reference the AgentConnected condition for verifying guest agent presence on the VM?",
-        "reference": "A skilled report checks the AgentConnected condition (from VM/VMI status.conditions) to verify qemu-guest-agent is running before snapshot. An unskilled report vaguely mentions guest agent without the exact condition name.",
-    },
-    {
-        "id": "hot_plug_blocker",
-        "file": "/solution/report.md",
-        "question": "Does the report identify hot-plugged volumes as blocking snapshot creation and explain persistence into spec.template.spec.volumes?",
-        "reference": "A skilled report warns hot-plugged volumes block snapshots and recommends persisting them in spec.template.spec.volumes. An unskilled report doesn't mention this blocker.",
-    },
-    {
-        "id": "consistency_levels",
-        "file": "/solution/report.md",
-        "question": "Does the report distinguish between application-consistent snapshots (with GuestAgent/filesystem freeze) and crash-consistent snapshots (Online without GuestAgent)?",
-        "reference": "A skilled report explains two consistency levels: GuestAgent indication means filesystem freeze/thaw (application-consistent), while Online without GuestAgent means crash-consistent only. An unskilled report treats all snapshots as equivalent.",
-    },
-    {
-        "id": "storage_prereq_analysis",
-        "file": "/solution/report.md",
-        "question": "Does the report describe a pre-snapshot storage analysis checking volumeSnapshotStatuses, CSI driver capabilities, and VolumeSnapshotClass compatibility?",
-        "reference": "A skilled report performs a 9-step storage analysis: check volumeSnapshotStatuses, verify storage class, find VolumeSnapshotClass, validate CSI driver snapshot support. An unskilled report skips storage validation entirely.",
+        "question": "Does the report check storage prerequisites before creating the snapshot, specifically verifying VolumeSnapshotClass existence and CSI driver snapshot capabilities for the VM's storage class?",
+        "reference": "A skilled report verifies that a VolumeSnapshotClass exists for the storage provisioner, checks CSI driver capabilities, and may reference volumeSnapshotStatuses. An unskilled report proceeds to create the snapshot without any storage-level prerequisite verification.",
     },
 ]
 

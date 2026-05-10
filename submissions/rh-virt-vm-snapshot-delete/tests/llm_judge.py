@@ -12,22 +12,16 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "spec_source",
+        "id": "restore_dependency_check",
         "file": "/solution/report.md",
-        "question": "Does the report reference spec.source.name to identify the source VM of a snapshot?",
-        "reference": "A skilled report reads spec.source.name from the VirtualMachineSnapshot to confirm the source VM. An unskilled report infers the VM from the snapshot name.",
+        "question": "Does the report explicitly check for active VirtualMachineRestore resources that reference the snapshot before proceeding with deletion?",
+        "reference": "A skilled report checks for VirtualMachineRestore resources that depend on the snapshot being deleted, because an active restore operation would fail if its source snapshot is removed. An unskilled report proceeds to deletion without verifying restore dependencies.",
     },
     {
-        "id": "sibling_discovery",
+        "id": "sibling_recovery_warning",
         "file": "/solution/report.md",
-        "question": "Does the report use vm.kubevirt.io/name labelSelector or spec.source.name filtering to find sibling snapshots?",
-        "reference": "A skilled report finds sibling snapshots via labelSelector vm.kubevirt.io/name or by filtering on spec.source.name. An unskilled report doesn't check for other recovery points.",
-    },
-    {
-        "id": "last_snapshot_warning",
-        "file": "/solution/report.md",
-        "question": "Does the report warn the user when the snapshot being deleted is the ONLY snapshot for the VM, meaning no recovery points will remain?",
-        "reference": "A skilled report counts sibling snapshots and displays a prominent warning when this is the last one: 'This is the ONLY snapshot for VM. After deletion, no snapshot recovery points will exist.' An unskilled report deletes without regard for remaining recovery options.",
+        "question": "Does the report count or enumerate the remaining snapshots for the same VM and warn about the impact on recovery options if this snapshot is deleted?",
+        "reference": "A skilled report lists sibling snapshots for the VM (using vm.kubevirt.io/name label or spec.source.name), counts how many remain, and warns if this is the last or only recovery point. An unskilled report deletes without considering how many recovery points remain for the VM.",
     },
 ]
 

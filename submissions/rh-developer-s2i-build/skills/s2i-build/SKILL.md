@@ -4,6 +4,7 @@ description: |
   Create BuildConfig and ImageStream resources on OpenShift and trigger a Source-to-Image (S2I) build. Use this skill after /detect-project to build container images from source code on the cluster. Handles namespace verification, resource creation with user confirmation, build monitoring with log streaming, and failure recovery. Triggers on /s2i-build command. Run before /deploy.
 model: inherit
 color: green
+license: Apache-2.0
 metadata:
    user_invocable: "true"
 ---
@@ -45,7 +46,7 @@ Is this the correct cluster and namespace for the build?
 - no - Let me switch context
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 ### Step 2: Gather Build Information
 
@@ -91,7 +92,7 @@ Your application uses `[PYTHON_ENTRY_FILE]` as entry point, but `gunicorn` is no
 3. **Continue anyway** - Proceed (build will likely fail)
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 **To detect Git URL:**
 - Read `.git/config` and extract `[remote "origin"]` url
@@ -114,7 +115,7 @@ Namespace `[namespace]` does not exist.
 Would you like me to create it? (yes/no)
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 If creating namespace, use `resources_create_or_update`:
 ```yaml
@@ -150,7 +151,7 @@ spec:
 **Proceed with creating this ImageStream?** (yes/no)
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 ### Step 5: Create BuildConfig
 
@@ -257,7 +258,7 @@ spec:
 **Proceed with creating this BuildConfig?** (yes/no)
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 ### Step 6: Start Build
 
@@ -276,7 +277,7 @@ Resources created successfully!
 (You can also trigger builds later with: oc start-build [app-name])
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 If yes, create a Build resource:
 ```yaml

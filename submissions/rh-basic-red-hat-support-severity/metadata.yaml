@@ -1,0 +1,13 @@
+name: rh-basic-red-hat-support-severity
+description: "rh-basic Red Hat Support Severity Skill Evaluation"
+persona: rh-basic
+version: "1.0.0"
+generation_mode: manual
+tags:
+  - rh-basic
+  - red-hat-support-severity
+cpus: 2
+memory_mb: 2048
+storage_mb: 10240
+experiment:
+  n_trials: 3

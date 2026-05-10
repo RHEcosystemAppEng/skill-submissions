@@ -12,10 +12,16 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "readyToUse_troubleshooting",
+        "id": "failed_snapshot_diagnosis",
         "file": "/solution/report.md",
-        "question": "Does the report describe a troubleshooting workflow triggered when a snapshot's readyToUse field is false, including investigation of snapshot conditions or underlying VolumeSnapshot issues?",
-        "reference": "A skilled report treats readyToUse == false as a troubleshooting trigger: it checks VirtualMachineSnapshot conditions, inspects underlying VolumeSnapshot status, and investigates CSI driver or storage class problems. An unskilled report either ignores readyToUse entirely or only mentions it without a diagnostic workflow.",
+        "question": "Does the report provide a specific diagnostic workflow for the failed snapshot (production-db-snap-failed), mentioning VolumeSnapshot, VolumeSnapshotClass, CSI driver, or storage class investigation as causes?",
+        "reference": "A skilled report diagnoses the failed snapshot by investigating underlying VolumeSnapshot status, checking VolumeSnapshotClass existence, verifying CSI driver snapshot capabilities, or examining storage class configuration. An unskilled report simply states the snapshot failed without explaining what to investigate or how to fix it.",
+    },
+    {
+        "id": "discovery_method",
+        "file": "/solution/report.md",
+        "question": "Does the report describe using the vm.kubevirt.io/name label selector or spec.source.name field to discover which snapshots belong to the production-db VM, rather than just listing all snapshots?",
+        "reference": "A skilled report explains using vm.kubevirt.io/name labelSelector to filter snapshots for a specific VM, or reading spec.source.name from each snapshot to identify the source VM. An unskilled report lists all snapshots without describing a targeted discovery method.",
     },
 ]
 

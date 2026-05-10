@@ -12,16 +12,48 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "decomposed_restart_workflow",
+        "id": "stuck_vm_troubleshooting_depth",
         "file": "/solution/report.md",
-        "question": "Does the report decompose the restart of production-db into explicit separate steps: stop, verify the VM reached Stopped state (via printableStatus), wait a few seconds, then start, and verify Running - rather than using a single atomic restart?",
-        "reference": "A skilled report decomposes restart into: (1) stop VM via vm_lifecycle, (2) poll printableStatus until 'Stopped', (3) wait ~5 seconds, (4) start VM via vm_lifecycle, (5) verify printableStatus is 'Running'. This avoids resourceVersion conflicts. An unskilled report uses a single restart command or restart action without intermediate verification steps.",
+        "question": (
+            "Does the report troubleshoot the stuck web-frontend VM using "
+            "specific diagnostic techniques from the lifecycle-errors.md "
+            "troubleshooting documentation: checking finalizers on the VM "
+            "object, verifying whether the VMI has a deletionTimestamp, "
+            "checking virt-launcher pod status, and reviewing events — "
+            "rather than just suggesting 'wait and retry' or 'force stop'?"
+        ),
+        "reference": (
+            "A skilled report follows the lifecycle-errors.md diagnostic steps: "
+            "(1) check .metadata.finalizers on the VM (kubevirt.io/virtualMachineControllerFinalize, "
+            "foregroundDeletion), (2) check if VMI still exists and has deletionTimestamp, "
+            "(3) check virt-launcher pod status using pods_list_in_namespace, "
+            "(4) review events with events_list. It then provides specific remediation: "
+            "force delete VMI, delete stuck virt-launcher pod, or remove finalizers "
+            "as last resort. An unskilled report gives generic advice without "
+            "the structured diagnostic approach."
+        ),
     },
     {
-        "id": "resource_version_rationale",
+        "id": "composite_restart_with_full_verification",
         "file": "/solution/report.md",
-        "question": "Does the report explain that restart must be decomposed into separate stop and start operations to avoid Kubernetes resourceVersion conflicts, rather than just saying 'it's best practice'?",
-        "reference": "A skilled report specifically explains that issuing start too quickly after stop causes resourceVersion conflicts because the Kubernetes API object hasn't been updated yet. An unskilled report either doesn't explain why restart is decomposed or gives a vague reason.",
+        "question": (
+            "Does the report implement the production-db restart as separate "
+            "stop and start operations with COMPLETE verification at each step: "
+            "(1) stop via vm_lifecycle, (2) verify VMI is gone (NotFound), "
+            "(3) wait a few seconds, (4) start via vm_lifecycle, "
+            "(5) verify printableStatus is Running — and explicitly state "
+            "that the restart action should NOT be used directly due to "
+            "resourceVersion conflicts?"
+        ),
+        "reference": (
+            "A skilled report follows the SKILL workflow: decompose restart "
+            "into 5 explicit steps with verification between stop and start. "
+            "It specifically warns against using action='restart' and explains "
+            "that resourceVersion conflicts occur when start is issued too "
+            "quickly after stop. The VMI must be confirmed gone (NotFound) — "
+            "not just VM showing Stopped. An unskilled report may use a single "
+            "restart command or skip intermediate VMI verification."
+        ),
     },
 ]
 

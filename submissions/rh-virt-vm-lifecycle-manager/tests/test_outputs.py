@@ -2,7 +2,10 @@
 Tests for rh-virt__vm-lifecycle-manager evaluation.
 
 6 tests: 2 padding (both agents pass) + 4 skill-dependent.
-Each test worth ~16.7% of pytest score.
+
+Skill-dependent tests target knowledge ONLY available through the
+SKILL.md and docs/troubleshooting/lifecycle-errors.md — NOT from
+general KubeVirt knowledge or mock MCP data exploration.
 """
 import os
 import pytest
@@ -31,43 +34,71 @@ class TestBaseline:
 
 
 class TestSkillDependent:
-    def test_decomposed_restart_with_wait(self):
-        """Skill teaches restart MUST be stop -> verify Stopped -> wait 5s
-        -> start -> verify Running. This avoids resourceVersion conflicts.
-        An unskilled agent uses a single restart command."""
+    def test_stuck_vm_finalizer_diagnosis(self):
+        """lifecycle-errors.md teaches checking .metadata.finalizers
+        on stuck VMs (kubevirt.io/virtualMachineControllerFinalize,
+        foregroundDeletion) as a diagnostic step. This is custom
+        troubleshooting doc content unavailable to the control agent."""
         c = read_report().lower()
-        has_stop_start = "stop" in c and "start" in c
-        has_wait = "5" in c and any(
-            t in c for t in ["second", "sec", "wait", "delay", "pause"]
-        )
-        assert has_stop_start and has_wait, (
-            "must decompose restart into stop/wait 5s/start sequence"
-        )
-
-    def test_printable_status_field(self):
-        """Skill teaches polling status.printableStatus for exact values
-        'Stopped' and 'Running' to verify state transitions. An unskilled
-        agent checks generic status or doesn't verify at all."""
-        c = read_report()
-        assert "printableStatus" in c, (
-            "must reference printableStatus field for state verification"
+        has_finalizer = any(t in c for t in [
+            "finalizer", "finalizers",
+            "virtualMachineControllerFinalize".lower(),
+            "foregrounddeletion",
+        ])
+        has_stuck = any(t in c for t in [
+            "stuck", "block", "terminating", "won't stop",
+            "not stopping", "unresponsive",
+        ])
+        assert has_finalizer and has_stuck, (
+            "must diagnose stuck VM using finalizer analysis "
+            "(lifecycle-errors.md troubleshooting knowledge)"
         )
 
-    def test_resource_version_conflict(self):
-        """Skill teaches that restart must be decomposed specifically to
-        avoid resourceVersion conflicts from rapid successive API calls.
-        This is a Kubernetes concurrency concept an unskilled agent
-        doesn't know."""
-        c = read_report()
-        assert "resourceVersion" in c, (
-            "must mention resourceVersion conflict as reason for decomposed restart"
+    def test_vmi_gone_before_start(self):
+        """SKILL Step 2 says to verify VMI is NotFound (gone) before
+        starting — not just that VM shows Stopped. This is a specific
+        verification step from the SKILL workflow."""
+        c = read_report().lower()
+        has_vmi = "vmi" in c or "virtualmachineinstance" in c
+        has_gone = any(t in c for t in [
+            "not found", "notfound", "gone", "absent",
+            "deleted", "no longer exists",
+        ])
+        assert has_vmi and has_gone, (
+            "must verify VMI is gone (NotFound) before starting, "
+            "not just check VM printableStatus (SKILL Step 2)"
         )
 
-    def test_run_strategy_halted(self):
-        """Skill teaches RunStrategy mapping: stop sets Halted, start sets
-        Always. 'Halted' is a KubeVirt-specific RunStrategy value that
-        an unskilled agent typically doesn't mention."""
-        c = read_report()
-        assert "Halted" in c, (
-            "must reference RunStrategy 'Halted' for stop operation"
+    def test_acpi_shutdown_awareness(self):
+        """lifecycle-errors.md 'VM Won't Stop' section explains that
+        the guest OS may not respond to ACPI shutdown signals and
+        provides specific remediation. This is custom doc content."""
+        c = read_report().lower()
+        has_acpi = "acpi" in c
+        has_shutdown = any(t in c for t in [
+            "shutdown", "graceful", "signal",
+            "guest os", "guest operating system",
+        ])
+        assert has_acpi and has_shutdown, (
+            "must mention ACPI shutdown signal and guest OS response "
+            "(lifecycle-errors.md troubleshooting knowledge)"
+        )
+
+    def test_error_handling_stop_failure(self):
+        """SKILL explicitly states: 'Stop fails during restart → Report,
+        do not proceed to start.' This abort-on-failure protocol is
+        specific to the SKILL workflow."""
+        c = read_report().lower()
+        has_stop_fail = any(t in c for t in [
+            "stop fails", "stop failure", "fails to stop",
+            "stop succeeds but", "if stop",
+        ])
+        has_abort = any(t in c for t in [
+            "do not proceed", "abort", "do not start",
+            "remains stopped", "not proceed to start",
+            "should not", "must not",
+        ])
+        assert has_stop_fail and has_abort, (
+            "must describe abort-on-failure protocol: if stop fails, "
+            "do not proceed to start (SKILL error handling)"
         )

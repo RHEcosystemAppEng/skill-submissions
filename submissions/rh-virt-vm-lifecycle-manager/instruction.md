@@ -1,15 +1,19 @@
 # VM Lifecycle Operations Task
 
-You are an OpenShift Virtualization administrator. Execute lifecycle operations for VMs in the cluster.
+You are an OpenShift Virtualization administrator. Execute lifecycle operations and troubleshoot a stuck VM in the cluster.
 
 ## Scenario
-In namespace `prod-vms`, you need to stop the VM `web-frontend` and restart the VM `production-db`. The restart is critical — the database VM must be fully stopped and verified before being started again to avoid data corruption from resourceVersion conflicts.
+In namespace `prod-vms`, you need to:
+1. **Troubleshoot**: VM `web-frontend` has been in a stuck state — a previous stop attempt left it unresponsive. Diagnose what is blocking the shutdown (check for finalizers, stuck VMI, virt-launcher pod status) and resolve it before proceeding.
+2. **Restart**: Restart VM `production-db` using a safe decomposed procedure. The restart is critical — the database VM must be fully stopped and verified (including confirming the VMI is gone) before being started again.
 
 ## Requirements
-- Plan the exact procedure for each operation
-- Describe how to verify each operation completed successfully
-- Explain what RunStrategy value results from each operation
-- Address error handling if an operation fails or the VM is already in the target state
+- Diagnose why `web-frontend` is stuck: check finalizers on the VM, verify whether the VMI still exists and has a deletionTimestamp, check virt-launcher pod status, and review events. Use troubleshooting documentation if available.
+- Plan the resolution for the stuck VM (force delete VMI, remove stuck finalizers, or wait for graceful completion)
+- For the `production-db` restart: describe the exact decomposed stop-then-start procedure, explaining why the restart action should NOT be used directly
+- Verify each operation at every step: VMI must be confirmed gone (NotFound) before starting, not just VM showing Stopped
+- Explain what RunStrategy value results from stop (Halted) and start (Always)
+- Address what happens if stop fails during restart — whether to proceed with start or abort
 
 Write your complete operations plan in `/solution/report.md`.
 

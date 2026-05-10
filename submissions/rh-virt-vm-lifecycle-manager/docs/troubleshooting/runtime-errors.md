@@ -569,7 +569,7 @@ When implementing diagnostic workflows:
 
 ```markdown
 **Document Consultation** (REQUIRED):
-1. **Action**: Read [runtime-errors.md](/workspace/supportive/docs/troubleshooting/runtime-errors.md) to understand CrashLoopBackOff causes
+1. **Action**: Read [runtime-errors.md](../../docs/troubleshooting/runtime-errors.md) to understand CrashLoopBackOff causes
 2. **Output to user**: "I consulted runtime-errors.md to diagnose the CrashLoopBackOff issue."
 ```
 

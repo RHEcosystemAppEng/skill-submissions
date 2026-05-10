@@ -12,16 +12,48 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "restore_dependency_check",
+        "id": "confirmation_and_safety_protocol",
         "file": "/solution/report.md",
-        "question": "Does the report explicitly check for active VirtualMachineRestore resources that reference the snapshot before proceeding with deletion?",
-        "reference": "A skilled report checks for VirtualMachineRestore resources that depend on the snapshot being deleted, because an active restore operation would fail if its source snapshot is removed. An unskilled report proceeds to deletion without verifying restore dependencies.",
+        "question": (
+            "Does the report describe a human-in-the-loop confirmation "
+            "protocol for snapshot deletion, including: (1) showing what "
+            "will be permanently lost, (2) listing remaining snapshots "
+            "for the VM, (3) warning when this is the last/only recovery "
+            "point, and (4) requiring explicit user approval before "
+            "proceeding? This should go beyond just mentioning 'be careful' "
+            "— it should describe a structured safety workflow."
+        ),
+        "reference": (
+            "A skilled report follows the SKILL's Human-in-the-Loop section: "
+            "present a formatted review showing snapshot details, impact of "
+            "deletion (recovery point loss, storage freed), remaining snapshots "
+            "for the VM, and a clear warning if this is the ONLY snapshot. "
+            "It explicitly states deletion requires 'yes' confirmation and "
+            "should never auto-execute. An unskilled report may briefly "
+            "mention safety but doesn't describe the full structured protocol."
+        ),
     },
     {
-        "id": "sibling_recovery_warning",
+        "id": "storage_cleanup_remediation",
         "file": "/solution/report.md",
-        "question": "Does the report count or enumerate the remaining snapshots for the same VM and warn about the impact on recovery options if this snapshot is deleted?",
-        "reference": "A skilled report lists sibling snapshots for the VM (using vm.kubevirt.io/name label or spec.source.name), counts how many remain, and warns if this is the last or only recovery point. An unskilled report deletes without considering how many recovery points remain for the VM.",
+        "question": (
+            "Does the report address orphaned storage after snapshot "
+            "deletion with specific remediation steps: checking PVC and "
+            "DataVolume finalizers, describing the correct deletion order "
+            "(DataVolume first, then PVC), checking PV reclaim policy, "
+            "and mentioning force delete or finalizer removal as last "
+            "resort options?"
+        ),
+        "reference": (
+            "A skilled report uses knowledge from storage-errors.md: "
+            "(1) check PVC finalizers (kubernetes.io/pvc-protection), "
+            "(2) check DataVolume finalizers (cdi.kubevirt.io/dataVolumeFinalizer), "
+            "(3) delete DataVolume FIRST then PVC (DV blocks PVC deletion), "
+            "(4) check PV reclaim policy (Retain vs Delete), "
+            "(5) force delete or remove finalizers as last resort. "
+            "An unskilled report suggests generic 'delete the PVC' without "
+            "the structured diagnostic and remediation sequence."
+        ),
     },
 ]
 

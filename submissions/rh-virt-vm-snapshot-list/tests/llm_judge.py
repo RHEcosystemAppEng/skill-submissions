@@ -12,16 +12,44 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "failed_snapshot_diagnosis",
+        "id": "failed_snapshot_events_diagnosis",
         "file": "/solution/report.md",
-        "question": "Does the report provide a specific diagnostic workflow for the failed snapshot (production-db-snap-failed), mentioning VolumeSnapshot, VolumeSnapshotClass, CSI driver, or storage class investigation as causes?",
-        "reference": "A skilled report diagnoses the failed snapshot by investigating underlying VolumeSnapshot status, checking VolumeSnapshotClass existence, verifying CSI driver snapshot capabilities, or examining storage class configuration. An unskilled report simply states the snapshot failed without explaining what to investigate or how to fix it.",
+        "question": (
+            "Does the report diagnose the failed snapshot by checking "
+            "cluster events (using events_list) AND examining "
+            "status.conditions on the snapshot object, rather than just "
+            "reporting the error message from status.error? The diagnosis "
+            "should include specific storage-level investigation "
+            "(VolumeSnapshotClass, CSI driver) as possible root causes."
+        ),
+        "reference": (
+            "A skilled report follows SKILL Issue 3: (1) uses resources_get "
+            "to check status.conditions for detailed error messages, "
+            "(2) uses events_list to check cluster events for snapshot-related "
+            "errors, (3) investigates storage prerequisites (VolumeSnapshotClass "
+            "existence, CSI driver snapshot support). An unskilled report just "
+            "reads the status.error message ('VolumeSnapshot creation timed out') "
+            "and may speculate about causes without the structured diagnostic approach."
+        ),
     },
     {
-        "id": "discovery_method",
+        "id": "discovery_with_explicit_fallback",
         "file": "/solution/report.md",
-        "question": "Does the report describe using the vm.kubevirt.io/name label selector or spec.source.name field to discover which snapshots belong to the production-db VM, rather than just listing all snapshots?",
-        "reference": "A skilled report explains using vm.kubevirt.io/name labelSelector to filter snapshots for a specific VM, or reading spec.source.name from each snapshot to identify the source VM. An unskilled report lists all snapshots without describing a targeted discovery method.",
+        "question": (
+            "Does the report describe BOTH the primary snapshot discovery method "
+            "(using vm.kubevirt.io/name label selector) AND an explicit fallback "
+            "strategy (listing all snapshots and filtering by spec.source.name) "
+            "for cases where the label selector returns no results?"
+        ),
+        "reference": (
+            "A skilled report follows SKILL Step 2: uses the label selector "
+            "vm.kubevirt.io/name=<vm-name> as the primary discovery method, "
+            "and explicitly describes a fallback: 'If no results, list all "
+            "snapshots and filter by spec.source.name.' It explains WHY the "
+            "fallback is needed (labels may not exist on all snapshots). "
+            "An unskilled report uses one method without acknowledging the "
+            "fallback, or lists all snapshots without explaining the strategy."
+        ),
     },
 ]
 

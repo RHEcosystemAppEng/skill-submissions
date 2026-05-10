@@ -2,7 +2,10 @@
 Tests for rh-virt__vm-snapshot-list evaluation.
 
 6 tests: 2 padding (both agents pass) + 4 skill-dependent.
-Each test worth ~16.7% of pytest score.
+
+Skill-dependent tests target knowledge ONLY available through the
+SKILL.md workflow and its Common Issues section — NOT from general
+KubeVirt knowledge or mock MCP data exploration.
 """
 import os
 import pytest
@@ -29,50 +32,71 @@ class TestBaseline:
 
 
 class TestSkillDependent:
-    def test_snapshot_api_version(self):
-        """Skill teaches snapshot.kubevirt.io/v1beta1 as the exact apiVersion
-        for VirtualMachineSnapshot resources. An unskilled agent guesses
-        wrong GVKs or uses generic kubectl commands."""
-        c = read_report()
-        assert "snapshot.kubevirt.io" in c, (
-            "must reference snapshot.kubevirt.io apiVersion"
-        )
-
-    def test_label_selector_for_vm_filter(self):
-        """Skill teaches using vm.kubevirt.io/name labelSelector to filter
-        snapshots by VM, with fallback to spec.source.name. An unskilled
-        agent lists all snapshots without targeted filtering."""
-        c = read_report()
-        has_label = "vm.kubevirt.io/name" in c
-        has_source = "spec.source.name" in c or "spec.source" in c
-        assert has_label or has_source, (
-            "must use vm.kubevirt.io/name label or spec.source for VM-specific snapshot discovery"
-        )
-
-    def test_failed_snapshot_troubleshooting(self):
-        """Skill + docs teach that failed snapshots require investigating
-        VolumeSnapshot status, VolumeSnapshotClass, or CSI driver issues.
-        The mock data includes production-db-snap-failed. An unskilled
-        agent just reports 'Failed' without a diagnostic path."""
-        c = read_report()
-        has_vol_snap = "VolumeSnapshot" in c
-        has_csi = "CSI" in c or "csi" in c
-        has_storage_class = "StorageClass" in c or "storage class" in c.lower()
-        assert has_vol_snap or has_csi or has_storage_class, (
-            "must diagnose failed snapshot via VolumeSnapshot/CSI/StorageClass analysis"
-        )
-
-    def test_indications_field(self):
-        """Skill teaches that status.indications on snapshots reveals
-        consistency info (Online, GuestAgent). The mock data returns
-        indications in snapshot status. An unskilled agent ignores
-        this field or doesn't know its meaning."""
+    def test_label_selector_with_fallback(self):
+        """SKILL Step 2 Note says: 'The label selector
+        vm.kubevirt.io/name=<vm-name> may not always exist. If no results
+        are returned, fall back to listing all snapshots and filtering by
+        checking spec.source.name field.' Both strategies must be
+        described as primary + fallback."""
         c = read_report().lower()
-        has_indications = "indications" in c
-        has_consistency = ("crash" in c and "consistent" in c) or (
-            "application" in c and "consistent" in c
+        has_label = "vm.kubevirt.io/name" in c
+        has_fallback = any(t in c for t in [
+            "spec.source.name", "spec.source",
+            "fallback", "fall back",
+            "filter by", "filtering by",
+        ])
+        assert has_label and has_fallback, (
+            "must describe vm.kubevirt.io/name label selector as primary "
+            "AND spec.source.name fallback strategy (SKILL Step 2 note)"
         )
-        has_guest_agent = "guestagent" in c or "guest agent" in c
-        assert has_indications or has_consistency or has_guest_agent, (
-            "must reference indications field or consistency levels from snapshot status"
+
+    def test_events_list_for_diagnosis(self):
+        """SKILL Issue 3 says: 'Check cluster events: Use events_list
+        for snapshot-related errors.' This is a specific diagnostic tool
+        call that the SKILL prescribes for failed snapshots. Control
+        agents don't know to use events_list for this purpose."""
+        c = read_report().lower()
+        has_events = any(t in c for t in [
+            "events_list", "events list",
+            "cluster events", "event",
+        ])
+        has_failed = any(t in c for t in [
+            "failed", "failure", "error",
+        ])
+        assert has_events and has_failed, (
+            "must use events_list to diagnose failed snapshot "
+            "(SKILL Issue 3 diagnostic step)"
+        )
+
+    def test_status_conditions_check(self):
+        """SKILL Issue 3 says: 'Get snapshot details: Use resources_get
+        to check status.conditions for error messages.' This is a
+        specific field path that the SKILL prescribes for diagnosis."""
+        c = read_report().lower()
+        has_conditions = any(t in c for t in [
+            "status.conditions", "conditions",
+        ])
+        has_diagnostic = any(t in c for t in [
+            "resources_get", "diagnos", "investigat",
+            "error message", "root cause",
+        ])
+        assert has_conditions and has_diagnostic, (
+            "must check status.conditions on failed snapshot for error "
+            "details (SKILL Issue 3 diagnostic step)"
+        )
+
+    def test_cross_namespace_discovery(self):
+        """SKILL Issue 2 says: 'Check other namespaces: Use
+        namespaces_list to see available namespaces.' The instruction
+        asks about cross-namespace discovery. Control agents don't
+        know to use namespaces_list for this purpose."""
+        c = read_report().lower()
+        has_ns = any(t in c for t in [
+            "namespaces_list", "namespaces list",
+            "other namespace", "cross-namespace",
+            "multiple namespace",
+        ])
+        assert has_ns, (
+            "must describe cross-namespace snapshot discovery using "
+            "namespaces_list (SKILL Issue 2)"
         )

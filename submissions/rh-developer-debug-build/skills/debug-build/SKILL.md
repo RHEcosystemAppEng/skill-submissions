@@ -4,6 +4,7 @@ description: |
   Diagnose OpenShift build failures including S2I builds, Docker/Podman builds, and BuildConfig issues. Automates multi-step diagnosis: BuildConfig validation, build pod logs, registry authentication, and source repository access. Use this skill when builds fail, hang, or produce unexpected results. Triggers on /debug-build command or phrases like "build failed", "S2I error", "can't pull builder image", "can't push to registry", "build timeout".
 model: inherit
 color: cyan
+license: Apache-2.0
 metadata:
   user_invocable: "true"
 ---
@@ -47,7 +48,7 @@ Which build would you like me to debug?
 Select an option or enter a build name:
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 If user selects "List failed builds":
 Use kubernetes MCP `resources_list` for builds, filter by Failed phase:
@@ -64,7 +65,7 @@ Use kubernetes MCP `resources_list` for builds, filter by Failed phase:
 Which build would you like me to debug?
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user to select a build.**
 
 ### Step 2: Get Build Status Overview
 
@@ -103,7 +104,7 @@ Use kubernetes MCP `resources_get` to get Build details:
 Continue with detailed analysis? (yes/no)
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 ### Step 3: Analyze BuildConfig
 
@@ -144,7 +145,7 @@ Use kubernetes MCP `resources_get` to get BuildConfig:
 Continue to view build logs? (yes/no)
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 ### Step 4: Get Build Pod Logs
 
@@ -186,7 +187,7 @@ Use kubernetes MCP `pod_logs` for the builder pod:
 Continue to check related resources? (yes/no)
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 ### Step 5: Check Related Resources
 
@@ -224,7 +225,7 @@ Check secrets, imagestreams, and source access:
 Continue to full diagnosis summary? (yes/no)
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user confirmation before proceeding.**
 
 ### Step 6: Present Diagnosis Summary
 
@@ -292,7 +293,7 @@ Would you like me to:
 Select an option:
 ```
 
-Proceed automatically without waiting for user input.
+**WAIT for user to select next action.**
 
 ## Build Failure Categories
 

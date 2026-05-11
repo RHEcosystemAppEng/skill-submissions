@@ -1,7 +1,7 @@
 """
-Tests for rh-sre__system-context per-skill evaluation.
+Tests for rh-sre system-context skill evaluation.
 Baseline tests: report structure.
-Skill-dependent tests: conceptual checks (no exact tool/field name matching).
+Skill-dependent tests: check for knowledge exclusive to SKILL.md + MCP data.
 """
 import os
 import pytest
@@ -22,7 +22,7 @@ class TestBaseline:
 
     def test_mentions_topic(self):
         content = read_report().lower()
-        assert any(t in content for t in ['system', 'context', 'environment']), (
+        assert any(t in content for t in ["system", "context", "environment"]), (
             "report should mention key topic"
         )
 
@@ -32,53 +32,81 @@ class TestBaseline:
 
 
 class TestSkillDependent:
-    def test_remediation_strategy_by_context(self):
-        """Skill: Determine strategy from context: batch vs rolling, maintenance window, pod eviction for K8s."""
-        c = read_report().lower()
-        has_strategy = any(t in c for t in ["strategy", "approach", "rolling", "batch"])
-        has_context = any(t in c for t in ["maintenance", "pod eviction", "kubernetes", "staging first"])
-        assert has_strategy and has_context, (
-            "should derive strategy from context (skill: Decision Matrix)"
-        )
-
-    def test_rhel_version_distribution(self):
-        """Skill: Report RHEL version distribution (playbook must support multiple versions)."""
-        c = read_report().lower()
-        assert any(t in c for t in ['rhel', 'version', 'distribution', 'el7', 'el8', 'el9']), (
-            "Should report RHEL version distribution (skill: conditional dnf/yum)"
-        )
-
-    def test_environment_and_criticality(self):
-        """Skill: Classify by environment (prod/staging/dev) and criticality for rollout order."""
-        c = read_report().lower()
-        has_env = any(t in c for t in ["staging", "development", "rollout_order", "rollout order"])
-        has_crit = any(t in c for t in ["critical", "criticality", "priority", "high", "rollout"])
-        assert has_env and has_crit, (
-            "should classify by environment and criticality (skill: rollout_order)"
-        )
-
-    def test_infrastructure_classification(self):
-        """Skill: infrastructure_type (bare_metal/virtualized/container) and infrastructure_vendor (kvm) fields."""
-        c = read_report().lower()
-        has_type = any(t in c for t in ["infrastructure_type", "infrastructure_vendor", "virtualized"])
-        has_bare = "bare_metal" in c or "bare metal" in c
-        assert has_type or has_bare, (
-            "should reference infrastructure classification (skill: bare_metal/virtualized/container)"
-        )
-
-    def test_kubernetes_context_fields(self):
-        """Skill: hasPdbs and daemonsets_present for safety planning in K8s context."""
-        c = read_report().lower()
-        has_k8s = any(t in c for t in ["pdb", "daemonset"])
-        has_safety = any(t in c for t in ["safety", "eviction"])
-        assert has_k8s and has_safety, (
-            "should reference PDB/daemonset for K8s safety (skill)"
-        )
-
-    def test_needs_restarting_check(self):
-        """Docs teach needs-restarting -r (exit code 0=no reboot, 1=reboot needed)
-        and -s for services needing restart. Without docs, agents skip this check."""
+    def test_compliance_tags_from_mcp(self):
+        """MCP returns pci-compliant, hipaa-compliant, soc2-compliant tags.
+        Only a skilled agent using MCP tools discovers these."""
         c = read_report().lower()
         assert any(t in c for t in [
-            "needs-restarting", "needs_restarting", "reboot", "restart service",
-        ]), "should use needs-restarting for reboot/service restart assessment"
+            "pci-compliant", "pci compliant", "pci",
+            "hipaa-compliant", "hipaa compliant", "hipaa",
+            "soc2-compliant", "soc2 compliant", "soc2",
+        ]), "should report compliance tags from MCP inventory (pci/hipaa/soc2)"
+
+    def test_stale_system_detection(self):
+        """MCP data includes stale=True systems (last_seen >7 days).
+        SKILL.md doesn't mention stale but MCP data exposes it."""
+        c = read_report().lower()
+        assert any(t in c for t in [
+            "stale", "last seen", "last_seen", "unreachable",
+            "not reporting", "offline", "check-in",
+        ]), "should identify stale/unreachable systems from MCP data"
+
+    def test_rhel_version_mix_specifics(self):
+        """MCP has systems on RHEL 8.8, 8.9, 9.2, 9.3.
+        SKILL teaches conditional dnf/yum for multi-version."""
+        c = read_report().lower()
+        versions_found = sum(1 for v in ["8.8", "8.9", "9.2", "9.3"] if v in c)
+        assert versions_found >= 2, (
+            "should report specific RHEL versions from MCP (8.8/8.9/9.2/9.3)"
+        )
+
+    def test_environment_breakdown_with_counts(self):
+        """MCP has 30 prod, 15 staging, 10 dev, 5 QA, 3 legacy.
+        SKILL teaches environment classification for rollout order."""
+        c = read_report().lower()
+        has_env = sum(1 for e in ["production", "staging", "development", "qa"] if e in c)
+        assert has_env >= 3, (
+            "should break down systems by environment (prod/staging/dev/qa from MCP)"
+        )
+
+    def test_staged_rollout_strategy(self):
+        """SKILL Decision Matrix: staging first, then production batches.
+        batch_size of 5-10 recommended."""
+        c = read_report().lower()
+        has_staged = any(t in c for t in [
+            "staging first", "test first", "validate first",
+            "staged", "phased", "rollout order",
+        ])
+        has_batch = any(t in c for t in ["batch", "parallel", "rolling"])
+        assert has_staged and has_batch, (
+            "should recommend staged rollout strategy (SKILL: Decision Matrix)"
+        )
+
+    def test_system_tier_classification(self):
+        """MCP tags include web-tier, database-tier, app-tier, loadbalancer,
+        monitoring, cache-tier. SKILL teaches criticality-based prioritization."""
+        c = read_report().lower()
+        tiers = sum(1 for t in [
+            "web", "database", "app", "load balancer", "loadbalancer",
+            "monitoring", "cache",
+        ] if t in c)
+        assert tiers >= 2, (
+            "should classify systems by tier/role from MCP tags"
+        )
+
+    def test_high_availability_awareness(self):
+        """MCP tags include high-availability and customer-facing.
+        SKILL teaches maintenance window for critical systems."""
+        c = read_report().lower()
+        assert any(t in c for t in [
+            "high-availability", "high availability", "ha ",
+            "maintenance window", "customer-facing", "customer facing",
+        ]), "should recognize HA/customer-facing constraints from MCP tags"
+
+    def test_fleet_size_accuracy(self):
+        """MCP has 63 total systems. A skilled agent should report approximate fleet size."""
+        c = read_report().lower()
+        assert any(t in c for t in [
+            "63", "sixty-three", "63 system", "63 host",
+            "30 prod", "30 production",
+        ]), "should report fleet size or production count from MCP data"

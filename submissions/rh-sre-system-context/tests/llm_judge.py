@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "infrastructure_classification", "file": "/solution/report.md", "question": "Does the report classify systems by infrastructure_type (bare_metal/virtualized/container) and infrastructure_vendor?", "reference": "A skilled report uses infrastructure classification fields. An unskilled report doesn't distinguish infrastructure types."},
-  {"id": "kubernetes_safety_context", "file": "/solution/report.md", "question": "Does the report consider Kubernetes context (PDBs, daemonsets) for safe remediation planning?", "reference": "A skilled report checks hasPdbs and daemonsets for safety. An unskilled report ignores K8s workload context."},
-  {"id": "staged_rollout", "file": "/solution/report.md", "question": "Does the report recommend staged rollout (staging first, then production batches) based on environment criticality?", "reference": "A skilled report follows staged rollout pattern. An unskilled report patches all systems simultaneously."}
+    {
+        "id": "compliance_aware_prioritization",
+        "file": "/solution/report.md",
+        "question": "Does the report use compliance information (PCI, HIPAA, SOC2) from system inventory to prioritize remediation?",
+        "reference": "A skilled report discovers compliance tags from MCP inventory and uses them to prioritize systems. An unskilled report treats all systems equally without compliance awareness.",
+    },
+    {
+        "id": "mcp_driven_environment_analysis",
+        "file": "/solution/report.md",
+        "question": "Does the report provide a concrete environment breakdown (production/staging/dev/QA) with system counts derived from actual inventory data?",
+        "reference": "A skilled report queries MCP tools and reports specific counts per environment (e.g. 30 production, 15 staging). An unskilled report gives generic advice without concrete numbers.",
+    },
+    {
+        "id": "staged_rollout_with_specifics",
+        "file": "/solution/report.md",
+        "question": "Does the report recommend a staged rollout strategy with specific phases (test on staging/dev first, then production batches) including batch sizing?",
+        "reference": "A skilled report follows the Decision Matrix from the skill: staged rollout, batch size 5-10, staging validation before production. An unskilled report suggests patching without phased approach.",
+    },
+    {
+        "id": "rhel_version_remediation_impact",
+        "file": "/solution/report.md",
+        "question": "Does the report identify the specific RHEL version distribution and discuss its impact on remediation (e.g. conditional dnf/yum, different package versions)?",
+        "reference": "A skilled report identifies the RHEL version mix (8.x and 9.x) and notes playbook must handle both. An unskilled report ignores version differences.",
+    },
 ]
 
 SYSTEM_PROMPT = (

@@ -13,19 +13,19 @@ except ImportError:
 CRITERIA = [
   {
     "id": "ausearch_avc_workflow",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report use ausearch -m AVC for investigating SELinux denials, rather than generic SELinux commands?",
     "reference": "A skilled report uses 'ausearch -m AVC -ts recent' to find recent SELinux AVC denials. An unskilled report checks getenforce or sestatus without examining specific denials."
   },
   {
     "id": "semanage_port_labeling",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report use semanage port for labeling nonstandard bind ports in SELinux?",
     "reference": "A skilled report uses 'semanage port -a -t http_port_t -p tcp <port>' for nonstandard ports. An unskilled report suggests disabling SELinux or only uses setsebool."
   },
   {
     "id": "concrete_rhel_remediation",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report provide concrete systemctl, firewall-cmd, and semanage/restorecon commands for RHEL troubleshooting?",
     "reference": "A skilled report provides specific commands for each layer: systemctl restart for services, firewall-cmd --add-port for networking, semanage+restorecon for SELinux. An unskilled report gives high-level suggestions."
   }

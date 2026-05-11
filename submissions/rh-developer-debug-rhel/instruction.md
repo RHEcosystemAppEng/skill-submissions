@@ -7,6 +7,6 @@ You are a Red Hat developer. A RHEL-based service is failing to start or accept 
 - Identify the system-level root cause
 - Recommend a fix
 
-Use available tools to examine the environment. Document your methodology, findings, and recommendations in `/root/report.md`.
+Use available tools to examine the environment. Document your methodology, findings, and recommendations in `/solution/report.md`.
 
 If reference documentation or skills are available in this environment, consult them before beginning work.

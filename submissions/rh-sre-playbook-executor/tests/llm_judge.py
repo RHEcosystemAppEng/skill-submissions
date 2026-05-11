@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "launch_config_and_git_flow", "file": "/solution/report.md", "question": "Does the report configure launch-time prompts for flexibility (variables, host limits, job type) and require Git synchronization before execution?", "reference": "A skilled report configures launch-time prompts and requires Git sync. An unskilled report hardcodes execution settings and skips synchronization requirements."},
-  {"id": "relaunch_failed_hosts", "file": "/solution/report.md", "question": "Does the report mention relaunching with hosts: failed to retry only failed hosts?", "reference": "A skilled report uses jobs_relaunch_retrieve with hosts: failed. An unskilled report suggests full re-execution."},
-  {"id": "dry_run_and_monitoring", "file": "/solution/report.md", "question": "Does the report recommend dry-run first and include per-host execution monitoring?", "reference": "A skilled report follows check mode before run and monitors per-host. An unskilled report runs directly without dry-run."}
+    {
+        "id": "dry_run_before_production",
+        "file": "/solution/report.md",
+        "question": "Does the report describe a dry-run (check mode) step BEFORE actual production execution, explaining that job_type 'check' simulates changes without applying them?",
+        "reference": "A skilled report follows the SKILL workflow: Phase 3 dry-run with job_type 'check' before Phase 4 production run with job_type 'run'. An unskilled report jumps to execution without a dry-run step.",
+    },
+    {
+        "id": "git_flow_mandatory",
+        "file": "/solution/report.md",
+        "question": "Does the report address Git Flow (commit/push/sync) as a prerequisite before launching jobs, explaining that AAP executes from the synced project and there's no playbook override at launch?",
+        "reference": "A skilled report explains the MANDATORY Git Flow: write playbook to Git, commit, push, wait for project sync, then launch. Without this, AAP executes the wrong playbook. An unskilled report doesn't mention Git Flow or assumes the playbook can be overridden at launch.",
+    },
+    {
+        "id": "aap_mcp_tool_usage",
+        "file": "/solution/report.md",
+        "question": "Does the report reference specific AAP MCP tools for the workflow (job_templates_list for finding templates, job_templates_launch_retrieve for launching, jobs_retrieve for monitoring)?",
+        "reference": "A skilled report names the actual MCP tools used at each step: job_templates_list, job_templates_retrieve, job_templates_launch_retrieve, jobs_retrieve, jobs_job_host_summaries_list. An unskilled report speaks generically about 'running the playbook'.",
+    },
+    {
+        "id": "human_in_the_loop",
+        "file": "/solution/report.md",
+        "question": "Does the report include explicit human confirmation gates before production execution, consistent with a HITL (human-in-the-loop) safety approach?",
+        "reference": "A skilled report includes confirmation checkpoints: before Git push, before dry-run, and before production execution. It waits for explicit 'yes' or 'execute'. An unskilled report automates everything without human gates.",
+    },
 ]
 
 SYSTEM_PROMPT = (

@@ -1,0 +1,13 @@
+name: rh-automation-execution-summary
+description: "rh-automation execution-summary Skill Evaluation"
+persona: rh-automation
+version: "1.0.0"
+generation_mode: manual
+tags:
+  - rh-automation
+  - execution-summary
+cpus: 2
+memory_mb: 2048
+storage_mb: 10240
+experiment:
+  n_trials: 3

@@ -7,6 +7,6 @@ You are a Red Hat developer. Plan the deployment of an application using Helm ch
 - Configure values for the target environment
 - Address OpenShift-specific considerations
 
-Use MCP tools to examine the cluster. Document your methodology, chart configuration, and deployment plan in `/root/report.md`.
+Use MCP tools to examine the cluster. Document your methodology, chart configuration, and deployment plan in `/solution/report.md`.
 
 If reference documentation or skills are available in this environment, consult them before beginning work.

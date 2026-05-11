@@ -13,13 +13,13 @@ except ImportError:
 CRITERIA = [
   {
     "id": "openshift_helm_considerations",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report address OpenShift-specific Helm concerns like Route vs Ingress and SecurityContextConstraints?",
     "reference": "A skilled report addresses that OpenShift uses Routes and has SCC requirements that may affect Helm charts designed for vanilla Kubernetes. An unskilled report treats the chart as platform-agnostic."
   },
   {
     "id": "buildconfig_in_chart",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report describe including an OpenShift BuildConfig template as part of the Helm chart structure, so that the chart manages the build pipeline alongside the deployment?",
     "reference": "A skilled report includes a BuildConfig YAML template inside the Helm chart (e.g., templates/buildconfig.yaml) for S2I builds. An unskilled report assumes pre-built images and does not integrate build pipelines into the chart."
   }

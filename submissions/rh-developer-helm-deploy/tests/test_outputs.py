@@ -6,7 +6,7 @@ Skill-dependent tests: OpenShift-Helm integration (not generic Helm knowledge).
 import os
 import pytest
 
-REPORT = "/root/report.md"
+REPORT = "/solution/report.md"
 
 
 def read_report():

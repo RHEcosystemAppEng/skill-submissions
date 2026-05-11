@@ -17,6 +17,7 @@ description: |
   - Listing existing clusters → Use `/cluster-inventory` skill
   - Modifying running clusters → Out of scope (Day-2 operations require direct cluster access)
   - Cluster upgrades (not yet supported)
+license: Apache-2.0
 model: inherit
 color: green
 metadata:
@@ -219,9 +220,22 @@ Ask: "Review configuration. Ready to create cluster definition?"
 
 **Save URL**: `/tmp/{cluster_name}.{base_domain}/iso-download-url.txt`
 
-**Download ISO**: Execute via Bash:
+**Download ISO**: Read the saved URL and download with safety flags:
 ```bash
-curl -L -# -o /tmp/{cluster_name}.{base_domain}/discovery.iso "{iso_url}"
+iso_url="$(cat /tmp/{cluster_name}.{base_domain}/iso-download-url.txt)"
+case "$iso_url" in
+  https://*.openshiftapps.com/* | \
+  https://api.openshift.com/* | \
+  https://mirror.openshift.com/* )
+    : ;;
+  *)
+    echo "ERROR: ISO URL domain not in allowlist: $iso_url" >&2
+    exit 1
+    ;;
+esac
+curl --fail --proto "=https" --tlsv1.2 -L -# \
+  -o /tmp/{cluster_name}.{base_domain}/discovery.iso \
+  -- "$iso_url"
 ```
 
 **Verify download**: Check file exists and size > 0

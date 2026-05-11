@@ -13,19 +13,19 @@ except ImportError:
 CRITERIA = [
   {
     "id": "security_hardening",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report include deployment security hardening such as runAsNonRoot, allowPrivilegeEscalation: false, seccompProfile, or insecureEdgeTerminationPolicy: Redirect on the Route?",
     "reference": "A skilled report includes security context on the Deployment (runAsNonRoot: true, allowPrivilegeEscalation: false) and configures Route with insecureEdgeTerminationPolicy: Redirect. An unskilled report creates basic Deployment+Service+Route without security hardening."
   },
   {
     "id": "deployment_service_route",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report create all three resources (Deployment, Service, Route) with correct selector/port alignment?",
     "reference": "A skilled report defines Deployment + Service + Route with matching selectors, targetPort, and containerPort. An unskilled report may miss selector alignment or skip the Route."
   },
   {
     "id": "tls_and_port_detection",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report address TLS termination for the Route and port detection based on framework defaults?",
     "reference": "A skilled report configures TLS (edge/passthrough) on the Route and detects the application port from framework conventions. An unskilled report hardcodes port 8080 and skips TLS."
   }

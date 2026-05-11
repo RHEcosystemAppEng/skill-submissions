@@ -9,6 +9,6 @@ You are a Red Hat developer. Your team needs to deploy a web application to Open
 - Configure a Route for external HTTPS access with appropriate TLS settings
 - Verify the deployment plan addresses image pull access and correct container port mapping
 
-Document your deployment plan and the complete resource definitions in `/root/report.md`.
+Document your deployment plan and the complete resource definitions in `/solution/report.md`.
 
 Use MCP tools to examine the cluster. If reference documentation or skills are available in this environment, consult them before beginning work.

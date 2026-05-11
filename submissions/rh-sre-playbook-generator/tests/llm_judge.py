@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "mcp_tool_for_generation", "file": "/solution/report.md", "question": "Does the report describe using an MCP tool (such as create_vulnerability_playbook or a remediations/Lightspeed endpoint) to generate the playbook, rather than writing it manually from scratch?", "reference": "A skilled report uses the Lightspeed MCP create_vulnerability_playbook tool. An unskilled report writes the playbook manually from general Ansible knowledge without using an MCP generation tool."},
-  {"id": "return_as_is", "file": "/solution/report.md", "question": "Does the report explicitly state that the generated playbook should be returned AS IS or unmodified, without adding extra steps like pre-flight checks, backup tasks, or restart handlers?", "reference": "A skilled report emphasizes returning the tool output unmodified. An unskilled report adds pre-flight checks, backup steps, restart handlers, or other enhancements to the generated playbook."},
-  {"id": "delegation_not_execution", "file": "/solution/report.md", "question": "Does the report explicitly state that playbook execution should be delegated to a separate execution workflow and NOT run directly via ansible-playbook?", "reference": "A skilled report delegates execution to a dedicated execution workflow rather than running ansible-playbook directly. An unskilled report runs ansible-playbook directly or doesn't address the execution boundary."}
+    {
+        "id": "mcp_tool_playbook_generation",
+        "file": "/solution/report.md",
+        "question": "Does the report demonstrate using the create_vulnerability_playbook (or create_vuln_playbook) MCP tool to generate the playbook, rather than writing one from scratch?",
+        "reference": "A skilled report calls the MCP tool and returns its output. An unskilled report writes a playbook from general Ansible knowledge without using the MCP tool.",
+    },
+    {
+        "id": "as_is_return_policy",
+        "file": "/solution/report.md",
+        "question": "Does the report emphasize that the generated playbook should be returned as-is from the MCP tool without modifications (no added pre-flight checks, backups, or service restarts)?",
+        "reference": "A skilled report follows the CRITICAL rule: return playbook AS IS. It does not add pre-flight checks, backup steps, or audit logging. An unskilled report freely modifies or enhances the playbook.",
+    },
+    {
+        "id": "scope_limitation",
+        "file": "/solution/report.md",
+        "question": "Does the report make clear that this is a generation-only workflow and that execution should be delegated to the playbook-executor skill via AAP?",
+        "reference": "A skilled report states the playbook is ready for handoff to playbook-executor/AAP for execution. An unskilled report suggests running ansible-playbook directly or does not distinguish generation from execution.",
+    },
+    {
+        "id": "failure_handling",
+        "file": "/solution/report.md",
+        "question": "Does the report address what happens if the MCP tool fails, including alternative approaches like retry or generating from documentation templates with user approval?",
+        "reference": "A skilled report describes the A/B/C error handling flow: retry the tool, generate from knowledge (with explicit user confirmation), or exit. An unskilled report either ignores failures or silently generates a replacement.",
+    },
 ]
 
 SYSTEM_PROMPT = (

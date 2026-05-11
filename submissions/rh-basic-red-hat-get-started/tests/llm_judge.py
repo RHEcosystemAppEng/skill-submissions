@@ -1,21 +1,22 @@
-import json
-import os
-import sys
-import time
+import json, os, sys, time
 from pathlib import Path
-
 try:
     from anthropic import Anthropic
 except ImportError:
-    print("ERROR: anthropic package not installed")
     sys.exit(1)
 
 CRITERIA = [
     {
-        "id": "skill_knowledge",
+        "id": "five_skills_listed",
         "file": "/solution/report.md",
-        "question": "Does the report demonstrate specific knowledge from the skill documentation and MCP tool data, rather than generic advice?",
-        "reference": "A skilled report uses specific data, tool names, and concepts from the SKILL.md and MCP environment. An unskilled report gives generic advice.",
+        "question": "Does the report list all 5 Red Hat skills to install: red-hat-cve-explainer, red-hat-diagnostics, red-hat-product-lifecycle, red-hat-security-mcp-setup, and red-hat-support-severity?",
+        "reference": "The installer SKILL.md defines exactly these 5 skills. A skilled agent lists all 5; an unskilled agent may not know these specific skill names.",
+    },
+    {
+        "id": "self_destruct",
+        "file": "/solution/report.md",
+        "question": "Does the report mention the installer removing/deleting itself (self-destruct) after completing installation?",
+        "reference": "The skill explicitly requires self-destruct: delete the installer's directory and tell the user 'This installer has removed itself.'",
     },
 ]
 
@@ -60,7 +61,6 @@ def main():
     base_url = os.getenv("ANTHROPIC_BASE_URL")
     model = os.getenv("LLM_JUDGE_MODEL", "claude-haiku-4-5")
     if not api_key:
-        print("ERROR: ANTHROPIC_API_KEY not set")
         json.dump({"criteria": [], "passed": 0, "total": 0, "score": 0.0},
                   open("/logs/verifier/llm_judge.json", "w"), indent=2)
         return

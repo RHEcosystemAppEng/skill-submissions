@@ -13,19 +13,19 @@ except ImportError:
 CRITERIA = [
   {
     "id": "nonroot_user_and_cleanup",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report include --user 1001 (non-root) in the corrected podman run command AND proper container cleanup (podman stop/rm) before rerunning?",
     "reference": "A skilled report includes --user 1001 for container security and shows 'podman stop/rm' cleanup (often with 2>/dev/null || true error suppression) before the corrected run command. An unskilled report omits the --user flag and skips cleanup steps."
   },
   {
     "id": "image_variant_strategy",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report recommend separate image variants/tags (e.g., using --build-arg VARIANT=web/worker) for different container roles as a long-term solution?",
     "reference": "A skilled report explains that web and worker containers should use separate image tags built with --build-arg VARIANT, rather than sharing a single image. An unskilled report only suggests adding the missing dependency to the shared image."
   },
   {
     "id": "oomkilled_verification",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report include verification commands using jq to inspect container state (e.g., podman inspect | jq '.State.OOMKilled')?",
     "reference": "A skilled report includes 'podman inspect <container> | jq .State.OOMKilled' to programmatically verify OOM status after fixing. An unskilled report checks logs or status manually without jq-based state inspection."
   }

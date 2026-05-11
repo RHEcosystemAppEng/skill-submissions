@@ -11,6 +11,6 @@ You are a Red Hat developer. Two containers in your local environment have stopp
 - Include verification commands to confirm the fix resolved the issue (e.g., checking container state for OOM status)
 - If separate image variants would be a better long-term solution, explain that approach
 
-Document your investigation and fixes in `/root/report.md`.
+Document your investigation and fixes in `/solution/report.md`.
 
 Use available tools to examine the environment. If reference documentation or skills are available in this environment, consult them before beginning work.

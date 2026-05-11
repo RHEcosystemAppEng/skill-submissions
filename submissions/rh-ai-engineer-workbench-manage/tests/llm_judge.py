@@ -11,9 +11,9 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "stop_vs_delete_data", "file": "/root/report.md", "question": "Does the report explain that stopping a workbench preserves PVC data while deleting requires separate storage decision?", "reference": "A skilled report distinguishes stop (preserves) from delete (data loss risk). An unskilled report treats stop and delete equivalently."},
-  {"id": "notebook_image_discovery", "file": "/root/report.md", "question": "Does the report describe discovering or listing available notebook images before creating a workbench?", "reference": "A skilled report lists available notebook images (via list_notebook_images or equivalent) to guide workbench creation. An unskilled report skips image discovery and assumes a default."},
-  {"id": "storage_access_mode_awareness", "file": "/root/report.md", "question": "Does the report mention the PVC access mode (ReadWriteOnce or RWO) when describing workbench storage configuration or provisioning?", "reference": "A skilled report specifies the storage access mode (ReadWriteOnce) for PVC provisioning, showing awareness of storage class constraints. An unskilled report describes storage size but omits access mode details."}
+  {"id": "stop_vs_delete_data", "file": "/solution/report.md", "question": "Does the report explain that stopping a workbench preserves PVC data while deleting requires separate storage decision?", "reference": "A skilled report distinguishes stop (preserves) from delete (data loss risk). An unskilled report treats stop and delete equivalently."},
+  {"id": "notebook_image_discovery", "file": "/solution/report.md", "question": "Does the report describe discovering or listing available notebook images before creating a workbench?", "reference": "A skilled report lists available notebook images (via list_notebook_images or equivalent) to guide workbench creation. An unskilled report skips image discovery and assumes a default."},
+  {"id": "storage_access_mode_awareness", "file": "/solution/report.md", "question": "Does the report mention the PVC access mode (ReadWriteOnce or RWO) when describing workbench storage configuration or provisioning?", "reference": "A skilled report specifies the storage access mode (ReadWriteOnce) for PVC provisioning, showing awareness of storage class constraints. An unskilled report describes storage size but omits access mode details."}
 ]
 
 SYSTEM_PROMPT = (

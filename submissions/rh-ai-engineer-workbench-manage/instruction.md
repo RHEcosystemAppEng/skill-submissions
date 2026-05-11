@@ -8,6 +8,6 @@ You are an AI engineer on Red Hat OpenShift AI. Your data science team needs wor
 - Identify any stopped or unused workbenches that should be cleaned up to free resources
 - Document the lifecycle procedures: how to stop a workbench to save resources, restart it, and safely delete one
 
-Document your workbench assessment, creation plan, and cleanup recommendations in `/root/report.md`.
+Document your workbench assessment, creation plan, and cleanup recommendations in `/solution/report.md`.
 
 Use MCP tools to interact with the platform. If reference documentation or skills are available in this environment, consult them before beginning work.

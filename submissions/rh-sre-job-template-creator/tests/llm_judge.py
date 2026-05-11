@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "no_create_tool", "file": "/solution/report.md", "question": "Does the report acknowledge that AAP MCP has no create/update tools and template creation must be done via Web UI?", "reference": "A skilled report notes the MCP limitation and directs to Web UI. An unskilled report attempts to create templates via API."},
-  {"id": "playbook_path_and_git", "file": "/solution/report.md", "question": "Does the report require the playbook to be in a Git repo with proper path convention before template creation?", "reference": "A skilled report follows playbooks/remediation/ path convention. An unskilled report skips Git integration."},
-  {"id": "launch_configuration", "file": "/solution/report.md", "question": "Does the report configure prompt-on-launch for job type and privilege escalation?", "reference": "A skilled report enables prompt-on-launch and become_enabled. An unskilled report skips these configuration details."}
+    {
+        "id": "web_ui_workflow",
+        "file": "/solution/report.md",
+        "question": "Does the report acknowledge that template creation must be done through the AAP Web UI (since the create MCP tool is not available) and provide step-by-step Web UI instructions?",
+        "reference": "A skilled report knows that job_templates_create is NOT available in the current MCP implementation and guides the user through the AAP Web UI. An unskilled report either assumes programmatic creation works or doesn't address this limitation.",
+    },
+    {
+        "id": "mcp_data_discovery",
+        "file": "/solution/report.md",
+        "question": "Does the report use MCP tools to discover existing AAP projects, inventories, and credentials, referencing specific names and IDs from the environment?",
+        "reference": "A skilled report queries projects_list, inventories_list to find 'Remediation Playbooks' (project 6), 'Production Systems' (inventory 1, 30 hosts), etc. An unskilled report uses placeholder or generic values.",
+    },
+    {
+        "id": "remediation_specific_settings",
+        "file": "/solution/report.md",
+        "question": "Does the report explain why specific template settings are needed for remediation: become_enabled for package updates, ask_job_type_on_launch for dry-run support, ask_variables_on_launch for CVE targeting?",
+        "reference": "A skilled report explains the reasoning: become is needed for sudo/package updates, ask_job_type enables check mode (dry-run) vs run, ask_variables allows passing CVE IDs at launch. An unskilled report configures settings without explaining their remediation-specific purpose.",
+    },
+    {
+        "id": "git_flow_integration",
+        "file": "/solution/report.md",
+        "question": "Does the report address getting the playbook into a Git repository that AAP can sync, including the playbook path convention (playbooks/remediation/)?",
+        "reference": "A skilled report covers Phase 1: write playbook to Git, commit, push, verify AAP project sync. It uses the playbooks/remediation/ path convention. An unskilled report skips Git setup or uses arbitrary paths.",
+    },
 ]
 
 SYSTEM_PROMPT = (

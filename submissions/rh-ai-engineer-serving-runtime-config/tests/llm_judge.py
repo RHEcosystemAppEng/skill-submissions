@@ -13,19 +13,19 @@ except ImportError:
 CRITERIA = [
   {
     "id": "kserve_container_naming",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the ServingRuntime YAML in the report name the main container 'kserve-container' (the required KServe naming convention)?",
     "reference": "A skilled report names the container kserve-container in the ServingRuntime spec, which is required by KServe for the model serving framework to function correctly. An unskilled report might use a framework-specific name like 'triton' or 'vllm', which would cause KServe integration issues."
   },
   {
     "id": "gpu_allocation_strategy",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report explain that GPU resources should NOT be hardcoded in the ServingRuntime and instead should be allocated at the InferenceService level for flexibility?",
     "reference": "A skilled report explains that GPU resources (nvidia.com/gpu) belong at the InferenceService deployment level because different models need 0, 1, or multiple GPUs. The ServingRuntime should remain GPU-agnostic. An unskilled report hardcodes nvidia.com/gpu: 1 directly in the ServingRuntime spec."
   },
   {
     "id": "autoselect_and_api_conventions",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report configure autoSelect: false for non-primary model formats and use the correct ServingRuntime API version (v1alpha1)?",
     "reference": "A skilled report uses autoSelect: true only for the primary format and false for secondary formats to prevent conflicts, and uses the serving.kserve.io/v1alpha1 API version for ServingRuntime (distinct from v1beta1 used for InferenceService). An unskilled report sets autoSelect: true for all formats or uses the wrong API version."
   }

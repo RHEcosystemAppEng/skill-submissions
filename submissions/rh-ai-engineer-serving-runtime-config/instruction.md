@@ -14,6 +14,6 @@ The existing platform-provided serving runtimes do not support the model format 
 - Ensure the runtime will be visible and usable from the platform dashboard
 - Document your design decisions and trade-offs
 
-Document your configuration plan and the complete runtime specification in `/root/report.md`.
+Document your configuration plan and the complete runtime specification in `/solution/report.md`.
 
 Use MCP tools to interact with the platform. If reference documentation or skills are available in this environment, consult them before beginning work.

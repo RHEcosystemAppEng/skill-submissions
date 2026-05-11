@@ -1,22 +1,23 @@
-import json
-import os
-import sys
-import time
+import json, os, sys, time
 from pathlib import Path
-
 try:
     from anthropic import Anthropic
 except ImportError:
-    print("ERROR: anthropic package not installed")
     sys.exit(1)
 
 CRITERIA = [
     {
-        "id": "skill_knowledge",
+        "id": "rhoai_registry_crs",
         "file": "/solution/report.md",
-        "question": "Does the report demonstrate specific knowledge from the skill documentation and MCP tool data, rather than generic advice?",
-        "reference": "A skilled report uses specific data, tool names, and concepts from the SKILL.md and MCP environment. An unskilled report gives generic advice.",
+        "question": "Does the report use RHOAI Model Registry Custom Resources (RegisteredModel, ModelVersion, ModelArtifact) with proper API versions and fields like storage URI, state, and custom properties?",
+        "reference": "The skill uses 3 RHOAI CRs: RegisteredModel, ModelVersion (with state LIVE/ARCHIVED), and ModelArtifact (with storage URI). An unskilled agent would not know these specific RHOAI resource types."
     },
+    {
+        "id": "cross_env_promotion",
+        "file": "/solution/report.md",
+        "question": "Does the report describe a cross-environment promotion workflow (dev to staging to production) using RHOAI Data Science Projects and data connections?",
+        "reference": "The skill defines promotion using Data Science Projects as environments and S3 data connections for model storage. This requires RHOAI-specific knowledge of how projects and data connections work."
+    }
 ]
 
 SYSTEM_PROMPT = (
@@ -60,7 +61,6 @@ def main():
     base_url = os.getenv("ANTHROPIC_BASE_URL")
     model = os.getenv("LLM_JUDGE_MODEL", "claude-haiku-4-5")
     if not api_key:
-        print("ERROR: ANTHROPIC_API_KEY not set")
         json.dump({"criteria": [], "passed": 0, "total": 0, "score": 0.0},
                   open("/logs/verifier/llm_judge.json", "w"), indent=2)
         return

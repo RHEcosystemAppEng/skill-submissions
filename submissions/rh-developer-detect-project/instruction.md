@@ -8,6 +8,6 @@ You are a Red Hat developer. A colleague has handed you a source repository and 
 - Based on what you find, recommend a deployment strategy: which builder image or base image to use, what build process to follow, and how the application should be started
 - Explain your reasoning for the recommended approach
 
-Document your analysis and deployment recommendation in `/root/report.md`.
+Document your analysis and deployment recommendation in `/solution/report.md`.
 
 Use available tools to examine the environment. If reference documentation or skills are available in this environment, consult them before beginning work.

@@ -13,13 +13,13 @@ except ImportError:
 CRITERIA = [
   {
     "id": "s2i_entry_point_sequence",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report describe the S2I Python builder's entry point detection order — specifically mentioning that the builder checks for files like app.sh before falling back to app.py, and how app.py being the default entry point affects startup?",
     "reference": "A skilled report describes the S2I Python startup sequence (check app.sh first, then application.py, then app.py) and explains that since app.py is found, gunicorn will serve it automatically. An unskilled report mentions app.py as the entry point without describing the detection sequence the builder follows."
   },
   {
     "id": "app_module_gunicorn_link",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report explain the connection between gunicorn in requirements.txt and APP_MODULE configuration for the S2I Python builder — specifically that gunicorn is required for APP_MODULE to work?",
     "reference": "A skilled report connects gunicorn to APP_MODULE, explaining that the S2I Python builder needs gunicorn in requirements.txt to serve the app specified by APP_MODULE (e.g., app:app). An unskilled report mentions gunicorn as a generic web server without connecting it to S2I builder mechanics."
   }

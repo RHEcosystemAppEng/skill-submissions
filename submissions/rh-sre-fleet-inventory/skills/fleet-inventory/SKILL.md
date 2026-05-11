@@ -42,7 +42,7 @@ This skill queries Red Hat Lightspeed to retrieve and display information about 
 
 See **Step 0** in the Workflow section below for implementation details.
 
-**Validation freshness**: Can skip if already validated in this session. See [Validation Freshness Policy](/skills/mcp-lightspeed-validator/SKILL.md#validation-freshness-policy).
+**Validation freshness**: Can skip if already validated in this session. See [Validation Freshness Policy](../mcp-lightspeed-validator/SKILL.md#validation-freshness-policy).
 
 ## When to Use This Skill
 
@@ -68,7 +68,7 @@ See **Step 0** in the Workflow section below for implementation details.
 
 **Action**: Execute the `/mcp-lightspeed-validator` skill
 
-**Note**: Can skip if validation was performed earlier in this session and succeeded. See [Validation Freshness Policy](/skills/mcp-lightspeed-validator/SKILL.md#validation-freshness-policy).
+**Note**: Can skip if validation was performed earlier in this session and succeeded. See [Validation Freshness Policy](../mcp-lightspeed-validator/SKILL.md#validation-freshness-policy).
 
 **How to invoke**: Execute the `/mcp-lightspeed-validator` skill
 
@@ -98,8 +98,8 @@ Proceeding with fleet inventory query...
 ### Step 1: Retrieve System Inventory
 
 **Document Consultation** (REQUIRED - Execute FIRST):
-1. **Action**: Read [insights-api.md](/docs/insights/insights-api.md) using the Read tool to understand the `get_host_details` response format and pagination handling
-2. **Output to user**: "I consulted [insights-api.md](/docs/insights/insights-api.md) to understand the `get_host_details` response format and pagination handling."
+1. **Action**: Read [insights-api.md](../../docs/insights/insights-api.md) using the Read tool to understand the `get_host_details` response format and pagination handling
+2. **Output to user**: "I consulted [insights-api.md](../../docs/insights/insights-api.md) to understand the `get_host_details` response format and pagination handling."
 
 **MCP Tool**: `get_host_details` (from lightspeed-mcp)
 
@@ -124,8 +124,8 @@ Proceeding with fleet inventory query...
 ### Step 2: Filter and Organize Systems
 
 **Document Consultation** (REQUIRED - Execute FIRST):
-1. **Action**: Read [fleet-management.md](/docs/insights/fleet-management.md) using the Read tool to understand fleet inventory reporting structure and best practices
-2. **Output to user**: "I consulted [fleet-management.md](/docs/insights/fleet-management.md) to structure this inventory report."
+1. **Action**: Read [fleet-management.md](../../docs/insights/fleet-management.md) using the Read tool to understand fleet inventory reporting structure and best practices
+2. **Output to user**: "I consulted [fleet-management.md](../../docs/insights/fleet-management.md) to structure this inventory report."
 
 Apply user-requested filters and grouping. See [references/01-parameter-reference.md](references/01-parameter-reference.md) for filtering and sorting patterns.
 
@@ -216,8 +216,8 @@ Examples:
   - Use after: "Show affected systems" → "Remediate those systems"
 
 ### Reference Documentation
-- [insights-api.md](/docs/insights/insights-api.md) - Red Hat Lightspeed API patterns and response formats
-- [fleet-management.md](/docs/insights/fleet-management.md) - System inventory best practices and filtering strategies
+- [insights-api.md](../../docs/insights/insights-api.md) - Red Hat Lightspeed API patterns and response formats
+- [fleet-management.md](../../docs/insights/fleet-management.md) - System inventory best practices and filtering strategies
 
 ### Skill Orchestration Pattern
 

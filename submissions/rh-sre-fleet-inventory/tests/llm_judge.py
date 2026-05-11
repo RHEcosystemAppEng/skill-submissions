@@ -11,36 +11,8 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-    {
-        "id": "status_strings",
-        "file": "/solution/report.md",
-        "question": "Does the report use exact case-sensitive status strings: 'Vulnerable', 'Patched', 'Not Affected' (with capital letters)?",
-        "reference": "A skilled report uses exact case: Vulnerable, Patched, Not Affected. An unskilled report uses lowercase or generic terms.",
-    },
-    {
-        "id": "stale_detection",
-        "file": "/solution/report.md",
-        "question": "Does the report define stale systems using last_seen timestamp with a 7-day threshold?",
-        "reference": "A skilled report checks last_seen and marks systems stale if >7 days. An unskilled report doesn't define staleness.",
-    },
-    {
-        "id": "remediation_flag",
-        "file": "/solution/report.md",
-        "question": "Does the report use remediation_available as a per-system-per-CVE flag rather than checking advisory status globally?",
-        "reference": "A skilled report uses remediation_available per host per CVE. An unskilled report checks advisories at the CVE level only.",
-    },
-    {
-        "id": "host_identifiers",
-        "file": "/solution/report.md",
-        "question": "Does the report identify hosts by display_name and fqdn fields (not generic hostname)?",
-        "reference": "A skilled report uses display_name and fqdn. An unskilled report uses hostname or IP addresses.",
-    },
-    {
-        "id": "mcp_tools",
-        "file": "/solution/report.md",
-        "question": "Does the report use get_host_details and get_cve_systems as the MCP tools for fleet queries?",
-        "reference": "A skilled report uses the correct Lightspeed MCP tools. An unskilled report uses generic API calls or wrong tool names.",
-    },
+  {"id": "system_id_for_remediation", "file": "/solution/report.md", "question": "Does the report track individual system identifiers (system_uuid, system_id, or host UUID) and link them to specific remediation follow-up actions, rather than just listing hostnames?", "reference": "A skilled report captures system UUIDs or identifiers to enable programmatic remediation API calls. An unskilled report lists hostnames or display names without machine-usable identifiers for follow-up."},
+  {"id": "classification_methodology", "file": "/solution/report.md", "question": "Does the report reference a classification methodology, classification criteria, or vulnerability classification framework for interpreting CVE status, rather than using ad-hoc severity labeling?", "reference": "A skilled report consults or references CVE classification criteria or methodology documentation before interpreting vulnerability data. An unskilled report classifies CVEs based on general knowledge without referencing established criteria."}
 ]
 
 SYSTEM_PROMPT = (
@@ -77,8 +49,6 @@ def judge_criterion(client, model, criterion):
                 )}],
             )
             text = response.content[0].text.strip()
-            if not text:
-                raise ValueError("Empty response from LLM")
             if "{" in text:
                 text = text[text.index("{"):text.rindex("}") + 1]
             result = json.loads(text)

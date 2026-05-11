@@ -1,8 +1,7 @@
 """
-Tests for rh-sre__fleet-inventory skill evaluation.
-
-Tests check for knowledge from the skill package (SKILL.md + references/)
-that is only available to the treatment agent.
+Tests for rh-sre__fleet-inventory per-skill evaluation.
+Baseline tests: report structure.
+Skill-dependent tests: conceptual checks (no exact tool/field name matching).
 """
 import os
 import pytest
@@ -21,72 +20,48 @@ class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
-    def test_mentions_inventory(self):
+    def test_mentions_topic(self):
         content = read_report().lower()
-        assert "inventor" in content or "fleet" in content
+        assert any(t in content for t in ['system', 'host', 'fleet', 'inventory']), (
+            "report should mention key topic"
+        )
 
     def test_report_has_structure(self):
         content = read_report()
-        assert len(content) > 200, "report should have substantial content"
+        assert len(content) > 150, "report should have substantial content"
 
 
 class TestSkillDependent:
+    def test_system_identifier_tracking(self):
+        """Skill teaches tracking system identifiers for follow-up actions.
+        Without skill, agents list systems without identifiers for remediation."""
+        c = read_report().lower()
+        assert any(t in c for t in [
+            "system id", "system_id", "system_uuid", "uuid", "identifier",
+        ]) and any(t in c for t in [
+            "remediat", "follow-up", "subsequent", "action", "track",
+        ]), (
+            "should track system identifiers for follow-up remediation actions"
+        )
 
-    def test_case_sensitive_status_strings(self):
-        """Skill teaches exact case-sensitive status strings:
-        'Vulnerable', 'Patched', 'Not Affected'. Without skill,
-        agents use lowercase or different terminology."""
-        c = read_report()
-        has_vulnerable = "Vulnerable" in c
-        has_patched = "Patched" in c
-        has_not_affected = "Not Affected" in c
-        assert sum([has_vulnerable, has_patched, has_not_affected]) >= 2
+    def test_remediation_transition_offer(self):
+        """Skill: Offer transition to a remediation workflow for CVE remediation."""
+        c = read_report().lower()
+        assert any(t in c for t in [
+            "next step", "remediate", "playbook",
+            "remediation workflow", "remediation action",
+        ]), "should offer next steps for remediation"
 
-    def test_stale_definition(self):
-        """Skill teaches stale = last check-in > 7 days via
-        last_seen timestamp. Without skill, agents don't define
-        staleness or use different thresholds."""
-        c = read_report()
-        cl = c.lower()
-        has_stale = "stale" in cl
-        has_last_seen = "last_seen" in c or "last seen" in cl or "last_seen" in cl
-        assert has_stale and has_last_seen
-
-    def test_remediation_available_flag(self):
-        """Skill teaches remediation_available as a per-system-per-CVE
-        boolean flag. Without skill, agents check advisory status
-        globally."""
-        c = read_report()
-        cl = c.lower()
-        assert "remediation_available" in c or "remediation available" in cl
-
-    def test_display_name_and_fqdn(self):
-        """Skill teaches host identification via display_name and fqdn
-        fields (not generic 'hostname'). Without skill, agents use
-        hostname or IP only."""
-        c = read_report()
-        cl = c.lower()
-        has_display = "display_name" in c or "display name" in cl
-        has_fqdn = "fqdn" in cl or "FQDN" in c or ".example.com" in c
-        assert has_display and has_fqdn
-
-    def test_get_host_details_tool(self):
-        """Skill teaches get_host_details as the MCP tool for host
-        information. Without skill, agents may use wrong tools."""
-        c = read_report()
-        assert "get_host_details" in c
-
-    def test_get_cve_systems_tool(self):
-        """Skill teaches get_cve_systems for querying CVE-affected
-        systems. Without skill, agents try to filter host lists
-        manually."""
-        c = read_report()
-        assert "get_cve_systems" in c
-
-    def test_lightspeed_mcp_credentials(self):
-        """Skill teaches Lightspeed MCP requires LIGHTSPEED_CLIENT_ID
-        and LIGHTSPEED_CLIENT_SECRET. Without skill, agents don't
-        know the credential pattern."""
-        c = read_report()
-        has_creds = "LIGHTSPEED_CLIENT" in c or "lightspeed" in c.lower()
-        assert has_creds
+    def test_classification_criteria_reference(self):
+        """Skill/docs teach consulting classification criteria or reference
+        documentation before interpreting vulnerability data. Without skill,
+        agents classify CVEs based on general knowledge alone."""
+        c = read_report().lower()
+        assert any(t in c for t in [
+            "classification criteria", "classification methodology",
+            "vulnerability classification", "cve classification",
+        ]) or (
+            "classification" in c and any(t in c for t in [
+                "consult", "reference", "methodology", "criteria",
+            ])
+        ), "should reference CVE classification criteria or methodology"

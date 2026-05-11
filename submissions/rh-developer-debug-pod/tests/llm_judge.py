@@ -13,19 +13,19 @@ except ImportError:
 CRITERIA = [
   {
     "id": "previous_logs_methodology",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report use --previous flag to retrieve logs from crashed containers when restarts are detected?",
     "reference": "A skilled report uses --previous to get logs from the terminated container instance when restart count > 0. An unskilled report only checks current container logs, missing crash context."
   },
   {
     "id": "readiness_endpoint_link",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report explain that readiness probe failures remove the pod from Service endpoints, causing traffic loss?",
     "reference": "A skilled report explains the readiness→endpoints relationship: failed readiness probes remove the pod from Service endpoints. An unskilled report treats readiness as only affecting pod status."
   },
   {
     "id": "oom_diagnosis_and_fix",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report map exit code 137 to OOMKilled and provide concrete oc set resources or oc patch commands to increase memory limits?",
     "reference": "A skilled report maps 137→OOM and provides actionable oc commands to fix resource limits. An unskilled report may identify OOM but gives vague recommendations."
   }

@@ -9,6 +9,6 @@ You are a Red Hat developer. A pod in the `web-frontend` namespace keeps crashin
 - Review namespace events for warnings or errors related to the pod
 - Identify the root cause and recommend a specific fix
 
-Use MCP tools to examine the cluster. Document your methodology, findings, and recommended remediation in `/root/report.md`.
+Use MCP tools to examine the cluster. Document your methodology, findings, and recommended remediation in `/solution/report.md`.
 
 If reference documentation or skills are available in this environment, consult them before beginning work.

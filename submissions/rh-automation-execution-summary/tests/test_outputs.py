@@ -1,6 +1,5 @@
-"""Tests for skill evaluation. Baseline + skill-dependent checks."""
-import os
-import pytest
+"""Execution summary tests - audit trail, MCP tools, decisions."""
+import os, pytest
 
 REPORT = "/solution/report.md"
 
@@ -12,14 +11,27 @@ def read_report():
 
 class TestBaseline:
     def test_report_exists(self):
-        assert os.path.exists(REPORT), "report.md must exist"
-
+        assert os.path.exists(REPORT)
     def test_report_has_content(self):
-        content = read_report()
-        assert len(content) > 200, "report should have substantial content"
+        assert len(read_report()) > 400
 
-class TestSkillDependent:
-    def test_uses_mcp_data(self):
-        """Report should contain specific data from MCP tool queries."""
+class TestAuditSections:
+    """The execution summary format is defined in the skill."""
+    def test_workflow_overview(self):
         c = read_report().lower()
-        assert len(c) > 500, "report should demonstrate thorough analysis using MCP tools"
+        assert "workflow" in c or "overview" in c
+    def test_documents_consulted(self):
+        c = read_report().lower()
+        assert "document" in c or "consulted" in c or "reference" in c
+    def test_mcp_tools_section(self):
+        c = read_report().lower()
+        assert "mcp" in c and "tool" in c
+    def test_decisions_section(self):
+        c = read_report().lower()
+        assert "decision" in c
+    def test_outcomes_section(self):
+        c = read_report().lower()
+        assert "outcome" in c or "result" in c
+    def test_recommendations(self):
+        c = read_report().lower()
+        assert "recommend" in c or "follow-up" in c or "improvement" in c

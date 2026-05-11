@@ -1,0 +1,13 @@
+name: rh-automation-forensic-troubleshooter
+description: "rh-automation forensic-troubleshooter Skill Evaluation"
+persona: rh-automation
+version: "1.0.0"
+generation_mode: manual
+tags:
+  - rh-automation
+  - forensic-troubleshooter
+cpus: 2
+memory_mb: 2048
+storage_mb: 10240
+experiment:
+  n_trials: 3

@@ -1,21 +1,34 @@
-import json
-import os
-import sys
-import time
+import json, os, sys, time
 from pathlib import Path
-
 try:
     from anthropic import Anthropic
 except ImportError:
-    print("ERROR: anthropic package not installed")
     sys.exit(1)
 
 CRITERIA = [
     {
-        "id": "skill_knowledge",
+        "id": "five_whys_methodology",
         "file": "/solution/report.md",
-        "question": "Does the report demonstrate specific knowledge from the skill documentation and MCP tool data, rather than generic advice?",
-        "reference": "A skilled report uses specific data, tool names, and concepts from the SKILL.md and MCP environment. An unskilled report gives generic advice.",
+        "question": "Does the report apply the Five Whys methodology with a structured causal chain tracing from observed symptom through multiple levels to a root cause?",
+        "reference": "A skilled agent structures the investigation as a Five Whys chain: Signal -> Why1 -> Why2 -> Why3 -> Root Cause. An unskilled agent may list findings but won't use this structured methodology.",
+    },
+    {
+        "id": "investigation_guardrails",
+        "file": "/solution/report.md",
+        "question": "Does the report apply investigation guardrails including exhaustive verification, contradicting evidence search, causal depth, evidence-based claims, and investigation error separation?",
+        "reference": "The skill defines 5 guardrails: Exhaustive Verification (inspect ALL resources), Contradicting Evidence Search (explicitly search for contradictions), Causal Depth (keep investigating deeper causes), Evidence-Based Claims Only (trace to tool output), Investigation Error Separation (distinguish incident errors from investigation errors).",
+    },
+    {
+        "id": "adversarial_due_diligence",
+        "file": "/solution/report.md",
+        "question": "Does the report include an adversarial due diligence review with a numeric confidence score and assessment across multiple dimensions?",
+        "reference": "The skill requires 8 dimensions: Causal Completeness, Target Accuracy, Evidence Sufficiency, Alternative Hypotheses, Scope Completeness, Proportionality, Regression Awareness, Confidence Calibration. Score starts at 1.0 with deductions.",
+    },
+    {
+        "id": "remediation_target_accuracy",
+        "file": "/solution/report.md",
+        "question": "Does the report distinguish between the symptom-reporting resource and the actual misconfigured resource that needs remediation?",
+        "reference": "The skill explicitly requires identifying the remediation target as the resource whose configuration change fixes the problem, NOT the resource that reported the symptom.",
     },
 ]
 
@@ -60,7 +73,6 @@ def main():
     base_url = os.getenv("ANTHROPIC_BASE_URL")
     model = os.getenv("LLM_JUDGE_MODEL", "claude-haiku-4-5")
     if not api_key:
-        print("ERROR: ANTHROPIC_API_KEY not set")
         json.dump({"criteria": [], "passed": 0, "total": 0, "score": 0.0},
                   open("/logs/verifier/llm_judge.json", "w"), indent=2)
         return

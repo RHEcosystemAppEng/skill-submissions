@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "ask_job_type_required", "file": "/solution/report.md", "question": "Does the report require ask_job_type_on_launch: true for dual check/run mode support?", "reference": "A skilled report requires this for dry-run vs run flexibility. An unskilled report doesn't validate this field."},
-  {"id": "become_and_credentials", "file": "/solution/report.md", "question": "Does the report validate both become_enabled and credentials (checking summary_fields.credentials or credentials array)?", "reference": "A skilled report checks both credential locations. An unskilled report checks only one."},
-  {"id": "required_vs_recommended", "file": "/solution/report.md", "question": "Does the report distinguish required fields (inventory, project, playbook, credentials, become, ask_job_type) from recommended (ask_variables, ask_limit)?", "reference": "A skilled report categorizes validation checks by priority. An unskilled report treats all checks equally."}
+    {
+        "id": "required_checks_validation",
+        "file": "/solution/report.md",
+        "question": "Does the report validate ALL 6 required job template fields: inventory, project, playbook, credentials, privilege escalation (become_enabled), and ask_job_type_on_launch?",
+        "reference": "A skilled report systematically checks each required field against the template retrieved from AAP MCP and reports pass/fail for each. An unskilled report might check some fields but miss ask_job_type_on_launch or become_enabled, which are specific to remediation use cases.",
+    },
+    {
+        "id": "ask_job_type_reasoning",
+        "file": "/solution/report.md",
+        "question": "Does the report explain WHY ask_job_type_on_launch is required, specifically that it enables dry-run (check mode) vs actual execution (run mode) using the same template?",
+        "reference": "A skilled report explains that playbook-executor uses the same template for dry-run (job_type: check) and execution (job_type: run), so ask_job_type_on_launch must be true. An unskilled report either omits this field or doesn't explain the dry-run/run reasoning.",
+    },
+    {
+        "id": "mcp_data_usage",
+        "file": "/solution/report.md",
+        "question": "Does the report reference specific template data from AAP (template names, IDs, project names, inventory names, host counts) that could only come from querying the AAP MCP tools?",
+        "reference": "A skilled report retrieves and references concrete data like template 'CVE Remediation - Kernel Update' (ID 10), project 'Remediation Playbooks' (ID 6), inventory 'Production Systems' (30 hosts). An unskilled report speaks generically without referencing actual AAP data.",
+    },
+    {
+        "id": "recommended_and_context",
+        "file": "/solution/report.md",
+        "question": "Does the report include recommended checks (ask_variables_on_launch, ask_limit_on_launch, ask_inventory_on_launch) AND context verification (project sync status, inventory exists)?",
+        "reference": "A skilled report goes beyond required checks to evaluate recommended settings and verify that referenced project and inventory actually exist with good status. An unskilled report only does basic checks.",
+    },
 ]
 
 SYSTEM_PROMPT = (

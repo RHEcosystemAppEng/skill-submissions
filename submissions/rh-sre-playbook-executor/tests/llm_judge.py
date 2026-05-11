@@ -11,36 +11,9 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-    {
-        "id": "git_flow_before_launch",
-        "file": "/solution/report.md",
-        "question": "Does the report show Git Flow (write -> commit -> push -> sync complete) BEFORE launching any job, rather than launching directly from local files?",
-        "reference": "A skilled report performs Git Flow before launch. An unskilled report launches directly or tries to override the playbook at launch time.",
-    },
-    {
-        "id": "dry_run_check_mode",
-        "file": "/solution/report.md",
-        "question": "Does the report use job_type: 'check' for dry-run rather than CLI --check or skipping dry-run entirely?",
-        "reference": "A skilled report uses job_type check in job_templates_launch_retrieve. An unskilled report either skips dry-run or uses CLI arguments.",
-    },
-    {
-        "id": "job_polling",
-        "file": "/solution/report.md",
-        "question": "Does the report use jobs_retrieve for polling and jobs_job_events_list for event details, rather than parsing stdout?",
-        "reference": "A skilled report uses the correct MCP tools for job monitoring. An unskilled report parses stdout or checks once.",
-    },
-    {
-        "id": "host_summaries",
-        "file": "/solution/report.md",
-        "question": "Does the report collect per-host results using jobs_job_host_summaries_list?",
-        "reference": "A skilled report uses the host summaries API. An unskilled report parses console output for host results.",
-    },
-    {
-        "id": "synced_project_requirement",
-        "file": "/solution/report.md",
-        "question": "Does the report mention that AAP runs from the synced project only — no playbook override at launch time?",
-        "reference": "A skilled report knows AAP requires project sync. An unskilled report tries to override playbook content at launch.",
-    },
+  {"id": "launch_config_and_git_flow", "file": "/solution/report.md", "question": "Does the report configure launch-time prompts for flexibility (variables, host limits, job type) and require Git synchronization before execution?", "reference": "A skilled report configures launch-time prompts and requires Git sync. An unskilled report hardcodes execution settings and skips synchronization requirements."},
+  {"id": "relaunch_failed_hosts", "file": "/solution/report.md", "question": "Does the report mention relaunching with hosts: failed to retry only failed hosts?", "reference": "A skilled report uses jobs_relaunch_retrieve with hosts: failed. An unskilled report suggests full re-execution."},
+  {"id": "dry_run_and_monitoring", "file": "/solution/report.md", "question": "Does the report recommend dry-run first and include per-host execution monitoring?", "reference": "A skilled report follows check mode before run and monitors per-host. An unskilled report runs directly without dry-run."}
 ]
 
 SYSTEM_PROMPT = (

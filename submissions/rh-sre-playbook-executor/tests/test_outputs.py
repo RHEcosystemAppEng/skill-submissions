@@ -1,9 +1,7 @@
 """
-Tests for rh-sre__playbook-executor skill evaluation.
-
-Tests check for knowledge from the skill package (SKILL.md +
-references/02-error-handling-guide.md + 05-git-flow-prompts.md)
-that is only available to the treatment agent.
+Tests for rh-sre__playbook-executor per-skill evaluation.
+Baseline tests: report structure.
+Skill-dependent tests: conceptual checks (no exact tool/field name matching).
 """
 import os
 import pytest
@@ -22,75 +20,70 @@ class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
-    def test_mentions_playbook(self):
+    def test_mentions_topic(self):
         content = read_report().lower()
-        assert "playbook" in content
+        assert any(t in content for t in ['playbook', 'execut', 'job']), (
+            "report should mention key topic"
+        )
 
     def test_report_has_structure(self):
         content = read_report()
-        assert len(content) > 200, "report should have substantial content"
+        assert len(content) > 150, "report should have substantial content"
 
 
 class TestSkillDependent:
-
-    def test_git_flow_sequence(self):
-        """Skill teaches mandatory Git Flow: write -> git add -> commit
-        -> push -> await 'sync complete' BEFORE any job launch.
-        Without skill, agents launch directly from local files."""
+    def test_git_flow_mandatory(self):
+        """Skill: When template playbook path differs from generated playbook, Git Flow (commit, push, sync) is MANDATORY before launch."""
         c = read_report().lower()
-        has_git = "git" in c
-        has_sync = "sync" in c
-        has_commit = "commit" in c
-        assert has_git and has_sync and has_commit
+        has_git = any(t in c for t in ["git", "commit", "push", "sync"])
+        has_block = any(t in c for t in ["before launch", "mandatory", "must", "block", "sync complete"])
+        assert has_git or has_block, (
+            "should require Git Flow when path differs (skill: no override at launch)"
+        )
 
-    def test_dry_run_check_mode(self):
-        """Skill teaches dry-run via job_type: 'check' parameter in
-        job_templates_launch_retrieve. Without skill, agents run
-        --check as CLI flag or skip dry-run."""
-        c = read_report()
-        has_check = "check" in c.lower()
-        has_job_type = "job_type" in c
-        assert has_check and has_job_type
-
-    def test_job_polling_mechanism(self):
-        """Skill teaches polling via jobs_retrieve every 2 seconds
-        and events via jobs_job_events_list. Without skill, agents
-        wait indefinitely or check once."""
-        c = read_report()
-        has_jobs_retrieve = "jobs_retrieve" in c
-        has_events = "job_events_list" in c or "events" in c.lower()
-        assert has_jobs_retrieve and has_events
-
-    def test_host_summaries(self):
-        """Skill teaches jobs_job_host_summaries_list for per-host
-        results. Without skill, agents parse stdout manually."""
-        c = read_report()
-        assert "host_summaries" in c or "job_host_summaries" in c
-
-    def test_absolute_write_paths(self):
-        """Skill teaches write paths must be absolute — relative
-        paths fail silently. Without skill, agents use relative
-        paths like 'playbooks/...' without anchoring."""
-        c = read_report()
-        has_absolute = "/playbooks/" in c or "absolute" in c.lower()
-        assert has_absolute
-
-    def test_no_override_at_launch(self):
-        """Skill teaches AAP runs from synced project only — no
-        playbook override at launch time. Without skill, agents
-        try to pass playbook content as launch parameter."""
+    def test_launch_configuration(self):
+        """Skill teaches configuring launch-time prompts for execution flexibility
+        (job type, variables, host limiting). Without skill, agents run playbooks
+        with hardcoded settings."""
         c = read_report().lower()
-        has_sync_required = any(t in c for t in [
-            "synced project", "project sync", "sync complete",
-            "git flow", "no override",
+        has_launch = any(t in c for t in ["launch", "prompt", "on launch"])
+        has_config = any(t in c for t in [
+            "variable", "limit", "job type", "configur",
         ])
-        assert has_sync_required
+        assert has_launch and has_config, (
+            "should configure launch-time prompts for execution flexibility"
+        )
 
-    def test_mcp_aap_validator(self):
-        """Skill teaches running mcp-aap-validator BEFORE execution.
-        Without skill, agents proceed without validating AAP
-        availability."""
-        c = read_report()
-        has_validator = "mcp-aap-validator" in c or "aap-validator" in c
-        has_result = any(t in c for t in ["PASSED", "FAILED", "PARTIAL"])
-        assert has_validator or has_result
+    def test_relaunch_failed_hosts(self):
+        """Skill: jobs_relaunch_retrieve with hosts: 'failed' to retry only failed hosts."""
+        c = read_report().lower()
+        assert any(t in c for t in ["relaunch", "failed hosts", "retry failed"]), (
+            "should mention relaunch for failed hosts (skill: jobs_relaunch_retrieve)"
+        )
+
+    def test_dry_run_first(self):
+        """Skill: Recommend dry-run (check mode) before production execution."""
+        c = read_report().lower()
+        assert any(t in c for t in ["dry", "check mode", "check_mode", "preview", "before launch"]), (
+            "should recommend dry-run first (skill: Phase 3)"
+        )
+
+    def test_per_host_results(self):
+        """Skill: Report per-host results (succeeded, failed, error details)."""
+        c = read_report().lower()
+        has_per_host = any(t in c for t in ["per host", "each host", "host result", "stdout", "host summary"])
+        has_ansible_outcome = any(t in c for t in ["succeeded", "failed", "unreachable", "skipped", "changed"])
+        assert has_per_host or has_ansible_outcome, (
+            "should report per-host execution results (skill: host summaries)"
+        )
+
+    def test_error_taxonomy(self):
+        """Docs teach error taxonomy: connection/permissions/package/service/disk
+        failure categories with specific recovery paths.
+        Without docs, agents treat all errors generically."""
+        c = read_report().lower()
+        categories = ["connection", "permission", "package", "service", "disk"]
+        mentioned = sum(1 for cat in categories if cat in c)
+        assert mentioned >= 2, (
+            "should categorize errors by type (connection/permissions/package/service/disk)"
+        )

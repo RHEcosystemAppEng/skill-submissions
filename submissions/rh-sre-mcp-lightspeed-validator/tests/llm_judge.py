@@ -11,40 +11,9 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-    {
-        "id": "no_args_get_cves_and_limit_bug",
-        "file": "/solution/report.md",
-        "question": (
-            "Does the report explain that the correct Lightspeed MCP "
-            "connectivity test is calling get_cves (or vulnerability__get_cves) "
-            "with NO arguments, AND warn about the limit -> limit_ parameter "
-            "serialization bug that causes 'Unexpected keyword argument' errors?"
-        ),
-        "reference": (
-            "A skilled report uses get_cves with no parameters as the "
-            "connectivity probe. It explains that passing 'limit' can cause "
-            "the MCP client to serialize it as 'limit_', triggering a "
-            "validation error. The workaround is to omit limit entirely. "
-            "An unskilled report passes limit or other params, gets errors, "
-            "and either retries blindly or treats the error as opaque."
-        ),
-    },
-    {
-        "id": "credential_safety_and_env_vars",
-        "file": "/solution/report.md",
-        "question": (
-            "Does the report identify the specific Lightspeed credential "
-            "env vars (LIGHTSPEED_CLIENT_ID, LIGHTSPEED_CLIENT_SECRET) AND "
-            "explicitly warn about never echoing or displaying their values?"
-        ),
-        "reference": (
-            "A skilled report names LIGHTSPEED_CLIENT_ID and "
-            "LIGHTSPEED_CLIENT_SECRET as the variables to verify, checks "
-            "their presence without printing values, and warns against "
-            "echoing secrets. An unskilled report gives generic 'check "
-            "your API key' advice or may leak credential values."
-        ),
-    },
+  {"id": "no_params_get_cves", "file": "/solution/report.md", "question": "Does the report call get_cves with no parameters (due to limit_ serialization bug)?", "reference": "A skilled report avoids passing limit parameter. An unskilled report passes limit which may break the call."},
+  {"id": "credential_handling", "file": "/solution/report.md", "question": "Does the report reference LIGHTSPEED_CLIENT_ID/CLIENT_SECRET env vars and warn against echoing credentials?", "reference": "A skilled report identifies the correct env vars and warns about credential exposure. An unskilled report doesn't know the specific variable names."},
+  {"id": "validation_structure", "file": "/solution/report.md", "question": "Does the report present Lightspeed MCP validation in structured table format?", "reference": "A skilled report uses table with PASSED/FAILED outcome. An unskilled report uses unstructured text."}
 ]
 
 SYSTEM_PROMPT = (

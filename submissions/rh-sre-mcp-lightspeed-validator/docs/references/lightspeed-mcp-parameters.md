@@ -3,7 +3,7 @@ title: Red Hat Lightspeed MCP - Parameter Reference
 category: references
 sources:
   - title: Red Hat Lightspeed MCP
-    url: https://github.com/redhat/lightspeed-mcp
+    url: https://github.com/RedHatInsights/insights-mcp
     date_accessed: 2026-02-26
 tags: [lightspeed, mcp, parameters, inventory]
 last_updated: 2026-02-26

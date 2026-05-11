@@ -2,9 +2,7 @@
   "mcpServers": {
     "lightspeed-mcp": {
       "command": "python3",
-      "args": [
-        "/workspace/supportive/mcp-servers/mock-lightspeed-mcp.py"
-      ]
+      "args": ["/workspace/supportive/mcp-servers/mock-lightspeed-mcp.py"]
     }
   }
 }

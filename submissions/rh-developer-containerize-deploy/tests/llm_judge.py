@@ -13,19 +13,19 @@ except ImportError:
 CRITERIA = [
   {
     "id": "multistage_and_startup_probe",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report include both a multi-stage Dockerfile example (with COPY --from=builder or AS builder) AND a startup probe configuration?",
     "reference": "A skilled report includes a multi-stage Dockerfile showing build and runtime stages with COPY --from=builder, and configures a startupProbe in addition to liveness/readiness probes. An unskilled report provides only a single-stage Dockerfile and only liveness/readiness probes without startup probe."
   },
   {
     "id": "hpa_and_pool_config",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report include a HorizontalPodAutoscaler manifest (with autoscaling/v2 API) AND database connection pool configuration (SQLALCHEMY_POOL or equivalent)?",
     "reference": "A skilled report includes a complete HPA YAML with kind: HorizontalPodAutoscaler and autoscaling/v2 API, plus SQLAlchemy connection pool settings (pool_size, pool_recycle). An unskilled report mentions autoscaling conceptually without the manifest, and skips connection pool configuration."
   },
   {
     "id": "strategy_comparison_depth",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report compare at least 3 containerization strategies (S2I, Dockerfile, Helm) with specific trade-offs and a justified recommendation?",
     "reference": "A skilled report provides a detailed comparison table of S2I, Dockerfile, and Helm with pros/cons/trade-offs for each, leading to a justified recommendation. An unskilled report may compare strategies superficially without detailed trade-offs."
   }

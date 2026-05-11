@@ -10,6 +10,6 @@ You are a Red Hat developer. Your team has a Python web application that needs t
 - Define the deployment configuration including: resource requests/limits, all three probe types (startup, liveness, readiness), autoscaling (HPA), and how external traffic will reach the application
 - Address application-specific concerns like database connection pooling configuration
 
-Document your strategy evaluation, recommendation, and deployment plan in `/root/report.md`.
+Document your strategy evaluation, recommendation, and deployment plan in `/solution/report.md`.
 
 Use MCP tools to examine the environment. If reference documentation or skills are available in this environment, consult them before beginning work.

@@ -1,18 +1,16 @@
 # System Context Task
 
-You are a Red Hat SRE. A high-severity CVE has been identified that affects your fleet. Before applying any remediation, you need to gather comprehensive context about the affected systems.
+You are a Red Hat SRE. Before rolling out a remediation for a critical vulnerability, you need to gather comprehensive context about the affected systems to make safe remediation decisions.
 
 ## Scenario
-CVE-2026-1234 has been flagged as critical. Your fleet includes a mix of bare-metal servers, VMs, and Kubernetes nodes across production, staging, and development environments. Some systems are RHEL 8, others RHEL 9. You need to understand the deployment landscape before creating a remediation plan.
+A high-severity advisory has been identified that affects multiple systems in your fleet. Before applying any patches, you need to understand each affected system's role, current health, installed packages, running services, and any special constraints (maintenance windows, compliance requirements, dependencies).
 
 ## Requirements
-- Identify all systems affected by the CVE using available MCP tools
-- For each system, gather detailed context including OS version, infrastructure type, role, and environment
-- Classify systems to determine remediation priority and ordering
-- Assess reboot and service restart requirements after patching
-- For Kubernetes nodes, identify workload safety considerations
-- Recommend a remediation strategy (batch vs rolling, ordering, maintenance windows)
+- Use MCP tools to query systems in the fleet and identify those affected by the advisory
+- For each affected system, gather: system role and criticality, current health and uptime, installed package versions relevant to the advisory, running services that may be impacted, and any compliance or scheduling constraints
+- Assess which systems can be patched immediately vs. which need coordination
+- Identify dependencies between systems that affect remediation ordering
 
-Document your system context analysis and remediation strategy in `/solution/report.md`.
+Document your system context analysis and remediation readiness assessment in `/solution/report.md`.
 
-Use MCP tools to query systems. If reference documentation or skills are available in this environment, consult them before beginning work. Complete the entire analysis autonomously — do not stop for user confirmation.
+If reference documentation or skills are available in this environment, consult them before beginning work.

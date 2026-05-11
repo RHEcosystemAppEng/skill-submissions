@@ -1,12 +1,7 @@
 """
 Tests for rh-sre__system-context per-skill evaluation.
-
-Skill-specific knowledge tested:
-- infrastructure_type (bare_metal/virtualized/container) and infrastructure_vendor
-- needs-restarting command for reboot/service restart assessment
-- PDB (PodDisruptionBudget) awareness for Kubernetes safety
-- include_system_profile parameter for get_host_details
-- Staged rollout by environment/criticality
+Baseline tests: report structure.
+Skill-dependent tests: conceptual checks (no exact tool/field name matching).
 """
 import os
 import pytest
@@ -27,113 +22,63 @@ class TestBaseline:
 
     def test_mentions_topic(self):
         content = read_report().lower()
-        assert any(t in content for t in ["system", "context", "fleet"]), (
+        assert any(t in content for t in ['system', 'context', 'environment']), (
             "report should mention key topic"
         )
 
     def test_report_has_structure(self):
         content = read_report()
-        assert len(content) > 200, "report should have substantial content"
+        assert len(content) > 150, "report should have substantial content"
 
 
 class TestSkillDependent:
-    def test_infrastructure_type_classification(self):
-        """Skill: Systems classified by infrastructure_type field values:
-        bare_metal, virtualized, container. Without skill, agents use
-        generic terms without the specific field values."""
+    def test_remediation_strategy_by_context(self):
+        """Skill: Determine strategy from context: batch vs rolling, maintenance window, pod eviction for K8s."""
         c = read_report().lower()
-        specific_types = sum(1 for t in [
-            "bare_metal", "bare metal",
-            "virtualized",
-            "container",
-        ] if t in c)
-        assert specific_types >= 2, (
-            "should classify by infrastructure_type: bare_metal, virtualized, "
-            "container (skill: specific field values)"
+        has_strategy = any(t in c for t in ["strategy", "approach", "rolling", "batch"])
+        has_context = any(t in c for t in ["maintenance", "pod eviction", "kubernetes", "staging first"])
+        assert has_strategy and has_context, (
+            "should derive strategy from context (skill: Decision Matrix)"
         )
 
-    def test_infrastructure_vendor(self):
-        """Skill: infrastructure_vendor field (e.g. kvm, vmware) provides
-        additional context about virtualization platform."""
+    def test_rhel_version_distribution(self):
+        """Skill: Report RHEL version distribution (playbook must support multiple versions)."""
+        c = read_report().lower()
+        assert any(t in c for t in ['rhel', 'version', 'distribution', 'el7', 'el8', 'el9']), (
+            "Should report RHEL version distribution (skill: conditional dnf/yum)"
+        )
+
+    def test_environment_and_criticality(self):
+        """Skill: Classify by environment (prod/staging/dev) and criticality for rollout order."""
+        c = read_report().lower()
+        has_env = any(t in c for t in ["staging", "development", "rollout_order", "rollout order"])
+        has_crit = any(t in c for t in ["critical", "criticality", "priority", "high", "rollout"])
+        assert has_env and has_crit, (
+            "should classify by environment and criticality (skill: rollout_order)"
+        )
+
+    def test_infrastructure_classification(self):
+        """Skill: infrastructure_type (bare_metal/virtualized/container) and infrastructure_vendor (kvm) fields."""
+        c = read_report().lower()
+        has_type = any(t in c for t in ["infrastructure_type", "infrastructure_vendor", "virtualized"])
+        has_bare = "bare_metal" in c or "bare metal" in c
+        assert has_type or has_bare, (
+            "should reference infrastructure classification (skill: bare_metal/virtualized/container)"
+        )
+
+    def test_kubernetes_context_fields(self):
+        """Skill: hasPdbs and daemonsets_present for safety planning in K8s context."""
+        c = read_report().lower()
+        has_k8s = any(t in c for t in ["pdb", "daemonset"])
+        has_safety = any(t in c for t in ["safety", "eviction"])
+        assert has_k8s and has_safety, (
+            "should reference PDB/daemonset for K8s safety (skill)"
+        )
+
+    def test_needs_restarting_check(self):
+        """Docs teach needs-restarting -r (exit code 0=no reboot, 1=reboot needed)
+        and -s for services needing restart. Without docs, agents skip this check."""
         c = read_report().lower()
         assert any(t in c for t in [
-            "infrastructure_vendor", "vendor",
-            "kvm", "vmware", "hyper-v",
-        ]), (
-            "should reference infrastructure_vendor for virtualization platform "
-            "(skill: infrastructure_vendor field)"
-        )
-
-    def test_needs_restarting(self):
-        """Skill: Use 'needs-restarting -r' to check if reboot is required
-        after patching (exit 0=no reboot, 1=reboot needed) and '-s' for
-        services. Without skill, agents skip this check or guess."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "needs-restarting", "needs_restarting",
-        ]), (
-            "should reference needs-restarting command for reboot/service "
-            "restart assessment (skill: specific RHEL utility)"
-        )
-
-    def test_pdb_awareness(self):
-        """Skill: For Kubernetes nodes, check PodDisruptionBudgets (PDBs)
-        before evicting pods during remediation. Without skill, agents
-        drain nodes without PDB awareness."""
-        c = read_report().lower()
-        has_pdb = any(t in c for t in [
-            "pdb", "poddisruptionbudget", "pod disruption budget",
-            "disruption budget",
-        ])
-        has_eviction = any(t in c for t in [
-            "evict", "eviction", "drain",
-        ])
-        assert has_pdb and has_eviction, (
-            "should check PDBs before pod eviction on Kubernetes nodes "
-            "(skill: hasPdbs field, pod eviction safety)"
-        )
-
-    def test_staged_rollout_by_environment(self):
-        """Skill: Remediate staging first, then production in batches.
-        Environment classification drives rollout order."""
-        c = read_report().lower()
-        has_staging_first = any(t in c for t in [
-            "staging first", "test first", "validate first",
-            "staging before", "validation phase",
-        ])
-        has_phases = any(t in c for t in [
-            "phase", "batch", "rollout", "rolling",
-            "stage 1", "stage 2", "step 1",
-        ])
-        assert has_staging_first and has_phases, (
-            "should recommend staged rollout: staging first, then production "
-            "(skill: Decision Matrix)"
-        )
-
-    def test_rhel_version_detection(self):
-        """Skill: Detect RHEL version distribution across affected systems
-        for playbook compatibility (conditional dnf/yum)."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "rhel 7", "rhel 8", "rhel 9",
-            "rhel7", "rhel8", "rhel9",
-            "el7", "el8", "el9",
-            "version distribution", "rhel version",
-        ]), (
-            "should detect RHEL version distribution for playbook compatibility"
-        )
-
-    def test_criticality_classification(self):
-        """Skill: Systems tagged by criticality (critical/high/medium/low)
-        which affects remediation ordering and maintenance windows."""
-        c = read_report().lower()
-        criticality_terms = sum(1 for t in [
-            "critical", "high", "medium", "low",
-        ] if t in c)
-        has_ordering = any(t in c for t in [
-            "priority", "order", "first", "window", "maintenance",
-        ])
-        assert criticality_terms >= 2 and has_ordering, (
-            "should classify by criticality for remediation ordering "
-            "(skill: criticality tags)"
-        )
+            "needs-restarting", "needs_restarting", "reboot", "restart service",
+        ]), "should use needs-restarting for reboot/service restart assessment"

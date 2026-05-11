@@ -11,44 +11,9 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-    {
-        "id": "pre_flight_safety_gates",
-        "file": "/solution/report.md",
-        "question": (
-            "Does the report describe checking the 'protected' label on the VM "
-            "before deletion (with removal via label command), verifying "
-            "printableStatus to determine if the VM must be stopped first, "
-            "AND presenting VM-only vs VM+storage deletion options?"
-        ),
-        "reference": (
-            "A skilled report checks metadata.labels.protected == 'true' and "
-            "explains how to remove it (oc label ... protected-), reads "
-            "status.printableStatus to classify if VM is Running (must stop) "
-            "or Stopped, and presents explicit deletion scope choices: "
-            "VM-only (keep DV/PVC) vs VM+storage (delete DV/PVC). An unskilled "
-            "report jumps to deletion without safety checks or only offers "
-            "one deletion mode."
-        ),
-    },
-    {
-        "id": "stuck_deletion_and_storage_discovery",
-        "file": "/solution/report.md",
-        "question": (
-            "Does the report explain that stuck Terminating VMs should be "
-            "diagnosed via finalizers (not force-deleted), AND describe "
-            "discovering VM storage via the vm.kubevirt.io/name label on "
-            "DataVolumes or PVCs (cdi.kubevirt.io/v1beta1)?"
-        ),
-        "reference": (
-            "A skilled report explains that Terminating VMs are caused by "
-            "blocking finalizers, diagnosed with resources_get and resolved "
-            "with resources_create_or_update — explicitly avoiding --force "
-            "or --grace-period=0. It discovers storage by listing DataVolumes "
-            "(cdi.kubevirt.io/v1beta1) or PVCs with label selector "
-            "vm.kubevirt.io/name=<vm>. An unskilled report suggests "
-            "force-delete and uses generic PVC listing."
-        ),
-    },
+  {"id": "protected_label", "file": "/solution/report.md", "question": "Does the report check for protected: true label that blocks deletion?", "reference": "A skilled report checks protection labels. An unskilled report attempts deletion without safety checks."},
+  {"id": "storage_scope", "file": "/solution/report.md", "question": "Does the report distinguish VM-only vs VM+storage deletion and warn about orphaned PVCs?", "reference": "A skilled report offers storage scope choice. An unskilled report deletes everything without distinction."},
+  {"id": "typed_confirmation", "file": "/solution/report.md", "question": "Does the report require typed VM name confirmation (exact, case-sensitive) before deletion?", "reference": "A skilled report requires exact name match confirmation. An unskilled report uses yes/no confirmation."}
 ]
 
 SYSTEM_PROMPT = (

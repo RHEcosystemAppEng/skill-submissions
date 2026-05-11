@@ -13,6 +13,7 @@ description: |
 
   NOT for power management (use vm-lifecycle-manager to stop VMs).
 
+license: Apache-2.0
 model: inherit
 color: red
 ---
@@ -393,7 +394,7 @@ This is preview only. No resources deleted.
 ## Advanced Features
 
 ### Batch Deletion
-Delete multiple VMs with confirmation for each: `"Delete VMs test-01, test-02, test-03 in dev"` → Process each individually with full workflow. Use typed confirmation: `DELETE-3-VMS` for batch.
+Delete multiple VMs: `"Delete VMs test-01, test-02, test-03 in dev"` → Process each VM individually through the full workflow (Steps 1-5), requiring typed confirmation of each VM name separately. Never use a generic batch confirmation — each VM must be confirmed by its exact name.
 
 ### Dry-Run Mode
 Show deletion scope without executing: Execute Step 1-2, skip Steps 3-4. User request: "Show what would be deleted if I delete VM xyz"

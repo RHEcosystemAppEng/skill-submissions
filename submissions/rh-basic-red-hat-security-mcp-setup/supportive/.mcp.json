@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "red-hat-security": {
+      "command": "python3",
+      "args": ["/workspace/supportive/mcp-servers/mock-rh-security-mcp.py"]
+    }
+  }
+}

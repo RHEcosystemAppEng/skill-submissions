@@ -1,6 +1,5 @@
-"""Tests for skill evaluation. Baseline + skill-dependent checks."""
-import os
-import pytest
+"""Job failure analyzer tests - events, host summaries, error classification."""
+import os, pytest
 
 REPORT = "/solution/report.md"
 
@@ -12,14 +11,43 @@ def read_report():
 
 class TestBaseline:
     def test_report_exists(self):
-        assert os.path.exists(REPORT), "report.md must exist"
-
+        assert os.path.exists(REPORT)
     def test_report_has_content(self):
-        content = read_report()
-        assert len(content) > 200, "report should have substantial content"
+        assert len(read_report()) > 400
 
-class TestSkillDependent:
-    def test_uses_mcp_data(self):
-        """Report should contain specific data from MCP tool queries."""
+class TestEventExtraction:
+    """Job events extraction is the core of failure analysis."""
+    def test_events_mentioned(self):
         c = read_report().lower()
-        assert len(c) > 500, "report should demonstrate thorough analysis using MCP tools"
+        assert "event" in c
+    def test_timeline(self):
+        c = read_report().lower()
+        assert "timeline" in c or "time" in c or "sequence" in c or "order" in c
+
+class TestHostAnalysis:
+    def test_host_summaries(self):
+        c = read_report().lower()
+        assert "host" in c and ("summar" in c or "failed" in c or "success" in c)
+    def test_affected_hosts_listed(self):
+        c = read_report().lower()
+        assert "host" in c and ("error" in c or "fail" in c)
+
+class TestErrorClassification:
+    """Error type classification is a specific skill requirement."""
+    def test_error_type_classified(self):
+        c = read_report().lower()
+        error_types = ["connectivity", "privilege", "escalation", "package",
+                       "timeout", "syntax", "permission", "unreachable"]
+        found = sum(1 for t in error_types if t in c)
+        assert found >= 1, "Must classify the error type"
+    def test_ansible_task_identified(self):
+        c = read_report().lower()
+        assert "task" in c or "module" in c or "play" in c
+
+class TestMCPToolUsage:
+    def test_job_data(self):
+        c = read_report().lower()
+        assert "job" in c and ("detail" in c or "status" in c or "retrieve" in c)
+    def test_stdout(self):
+        c = read_report().lower()
+        assert "output" in c or "stdout" in c or "log" in c

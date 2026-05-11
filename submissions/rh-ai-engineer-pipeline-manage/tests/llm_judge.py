@@ -1,22 +1,23 @@
-import json
-import os
-import sys
-import time
+import json, os, sys, time
 from pathlib import Path
-
 try:
     from anthropic import Anthropic
 except ImportError:
-    print("ERROR: anthropic package not installed")
     sys.exit(1)
 
 CRITERIA = [
     {
-        "id": "skill_knowledge",
+        "id": "dspa_setup",
         "file": "/solution/report.md",
-        "question": "Does the report demonstrate specific knowledge from the skill documentation and MCP tool data, rather than generic advice?",
-        "reference": "A skilled report uses specific data, tool names, and concepts from the SKILL.md and MCP environment. An unskilled report gives generic advice.",
+        "question": "Does the report describe setting up or verifying a DSPA (DataSciencePipelinesApplication) CR in the target namespace as the pipeline server?",
+        "reference": "The skill requires a DSPA CR as the pipeline server in RHOAI. This is a specific Custom Resource type that an unskilled agent would not know about."
     },
+    {
+        "id": "kfp2_pipeline_lifecycle",
+        "file": "/solution/report.md",
+        "question": "Does the report demonstrate Kubeflow Pipelines 2.0 lifecycle management including submitting pipeline runs from YAML, scheduling recurring runs with cron, and monitoring with step-level logs?",
+        "reference": "The skill covers KFP 2.0 specific features: YAML-based run submission, ScheduledWorkflow for cron scheduling, step-level pod monitoring and logs. An unskilled agent gives generic pipeline advice."
+    }
 ]
 
 SYSTEM_PROMPT = (
@@ -60,7 +61,6 @@ def main():
     base_url = os.getenv("ANTHROPIC_BASE_URL")
     model = os.getenv("LLM_JUDGE_MODEL", "claude-haiku-4-5")
     if not api_key:
-        print("ERROR: ANTHROPIC_API_KEY not set")
         json.dump({"criteria": [], "passed": 0, "total": 0, "score": 0.0},
                   open("/logs/verifier/llm_judge.json", "w"), indent=2)
         return

@@ -15,6 +15,6 @@ You are an AI engineer on Red Hat OpenShift AI. Your team needs a new project to
 - Configure the pipeline server using the data connection you created
 - Verify the project is fully configured and ready for model deployment
 
-Document your setup steps, the final project configuration, and any issues encountered in `/root/report.md`. Redact any credentials in the report.
+Document your setup steps, the final project configuration, and any issues encountered in `/solution/report.md`. Redact any credentials in the report.
 
 Use MCP tools to interact with the platform. If reference documentation or skills are available in this environment, consult them before beginning work.

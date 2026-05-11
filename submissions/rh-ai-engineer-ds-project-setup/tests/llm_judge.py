@@ -13,13 +13,13 @@ except ImportError:
 CRITERIA = [
   {
     "id": "partial_credential_redaction",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report display S3 credentials using partial redaction — showing the first few characters of the access key (like AKIA****) with the rest masked — rather than using placeholder values or full redaction?",
     "reference": "A skilled report shows credentials partially redacted: the first few characters of the access key visible followed by asterisks (e.g., 'AKIA****'), and the secret key fully masked ('********'). Using PLACEHOLDER_ACCESS_KEY or completely hiding the access key is insufficient — partial redaction allows verification without exposing the full credential."
   },
   {
     "id": "secret_manifest_structure",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report include a Kubernetes Secret manifest (with kind: Secret, apiVersion, metadata, and data fields) showing how the S3 data connection is stored as a K8s resource, rather than just describing the connection narratively?",
     "reference": "A skilled report shows the actual K8s Secret YAML structure with kind: Secret, metadata (namespace, name, labels), and data fields containing base64-encoded values. An unskilled report describes the data connection configuration narratively without showing the underlying K8s resource structure."
   }

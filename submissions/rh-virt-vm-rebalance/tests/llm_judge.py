@@ -11,42 +11,8 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-    {
-        "id": "allocated_vs_runtime_capacity",
-        "file": "/solution/report.md",
-        "question": (
-            "Does the report use VMI domain spec (spec.domain.cpu with "
-            "sockets/cores/threads, spec.domain.memory.guest) and node "
-            "status.capacity for rebalance planning, rather than relying "
-            "solely on nodes_top runtime utilization?"
-        ),
-        "reference": (
-            "A skilled report computes per-VM allocated CPU from "
-            "spec.domain.cpu (sockets x cores x threads) and guest memory "
-            "from spec.domain.memory.guest, then divides by node "
-            "status.capacity to get reservation percentages. This captures "
-            "idle VMs that still reserve capacity. An unskilled report uses "
-            "only nodes_top runtime metrics, which misleads for idle VMs."
-        ),
-    },
-    {
-        "id": "storage_aware_migration_path",
-        "file": "/solution/report.md",
-        "question": (
-            "Does the report check PVC access modes (RWX vs RWO) to "
-            "determine whether each VM can live-migrate or must use the "
-            "cold migration path (stop, re-fetch, set nodeAffinity, start)?"
-        ),
-        "reference": (
-            "A skilled report inspects PersistentVolumeClaim.spec.accessModes "
-            "for each VM: RWX allows live migration via "
-            "VirtualMachineInstanceMigration; RWO blocks live migration and "
-            "requires the cold path (vm_lifecycle stop, re-read VM for fresh "
-            "resourceVersion, set required nodeAffinity to target, start). "
-            "An unskilled report assumes all VMs can live-migrate or uses "
-            "kubectl drain without checking storage constraints."
-        ),
-    },
+  {"id": "cpu_compatibility_check", "file": "/solution/report.md", "question": "Does the report check CPU model or feature compatibility between source and target nodes before recommending migration?", "reference": "A skilled report verifies CPU compatibility (model, features) to ensure live migration success. An unskilled report migrates VMs without CPU compatibility checks."},
+  {"id": "overcommit_awareness", "file": "/solution/report.md", "question": "Does the report assess overcommit risk (whether the target node will exceed capacity after receiving migrated VMs)?", "reference": "A skilled report calculates whether the target node can handle the additional load without overcommitting. An unskilled report moves VMs without capacity verification."}
 ]
 
 SYSTEM_PROMPT = (

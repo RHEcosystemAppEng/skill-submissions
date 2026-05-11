@@ -1,6 +1,5 @@
-"""Tests for skill evaluation. Baseline + skill-dependent checks."""
-import os
-import pytest
+"""Host fact inspector tests - system facts, drift, resource checks."""
+import os, pytest
 
 REPORT = "/solution/report.md"
 
@@ -12,14 +11,34 @@ def read_report():
 
 class TestBaseline:
     def test_report_exists(self):
-        assert os.path.exists(REPORT), "report.md must exist"
-
+        assert os.path.exists(REPORT)
     def test_report_has_content(self):
-        content = read_report()
-        assert len(content) > 200, "report should have substantial content"
+        assert len(read_report()) > 400
 
-class TestSkillDependent:
-    def test_uses_mcp_data(self):
-        """Report should contain specific data from MCP tool queries."""
+class TestSystemFacts:
+    """Host fact inspection requires specific system data points."""
+    def test_os_version(self):
         c = read_report().lower()
-        assert len(c) > 500, "report should demonstrate thorough analysis using MCP tools"
+        assert "os" in c or "operating system" in c or "rhel" in c
+    def test_resource_data(self):
+        c = read_report().lower()
+        has_disk = "disk" in c
+        has_memory = "memory" in c or "ram" in c
+        assert has_disk or has_memory, "Must check disk or memory resources"
+
+class TestPlatformDrift:
+    """Drift detection between hosts is a key differentiator."""
+    def test_drift_analysis(self):
+        c = read_report().lower()
+        assert "drift" in c or "different" in c or "mismatch" in c or "inconsisten" in c
+    def test_comparison(self):
+        c = read_report().lower()
+        assert "compar" in c or "vs" in c or "failed" in c and "healthy" in c
+
+class TestCorrelation:
+    def test_failure_correlation(self):
+        c = read_report().lower()
+        assert "correlat" in c or "cause" in c or "related" in c
+    def test_host_specific_vs_job_specific(self):
+        c = read_report().lower()
+        assert "host" in c and ("specific" in c or "job" in c or "config" in c)

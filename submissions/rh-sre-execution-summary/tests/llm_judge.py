@@ -11,9 +11,30 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-  {"id": "tool_purpose_attribution", "file": "/solution/report.md", "question": "Does the report pair each tool or MCP call with an explicit purpose statement explaining why it was invoked, rather than just listing tools used or describing actions narratively?", "reference": "A skilled report explicitly pairs each tool (e.g., get_host_details, get_cves) with a 'Purpose:' or 'used to' statement. An unskilled report lists tools in a table or mentions them inline without structured per-tool purpose mapping."},
-  {"id": "tool_purpose_categorization", "file": "/solution/report.md", "question": "Does the report organize MCP tools into named functional categories (e.g., 'Vulnerability Assessment Tools', 'Fleet Management Tools', 'Remediation Tools') rather than listing all tools in a single flat list?", "reference": "A skilled report groups tools by their functional purpose into labeled sub-sections (e.g., 'Assessment Tools: get_cves, get_cve', 'Fleet Tools: get_host_details'). An unskilled report lists all tools sequentially without categorizing them by function."},
-  {"id": "methodology_phases", "file": "/solution/report.md", "question": "Does the report organize the execution into at least two named methodology phases (e.g., 'Data Collection', 'Evidence Gathering', 'Triage', 'Verification') as distinct sections or headings?", "reference": "A skilled report structures execution into named phases as headings or sections. An unskilled report presents a flat narrative or simple numbered list without phase-level organization."}
+    {
+        "id": "execution_summary_format",
+        "file": "/solution/report.md",
+        "question": "Does the report contain a structured execution summary using the exact EXECUTION SUMMARY START/END delimiters with Agents, Skills, Tools, and Docs categories?",
+        "reference": "A skilled agent produces output matching the template: **** EXECUTION SUMMARY START **** with four labeled categories (Agents, Skills, Tools, Docs) and **** EXECUTION SUMMARY END ****. An unskilled agent writes a free-form narrative without this structured format.",
+    },
+    {
+        "id": "naming_conventions",
+        "file": "/solution/report.md",
+        "question": "Does the execution summary use the correct naming conventions with rh-sre: prefix for skills/agents and MCP server prefixes like lightspeed-mcp: for tools?",
+        "reference": "A skilled agent knows to use rh-sre:skill-name format for skills (e.g. rh-sre:fleet-inventory) and lightspeed-mcp:tool_name for tools (e.g. lightspeed-mcp:get_host_details). An unskilled agent uses plain names without server/plugin prefixes.",
+    },
+    {
+        "id": "mcp_tools_evidence",
+        "file": "/solution/report.md",
+        "question": "Does the report reference actual MCP tools from the environment (get_host_details, get_cve_systems, get_cves, create_vulnerability_playbook)?",
+        "reference": "A skilled agent actually calls MCP tools and accurately lists them by name. An unskilled agent invents tool names or speaks generically about 'querying the API'.",
+    },
+    {
+        "id": "workflow_documentation_quality",
+        "file": "/solution/report.md",
+        "question": "Does the execution summary document a clear remediation workflow sequence with multiple steps, including which CVEs were addressed and what actions were taken?",
+        "reference": "A skilled report shows a chronological workflow: CVE identification, system enumeration, playbook generation, execution, and verification — referencing specific CVE IDs and system counts from MCP data. An unskilled report is generic.",
+    },
 ]
 
 SYSTEM_PROMPT = (

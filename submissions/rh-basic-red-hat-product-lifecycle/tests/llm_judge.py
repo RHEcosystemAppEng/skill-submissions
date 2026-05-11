@@ -14,39 +14,26 @@ CRITERIA = [
     {
         "id": "backporting_model_explanation",
         "file": "/solution/report.md",
-        "question": (
-            "Does the report explain Red Hat's backporting model — that Red Hat "
-            "backports security fixes into the shipped package version rather than "
-            "rebasing to upstream, and that a higher release counter (e.g., -7.el8 "
-            "to -8.el8) with the same version means a fix was applied?"
-        ),
-        "reference": (
-            "A skilled report explains: Red Hat backports fixes into the shipped "
-            "version (e.g., openssl-1.1.1k) rather than rebasing to upstream 3.x. "
-            "The package format is name-version-release.elX where the release counter "
-            "increments for each backported fix. Same version + higher release = fix "
-            "applied. Version numbers look 'old' but carry all critical/important CVE "
-            "fixes. An unskilled report says 'upgrade to latest OpenSSL' or does not "
-            "explain why the version appears outdated."
-        ),
+        "question": "Does the report correctly explain Red Hat's backporting model — that Red Hat backports security fixes into the shipped package version rather than rebasing to upstream, and therefore a package like openssl-1.1.1k can be fully patched despite looking 'old' compared to upstream 3.x?",
+        "reference": "A skilled report explains that Red Hat backports CVE fixes into the shipped version (1.1.1k), so the release counter (-7.el8 -> -8.el8) is what indicates patches applied. The upstream version (3.x) is irrelevant for patch currency. An unskilled report agrees with the scanner that the version is outdated or doesn't explain backporting.",
     },
     {
-        "id": "lifecycle_with_concrete_dates",
+        "id": "rhel_lifecycle_phases",
         "file": "/solution/report.md",
-        "question": (
-            "Does the report provide concrete lifecycle dates for RHEL 8 and "
-            "OpenShift 4.14, distinguishing Full Support and Maintenance Support "
-            "phases, and giving specific date-based recommendations?"
-        ),
-        "reference": (
-            "A skilled report states dates concretely (e.g., 'Full Support ends May "
-            "2024', 'Maintenance Support ends May 2029') rather than relatively. It "
-            "distinguishes what updates each phase receives: Full Support = security + "
-            "bugs + hardware enablement + minor releases; Maintenance Support = "
-            "security + urgent bugs only. For OCP 4.14, it mentions 18-month lifecycle "
-            "and EUS availability for even minors. An unskilled report gives vague "
-            "guidance without specific dates or phase distinctions."
-        ),
+        "question": "Does the report correctly describe RHEL's lifecycle phases (Full Support ~5 years with CVE fixes and features, Maintenance Support ~5 years with security-only, Extended Life with no fixes) with concrete dates for RHEL 8.6?",
+        "reference": "A skilled report knows the RHEL 10-year lifecycle structure and provides concrete dates for RHEL 8.6's GA, End of Full Support, End of Maintenance, and EOL. An unskilled report gives vague timeframes or wrong phase definitions.",
+    },
+    {
+        "id": "ocp_lifecycle_and_eus",
+        "file": "/solution/report.md",
+        "question": "Does the report describe OpenShift 4.14's lifecycle (18-month per minor, 6-month full support) AND correctly identify whether EUS is available for 4.14 (it is, since 4.14 is an even minor)?",
+        "reference": "A skilled report knows OCP has 18-month lifecycle per minor with 6-month full support, and that EUS is available for even minors (4.12, 4.14, 4.16). An unskilled report doesn't know the 18-month duration or the even-minor EUS rule.",
+    },
+    {
+        "id": "concrete_actionable_output",
+        "file": "/solution/report.md",
+        "question": "Does the report provide concrete dates (not relative like 'in 2 years') and actionable recommendations for each product/version analyzed?",
+        "reference": "A skilled report uses concrete dates like 'May 31, 2029' and gives phase-appropriate actions: 'Apply updates on normal cadence' for Full Support, 'Security patches only, plan upgrade before [date]' for Maintenance. An unskilled report uses vague language or misses recommendations.",
     },
 ]
 

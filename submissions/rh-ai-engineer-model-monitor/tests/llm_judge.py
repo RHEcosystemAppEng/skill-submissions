@@ -1,22 +1,23 @@
-import json
-import os
-import sys
-import time
+import json, os, sys, time
 from pathlib import Path
-
 try:
     from anthropic import Anthropic
 except ImportError:
-    print("ERROR: anthropic package not installed")
     sys.exit(1)
 
 CRITERIA = [
     {
-        "id": "skill_knowledge",
+        "id": "trustyai_bias_metrics",
         "file": "/solution/report.md",
-        "question": "Does the report demonstrate specific knowledge from the skill documentation and MCP tool data, rather than generic advice?",
-        "reference": "A skilled report uses specific data, tool names, and concepts from the SKILL.md and MCP environment. An unskilled report gives generic advice.",
+        "question": "Does the report configure TrustyAI-specific bias metrics SPD (Statistical Parity Difference) and DIR (Disparate Impact Ratio) with protected attributes and threshold values?",
+        "reference": "The skill requires configuring SPD and DIR metrics with protected attributes (e.g., applicant_age), favorable outcomes, and specific thresholds (SPD +/-0.1, DIR 0.8-1.2). These are TrustyAI-specific concepts."
     },
+    {
+        "id": "drift_detection",
+        "file": "/solution/report.md",
+        "question": "Does the report configure TrustyAI drift detection using specific methods like MeanShift, FourierMMD, KS-Test, or Jensen-Shannon with significance thresholds?",
+        "reference": "The skill defines 4 drift methods (MeanShift, FourierMMD, KS-Test, Jensen-Shannon) with significance thresholds. An unskilled agent would give generic drift advice without these specific TrustyAI methods."
+    }
 ]
 
 SYSTEM_PROMPT = (
@@ -60,7 +61,6 @@ def main():
     base_url = os.getenv("ANTHROPIC_BASE_URL")
     model = os.getenv("LLM_JUDGE_MODEL", "claude-haiku-4-5")
     if not api_key:
-        print("ERROR: ANTHROPIC_API_KEY not set")
         json.dump({"criteria": [], "passed": 0, "total": 0, "score": 0.0},
                   open("/logs/verifier/llm_judge.json", "w"), indent=2)
         return

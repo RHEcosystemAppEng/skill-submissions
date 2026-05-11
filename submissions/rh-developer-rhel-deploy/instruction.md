@@ -7,6 +7,6 @@ You are a Red Hat developer. Plan the deployment of a containerized application 
 - Address security hardening (SELinux, privilege restrictions)
 - Include volume mounts and networking configuration
 
-Use available tools to examine the environment. Document your methodology, configuration, and deployment plan in `/root/report.md`.
+Use available tools to examine the environment. Document your methodology, configuration, and deployment plan in `/solution/report.md`.
 
 If reference documentation or skills are available in this environment, consult them before beginning work.

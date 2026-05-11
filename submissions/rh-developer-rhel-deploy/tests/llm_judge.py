@@ -13,19 +13,19 @@ except ImportError:
 CRITERIA = [
   {
     "id": "selinux_volume_labels",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report explain SELinux volume labels :z (shared, multi-container) and :Z (private) for Podman bind mounts?",
     "reference": "A skilled report uses :z or :Z suffixes on volume mounts and explains the difference. An unskilled report skips SELinux mount context."
   },
   {
     "id": "rootless_systemd",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report address rootless systemd service configuration (~/.config/systemd/user/) and loginctl enable-linger?",
     "reference": "A skilled report shows the rootless systemd path and explains enable-linger for services to survive logout. An unskilled report only shows rootful /etc/systemd/system/ paths."
   },
   {
     "id": "semanage_fcontext_restorecon",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report use semanage fcontext + restorecon for setting SELinux file contexts on application directories?",
     "reference": "A skilled report uses 'semanage fcontext -a -t bin_t' plus 'restorecon -Rv' for app files. An unskilled report skips file-level SELinux context management."
   }

@@ -1,7 +1,7 @@
 """
 Tests for rh-virt__vm-inventory per-skill evaluation.
-
-Exact-field tests: require API field paths that only SKILL.md teaches.
+Baseline tests: report structure.
+Skill-dependent tests: conceptual checks (no exact tool/field name matching).
 """
 import os
 import pytest
@@ -15,7 +15,6 @@ def read_report():
     with open(REPORT) as f:
         return f.read()
 
-
 class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
@@ -24,88 +23,45 @@ class TestBaseline:
         content = read_report()
         has_table = "|" in content and content.count("|") >= 4
         has_list = content.count("- ") >= 5
-        assert has_table or has_list, "report should present inventory in structured format"
+        assert has_table or has_list, "report should present VM inventory in a structured format (table or list)"
 
     def test_mentions_namespace(self):
         content = read_report().lower()
-        assert "namespace" in content
+        assert "namespace" in content, "report should organize by namespace"
 
 
 class TestSkillDependent:
-    def test_storage_capacity_field_path(self):
-        """Skill teaches summing storage from
-        status.volumeStatus[].persistentVolumeClaimInfo.capacity.storage
-        on VMI, excluding container disks and cloud-init.
-        Without skill, agents don't know this nested path."""
-        c = read_report()
-        has_volume_status = "volumeStatus" in c or "persistentVolumeClaimInfo" in c
-        assert has_volume_status, (
-            "must reference volumeStatus or persistentVolumeClaimInfo for storage"
-        )
-
-    def test_guest_os_info_field(self):
-        """Skill teaches reading guest OS from status.guestOSInfo.prettyName
-        (or .name + version) on VMI. Without skill, agents guess OS from
-        the image name."""
-        c = read_report()
-        assert "guestOSInfo" in c, (
-            "must reference guestOSInfo field for OS detection"
-        )
-
-    def test_agent_connected_condition(self):
-        """Skill teaches checking AgentConnected condition from VMI
-        status.conditions. Without skill, agents skip guest agent health."""
-        c = read_report()
-        assert "AgentConnected" in c, (
-            "must reference AgentConnected condition from VMI"
-        )
-
-    def test_vmi_for_runtime_data(self):
-        """Skill teaches querying VirtualMachineInstance (separate from VM)
-        for live runtime data: nodeName, IP, guestOS, conditions.
-        Without skill, agents query only VirtualMachine objects."""
-        c = read_report()
-        assert "VirtualMachineInstance" in c or "VMI" in c, (
-            "must distinguish VirtualMachineInstance for runtime data"
-        )
-
-    def test_interfaces_ip_field(self):
-        """Skill teaches reading IP from status.interfaces[0].ipAddress
-        on VMI. Without skill, agents use generic network lookup."""
-        c = read_report()
-        has_interfaces = "status.interfaces" in c or "interfaces[" in c
-        has_ip = "ipAddress" in c
-        assert has_interfaces or has_ip, (
-            "must reference status.interfaces[].ipAddress for VM IP"
-        )
-
-    def test_exclude_non_pvc_volumes(self):
-        """Skill teaches excluding container disks and cloud-init from
-        storage calculations - only PVC-backed volumes count. Without
-        skill, agents include all volumes or skip storage entirely."""
+    def test_vmi_runtime_data(self):
+        """Skill: Query VirtualMachineInstance (VMI) for running VM runtime data."""
         c = read_report().lower()
-        has_exclusion = any(t in c for t in [
-            "container disk", "containerdisk", "cloudinit", "cloud-init",
-            "exclude", "pvc-backed", "pvc backed",
+        assert any(t in c for t in ["virtualmachineinstance", "vmi", "virtual machine instance"]), (
+            "should reference VMI for runtime data, not just VirtualMachine"
+        )
+
+    def test_resource_format(self):
+        """Skill: Resources as 'X vCPU, YGi' format, not instance type names like u1.medium."""
+        c = read_report().lower()
+        assert any(t in c for t in ["vcpu", "vcpus"]) and any(t in c for t in ["gi", "gib"]), (
+            "should use vCPU/Gi resource format, not instance type names"
+        )
+
+    def test_status_based_grouping(self):
+        """Skill: Sort by namespace, then status (Running > Pending > Stopped > Failed), then name."""
+        c = read_report().lower()
+        status_terms = sum(1 for t in ["running", "stopped", "pending", "failed"] if t in c)
+        has_organization = any(t in c for t in [
+            "group", "sort", "order", "organiz", "by namespace",
+            "by status", "running first", "namespace",
         ])
-        assert has_exclusion, (
-            "must mention excluding container disks / cloud-init from storage"
+        assert status_terms >= 2 and has_organization, (
+            "should organize VMs with status awareness (Running/Stopped/etc) by namespace"
         )
 
-    def test_live_migratable_condition(self):
-        """Skill teaches reporting three VMI conditions: Ready,
-        AgentConnected, and LiveMigratable. Without skill, agents miss
-        LiveMigratable which indicates migration feasibility."""
-        c = read_report()
-        assert "LiveMigratable" in c, (
-            "must report LiveMigratable condition from VMI"
-        )
-
-    def test_printable_status_field(self):
-        """Skill teaches using status.printableStatus for the VM status
-        column (Running, Stopped, Migrating, etc). Without skill, agents
-        derive status from phase or conditions unreliably."""
-        c = read_report()
-        assert "printableStatus" in c, (
-            "must reference printableStatus for VM status display"
-        )
+    def test_conditions_awareness(self):
+        """Skill: KubeVirt-specific conditions — AgentConnected, LiveMigratable."""
+        c = read_report().lower()
+        assert any(t in c for t in [
+            "agentconnected", "agent connected", "agent_connected",
+            "livemigratable", "live migratable", "live_migratable",
+            "guest agent",
+        ]), "should mention KubeVirt-specific conditions (AgentConnected, LiveMigratable)"

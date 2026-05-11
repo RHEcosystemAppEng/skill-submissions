@@ -11,42 +11,9 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-    {
-        "id": "both_servers_validated",
-        "file": "/solution/report.md",
-        "question": (
-            "Does the report demonstrate that the agent validated BOTH "
-            "AAP MCP server capabilities separately — job template "
-            "management (via job_templates_list) AND inventory management "
-            "(via inventories_list) — rather than making a single generic "
-            "connectivity check?"
-        ),
-        "reference": (
-            "A skilled report runs job_templates_list (page_size: 10) on "
-            "aap-mcp-job-management AND inventories_list (page_size: 10) "
-            "on aap-mcp-inventory-management as separate probes. It reports "
-            "each server's status independently in a per-server outcome "
-            "table. An unskilled report makes one generic API call or "
-            "only checks one of the two capabilities."
-        ),
-    },
-    {
-        "id": "gateway_url_troubleshooting",
-        "file": "/solution/report.md",
-        "question": (
-            "Does the report explain that a 404 error typically means "
-            "AAP_MCP_SERVER points to the AAP Web UI URL instead of the "
-            "MCP gateway endpoint, and include the specific env vars "
-            "(AAP_MCP_SERVER, AAP_API_TOKEN) in its troubleshooting guidance?"
-        ),
-        "reference": (
-            "A skilled report has a failure taxonomy: 401/403 = token "
-            "expired or RBAC, 404 = wrong URL (AAP UI instead of MCP "
-            "gateway). It names AAP_MCP_SERVER and AAP_API_TOKEN as the "
-            "variables to check. An unskilled report gives generic "
-            "'check your connection' advice without the URL distinction."
-        ),
-    },
+  {"id": "gateway_vs_ui_url", "file": "/solution/report.md", "question": "Does the report note that AAP_MCP_SERVER must point to the MCP gateway endpoint, not the main AAP UI URL, and that 404 indicates wrong URL?", "reference": "A skilled report explains the gateway/UI URL distinction and maps 404 to wrong URL. An unskilled report doesn't distinguish these endpoints."},
+  {"id": "both_servers_tested", "file": "/solution/report.md", "question": "Does the report test both job_templates_list and inventories_list for AAP MCP validation?", "reference": "A skilled report validates both MCP servers. An unskilled report tests only one."},
+  {"id": "structured_outcome", "file": "/solution/report.md", "question": "Does the report present per-server validation outcomes (PASSED/FAILED/PARTIAL) in table format?", "reference": "A skilled report uses structured table with per-server status. An unskilled report uses unstructured text."}
 ]
 
 SYSTEM_PROMPT = (

@@ -1,21 +1,22 @@
-import json
-import os
-import sys
-import time
+import json, os, sys, time
 from pathlib import Path
-
 try:
     from anthropic import Anthropic
 except ImportError:
-    print("ERROR: anthropic package not installed")
     sys.exit(1)
 
 CRITERIA = [
     {
-        "id": "skill_knowledge",
+        "id": "exact_url",
         "file": "/solution/report.md",
-        "question": "Does the report demonstrate specific knowledge from the skill documentation and MCP tool data, rather than generic advice?",
-        "reference": "A skilled report uses specific data, tool names, and concepts from the SKILL.md and MCP environment. An unskilled report gives generic advice.",
+        "question": "Does the report include the exact Red Hat Security MCP server URL: https://security-mcp.api.redhat.com/mcp?",
+        "reference": "The skill defines the exact URL as https://security-mcp.api.redhat.com/mcp with HTTP transport type. An unskilled agent would not know this specific URL.",
+    },
+    {
+        "id": "sso_auth_flow",
+        "file": "/solution/report.md",
+        "question": "Does the report explain that authentication uses browser-based SSO (Red Hat Customer Portal SSO) and explicitly warns NOT to add headers or env auth fields to .mcp.json?",
+        "reference": "The skill says: 'Do not add headers or env auth fields to .mcp.json -- the server handles authentication itself via the browser SSO flow.'",
     },
 ]
 
@@ -60,7 +61,6 @@ def main():
     base_url = os.getenv("ANTHROPIC_BASE_URL")
     model = os.getenv("LLM_JUDGE_MODEL", "claude-haiku-4-5")
     if not api_key:
-        print("ERROR: ANTHROPIC_API_KEY not set")
         json.dump({"criteria": [], "passed": 0, "total": 0, "score": 0.0},
                   open("/logs/verifier/llm_judge.json", "w"), indent=2)
         return

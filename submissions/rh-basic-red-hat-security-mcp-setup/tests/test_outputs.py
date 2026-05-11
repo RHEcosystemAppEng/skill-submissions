@@ -1,6 +1,5 @@
-"""Tests for skill evaluation. Baseline + skill-dependent checks."""
-import os
-import pytest
+"""Red Hat Security MCP Setup tests."""
+import os, re, pytest
 
 REPORT = "/solution/report.md"
 
@@ -12,14 +11,44 @@ def read_report():
 
 class TestBaseline:
     def test_report_exists(self):
-        assert os.path.exists(REPORT), "report.md must exist"
-
+        assert os.path.exists(REPORT)
     def test_report_has_content(self):
-        content = read_report()
-        assert len(content) > 200, "report should have substantial content"
+        assert len(read_report()) > 200
 
-class TestSkillDependent:
-    def test_uses_mcp_data(self):
-        """Report should contain specific data from MCP tool queries."""
+class TestMCPServerConfig:
+    """Specific MCP server URL and key name from the SKILL.md."""
+    def test_server_key_name(self):
+        c = read_report()
+        assert "red-hat-security" in c
+    def test_http_transport(self):
         c = read_report().lower()
-        assert len(c) > 500, "report should demonstrate thorough analysis using MCP tools"
+        assert "http" in c
+    def test_server_url(self):
+        c = read_report()
+        assert "security-mcp.api.redhat.com" in c or "security-mcp" in c
+    def test_mcp_json_file(self):
+        c = read_report()
+        assert ".mcp.json" in c
+
+class TestMergeNotOverwrite:
+    """Skill specifically says merge, not overwrite."""
+    def test_merge_behavior(self):
+        c = read_report().lower()
+        assert "merge" in c or "without removing" in c or "existing" in c
+
+class TestSSOAuth:
+    """SSO browser login flow is skill-specific knowledge."""
+    def test_sso_mentioned(self):
+        c = read_report().lower()
+        assert "sso" in c or "browser" in c or "login" in c
+    def test_no_headers_or_env(self):
+        c = read_report().lower()
+        has_warning = "do not add" in c or "no headers" in c or "not add" in c or \
+                      "handles authentication" in c or "automatically" in c
+        assert has_warning, "Must warn not to add headers/env auth fields"
+
+class TestRedHatAccount:
+    """Requires Red Hat account/subscription."""
+    def test_red_hat_account(self):
+        c = read_report().lower()
+        assert "red hat" in c and ("account" in c or "subscription" in c or "console.redhat.com" in c)

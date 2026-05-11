@@ -11,30 +11,9 @@ except ImportError:
     sys.exit(1)
 
 CRITERIA = [
-    {
-        "id": "no_create_api",
-        "file": "/solution/report.md",
-        "question": "Does the report explicitly state that AAP has no API or MCP tool for creating job templates, and that template creation must be done via the AAP Web UI?",
-        "reference": "A skilled report explicitly acknowledges that job_templates_create does not exist and directs the user to the AAP Web UI for template creation. An unskilled report attempts to create templates via an API call or MCP tool, or does not mention the Web UI requirement at all.",
-    },
-    {
-        "id": "git_and_sync_prerequisite",
-        "file": "/solution/report.md",
-        "question": "Does the report require the playbook to be committed to a Git repository AND the AAP project to be synced before the template can reference it?",
-        "reference": "A skilled report treats Git commit + AAP project sync as a mandatory prerequisite before template creation. An unskilled report either skips Git entirely, uploads playbooks manually, or creates the template without ensuring the project is synced.",
-    },
-    {
-        "id": "prompt_on_launch_config",
-        "file": "/solution/report.md",
-        "question": "Does the report configure the template to prompt at launch time for at least two of: job type, variables, or host limit?",
-        "reference": "A skilled report enables prompt-on-launch for job type, extra variables, and host limit to give operators flexibility. An unskilled report hardcodes all execution parameters without launch-time prompts.",
-    },
-    {
-        "id": "privilege_escalation",
-        "file": "/solution/report.md",
-        "question": "Does the report enable privilege escalation (become/sudo) for the remediation template?",
-        "reference": "A skilled report enables become_enabled because remediation playbooks need root for package updates and service restarts. An unskilled report omits privilege escalation.",
-    },
+  {"id": "no_create_tool", "file": "/solution/report.md", "question": "Does the report acknowledge that AAP MCP has no create/update tools and template creation must be done via Web UI?", "reference": "A skilled report notes the MCP limitation and directs to Web UI. An unskilled report attempts to create templates via API."},
+  {"id": "playbook_path_and_git", "file": "/solution/report.md", "question": "Does the report require the playbook to be in a Git repo with proper path convention before template creation?", "reference": "A skilled report follows playbooks/remediation/ path convention. An unskilled report skips Git integration."},
+  {"id": "launch_configuration", "file": "/solution/report.md", "question": "Does the report configure prompt-on-launch for job type and privilege escalation?", "reference": "A skilled report enables prompt-on-launch and become_enabled. An unskilled report skips these configuration details."}
 ]
 
 SYSTEM_PROMPT = (

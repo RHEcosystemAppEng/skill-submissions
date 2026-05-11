@@ -6,7 +6,7 @@ Skill-dependent tests: based on empirical gaps between skilled and unskilled age
 import os
 import pytest
 
-REPORT = "/root/report.md"
+REPORT = "/solution/report.md"
 
 
 def read_report():

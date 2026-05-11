@@ -13,19 +13,19 @@ except ImportError:
 CRITERIA = [
   {
     "id": "observability_stack_awareness",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report recommend specific observability tools from the OpenShift AI ecosystem — specifically Tempo for distributed tracing AND Korrel8r for cross-domain correlation — as part of the observability strategy?",
     "reference": "A skilled report should mention BOTH Tempo (for distributed tracing of inference requests) and Korrel8r (for correlating signals across logs, metrics, traces, and alerts). These are specific tools the skill teaches. A report that only recommends generic Prometheus/Grafana monitoring without Tempo or Korrel8r is insufficient."
   },
   {
     "id": "gpu_metric_specificity",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report reference DCGM (Data Center GPU Manager) metric names (like DCGM_FI_DEV_FB_USED or DCGM_FI_DEV_GPU_UTIL) for GPU monitoring, rather than generic nvidia_gpu_memory metric names?",
     "reference": "A skilled report uses DCGM-specific metric names (DCGM_FI_DEV_*) which are the actual metrics exposed by the GPU operator on OpenShift. Using generic names like nvidia_gpu_memory_used_bytes suggests the agent doesn't know the specific metric naming convention."
   },
   {
     "id": "vllm_tuning_specificity",
-    "file": "/root/report.md",
+    "file": "/solution/report.md",
     "question": "Does the report recommend specific vLLM configuration parameters (like --max-model-len, --gpu-memory-utilization, or tensor parallelism) for resolving GPU memory issues, rather than only recommending generic resource increases?",
     "reference": "A skilled report should mention vLLM-specific tuning args like --max-model-len to limit KV cache size, --gpu-memory-utilization to control memory allocation, or tensor parallelism for multi-GPU distribution. Only recommending 'increase memory to 32Gi' without vLLM-specific configuration is insufficient."
   }

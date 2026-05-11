@@ -1,0 +1,13 @@
+name: rh-ai-engineer-model-registry
+description: "rh-ai-engineer model-registry Skill Evaluation"
+persona: rh-ai-engineer
+version: "1.0.0"
+generation_mode: manual
+tags:
+  - rh-ai-engineer
+  - model-registry
+cpus: 2
+memory_mb: 2048
+storage_mb: 10240
+experiment:
+  n_trials: 3

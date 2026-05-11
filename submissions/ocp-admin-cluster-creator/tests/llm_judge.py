@@ -12,40 +12,28 @@ except ImportError:
 
 CRITERIA = [
     {
-        "id": "sno_platform_none",
+        "id": "sno_specific_knowledge",
         "file": "/solution/report.md",
-        "question": "Does the report specify platform: 'none' for the SNO cluster creation?",
-        "reference": "A skilled report sets platform to 'none' for Single Node OpenShift. This is a Red Hat API requirement specific to SNO. An unskilled report uses 'baremetal' or 'vsphere' for SNO.",
+        "question": "Does the report correctly specify that SNO (Single-Node OpenShift) requires platform type 'none' and does not use VIPs, demonstrating knowledge specific to Assisted Installer SNO deployments?",
+        "reference": "A skilled report knows that SNO platform MUST be 'none' (Red Hat API requirement) and that VIPs are not applicable for SNO. An unskilled report either uses 'baremetal' for SNO or tries to configure VIPs for a single node.",
     },
     {
-        "id": "create_cluster_tool",
+        "id": "assisted_installer_workflow",
         "file": "/solution/report.md",
-        "question": "Does the report reference the create_cluster MCP tool with parameters like name, version, base_domain, single_node?",
-        "reference": "A skilled report uses create_cluster with specific parameters. An unskilled report uses generic API calls or doesn't specify the exact tool.",
+        "question": "Does the report describe the complete Assisted Installer workflow: cluster definition, ISO generation, host discovery, role assignment, readiness validation, and installation monitoring?",
+        "reference": "A skilled report follows the 12-step workflow from the SKILL: create cluster, generate ISO, discover hosts, assign roles, validate, install, monitor, retrieve credentials. An unskilled report skips key steps like ISO generation or host discovery.",
     },
     {
-        "id": "set_host_role",
+        "id": "mcp_tools_usage",
         "file": "/solution/report.md",
-        "question": "Does the report reference set_host_role with role values 'master' and/or 'worker'?",
-        "reference": "A skilled report uses set_host_role with Assisted Installer role names: 'master' and 'worker'. An unskilled report uses Kubernetes terminology like 'control-plane'.",
+        "question": "Does the report reference specific Assisted Installer MCP tools (list_versions, create_cluster, cluster_iso_download_url, install_cluster) and demonstrate using them?",
+        "reference": "A skilled report uses openshift-self-managed MCP tools by name and describes the API calls at each step. An unskilled report speaks generically about 'installing OpenShift' without referencing the actual tools.",
     },
     {
-        "id": "status_lifecycle",
+        "id": "cluster_creation_parameters",
         "file": "/solution/report.md",
-        "question": "Does the report describe the cluster status lifecycle: waiting for 'ready' before install, then monitoring for 'installed' or 'error'?",
-        "reference": "A skilled report monitors cluster status: 'ready' = can trigger install, 'installed' = success, 'error' = failure. An unskilled report doesn't describe the status lifecycle.",
-    },
-    {
-        "id": "iso_discovery_workflow",
-        "file": "/solution/report.md",
-        "question": "Does the report describe the discovery ISO workflow: generating an ISO via cluster_iso_download_url, booting hosts from it, and waiting for host discovery?",
-        "reference": "A skilled report describes the Assisted Installer's ISO-based discovery: generate ISO, boot bare metal hosts, wait for discovery. An unskilled report skips the ISO generation step or doesn't know about the host discovery process.",
-    },
-    {
-        "id": "install_cluster_trigger",
-        "file": "/solution/report.md",
-        "question": "Does the report reference install_cluster as an explicit API call to trigger the installation after hosts are validated and cluster is ready?",
-        "reference": "A skilled report calls install_cluster explicitly after readiness validation. An unskilled report assumes installation starts automatically or doesn't describe the trigger mechanism.",
+        "question": "Does the report specify the correct create_cluster parameters: cluster name, base_dns_domain, openshift_version, high_availability_mode, platform type, and cpu_architecture?",
+        "reference": "A skilled report provides concrete values for all required parameters matching the task scenario (edge-site-01, edge.example.com, 4.15, None for HA mode, none for platform, x86_64). An unskilled report misses key parameters or uses wrong values.",
     },
 ]
 

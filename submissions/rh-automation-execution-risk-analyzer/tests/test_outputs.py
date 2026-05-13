@@ -1,7 +1,14 @@
-"""Execution risk analyzer tests - inventory classification, secret scanning, scope."""
-import os, re, pytest
+"""
+Tests for rh-automation-execution-risk-analyzer per-skill evaluation.
+
+Only differentiating tests kept — dead-weight tests where both
+control and treatment pass 3/3 have been removed.
+"""
+import os
+import pytest
 
 REPORT = "/solution/report.md"
+
 
 def read_report():
     if not os.path.exists(REPORT):
@@ -9,38 +16,56 @@ def read_report():
     with open(REPORT) as f:
         return f.read()
 
+
 class TestBaseline:
     def test_report_exists(self):
-        assert os.path.exists(REPORT)
-    def test_report_has_content(self):
-        assert len(read_report()) > 400
+        assert os.path.exists(REPORT), "report.md must exist"
 
-class TestInventoryClassification:
-    """Production/staging/dev classification is skill-specific."""
-    def test_risk_classification(self):
-        c = read_report().lower()
-        assert any(level in c for level in ["critical", "high", "medium", "low"])
-    def test_production_identified(self):
-        c = read_report().lower()
-        assert "production" in c or "prod" in c
-    def test_inventory_scope(self):
-        c = read_report().lower()
-        assert "host" in c and ("count" in c or "scope" in c or "target" in c or re.search(r'\d+\s*host', c))
 
-class TestSecretScanning:
-    """Scanning extra_vars for secrets is a key differentiator."""
-    def test_extra_vars_inspection(self):
-        c = read_report().lower()
-        assert "extra_var" in c or "variable" in c
-    def test_secret_scanning(self):
-        c = read_report().lower()
-        assert any(term in c for term in ["secret", "password", "token", "key", "credential", "sensitive"])
+class TestSkillDependent:
+    def test_ask_launch_flags(self):
+        """Skill teaches checking ask_* launch flags (ask_diff_mode_on_launch,
+        ask_job_type_on_launch, ask_limit_on_launch) as risk indicators.
+        Without skill, agents don't check these AAP-specific flags."""
+        c = read_report()
+        has_ask = any(f in c for f in [
+            "ask_diff_mode_on_launch",
+            "ask_job_type_on_launch",
+            "ask_limit_on_launch",
+            "ask_variables_on_launch",
+        ])
+        assert has_ask, (
+            "must check ask_*_on_launch flags as risk indicators"
+        )
 
-class TestCheckMode:
-    """Recommending check mode / dry run before production execution."""
+    def test_job_templates_retrieve_tool(self):
+        """Skill teaches using job_templates_retrieve MCP tool to get
+        template details for risk analysis."""
+        c = read_report()
+        assert "job_templates_retrieve" in c, (
+            "must reference job_templates_retrieve MCP tool"
+        )
+
+    def test_hosts_list_fleet_scope(self):
+        """Skill teaches using hosts_list to count target hosts and
+        calculate fleet percentage for scope assessment."""
+        c = read_report()
+        assert "hosts_list" in c, (
+            "must reference hosts_list tool for scope assessment"
+        )
+
+    def test_extra_vars_secret_scanning(self):
+        """Skill teaches scanning extra_vars for secret patterns
+        (passwords, tokens, keys). Without skill, agents skip this."""
+        c = read_report()
+        assert "extra_vars" in c, (
+            "must reference extra_vars scanning for secrets"
+        )
+
     def test_check_mode_recommendation(self):
-        c = read_report().lower()
-        assert "check mode" in c or "dry run" in c or "check" in c
-    def test_approval_gate(self):
-        c = read_report().lower()
-        assert "approv" in c or "confirm" in c or "gate" in c
+        """Skill teaches recommending check mode (dry run) before
+        production execution based on risk level."""
+        c = read_report()
+        assert "check" in c.lower() and "mode" in c.lower(), (
+            "must recommend check mode for risk mitigation"
+        )

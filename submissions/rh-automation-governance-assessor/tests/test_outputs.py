@@ -1,7 +1,14 @@
-"""Governance assessor tests - 7+1 domains, scoring, remediation."""
-import os, re, pytest
+"""
+Tests for rh-automation-governance-assessor per-skill evaluation.
+
+Only differentiating tests kept — dead-weight tests where both
+control and treatment pass 3/3 have been removed.
+"""
+import os
+import pytest
 
 REPORT = "/solution/report.md"
+
 
 def read_report():
     if not os.path.exists(REPORT):
@@ -9,45 +16,50 @@ def read_report():
     with open(REPORT) as f:
         return f.read()
 
+
 class TestBaseline:
     def test_report_exists(self):
-        assert os.path.exists(REPORT)
-    def test_report_has_content(self):
-        assert len(read_report()) > 600
+        assert os.path.exists(REPORT), "report.md must exist"
 
-class TestGovernanceDomains:
-    """The 7+1 domains are defined in the skill."""
-    def test_workflow_governance(self):
-        c = read_report().lower()
-        assert "workflow" in c and ("governance" in c or "approval" in c)
-    def test_notification_coverage(self):
-        c = read_report().lower()
-        assert "notification" in c
-    def test_rbac(self):
-        c = read_report().lower()
-        assert "rbac" in c or "access control" in c or "role" in c
-    def test_credential_security(self):
-        c = read_report().lower()
-        assert "credential" in c
-    def test_execution_environments(self):
-        c = read_report().lower()
-        assert "execution environment" in c or "ee" in c or "custom ee" in c
-    def test_workload_isolation(self):
-        c = read_report().lower()
-        assert "isolation" in c or "instance group" in c
-    def test_audit_trail(self):
-        c = read_report().lower()
-        assert "audit" in c
 
-class TestScoring:
-    def test_has_scores(self):
+class TestSkillDependent:
+    def test_governance_readiness_assessor_invocation(self):
+        """Skill teaches invoking governance-readiness-assessor sub-skill
+        for the 7-domain assessment. Without skill, agents do freeform audit."""
         c = read_report()
-        assert re.search(r'\d+%', c) or re.search(r'\d+/\d+', c), "Must include scores"
-    def test_overall_readiness(self):
-        c = read_report().lower()
-        assert "readiness" in c or "overall" in c or "pass" in c or "fail" in c
+        assert "governance-readiness-assessor" in c or "readiness-assessor" in c, (
+            "must reference governance-readiness-assessor sub-skill"
+        )
 
-class TestRemediation:
-    def test_remediation_items(self):
-        c = read_report().lower()
-        assert "remediat" in c or "fix" in c or "action" in c or "recommend" in c
+    def test_aap_mcp_validator_invocation(self):
+        """Skill teaches invoking aap-mcp-validator as first step
+        before any assessment queries."""
+        c = read_report()
+        assert "aap-mcp-validator" in c or "mcp-validator" in c, (
+            "must reference aap-mcp-validator sub-skill invocation"
+        )
+
+    def test_compound_risk_analysis(self):
+        """Skill teaches cross-domain compound risk analysis identifying
+        combinations like 'no workflows + no notifications = invisible failures'.
+        Without skill, agents assess domains independently."""
+        c = read_report()
+        assert "compound" in c.lower() or "cross-domain" in c.lower() or "correlation" in c.lower(), (
+            "must include compound/cross-domain risk analysis"
+        )
+
+    def test_governance_readiness_doc(self):
+        """Skill teaches consulting governance-readiness.md for the
+        7-domain assessment framework with Red Hat citations."""
+        c = read_report()
+        assert "governance-readiness" in c, (
+            "must reference governance-readiness.md"
+        )
+
+    def test_execution_summary_invocation(self):
+        """Skill teaches invoking execution-summary sub-skill as final
+        step to produce audit trail."""
+        c = read_report()
+        assert "execution-summary" in c or "execution summary" in c.lower(), (
+            "must reference execution-summary sub-skill"
+        )

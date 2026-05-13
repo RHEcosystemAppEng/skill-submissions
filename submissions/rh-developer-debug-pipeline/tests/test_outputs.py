@@ -1,7 +1,8 @@
 """
-Tests for rh-developer__debug-pipeline per-skill evaluation.
-Baseline tests: report structure.
-Skill-dependent tests: methodology checks that require skill knowledge.
+Tests for rh-developer-debug-pipeline per-skill evaluation.
+
+Only differentiating tests kept — dead-weight tests where both
+control and treatment pass 3/3 have been removed.
 """
 import os
 import pytest
@@ -20,34 +21,51 @@ class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
-    def test_mentions_pipeline(self):
-        content = read_report().lower()
-        assert "pipeline" in content, "report should mention pipeline"
-
-    def test_report_has_structure(self):
-        content = read_report()
-        assert len(content) > 150, "report should have substantial content"
-
 
 class TestSkillDependent:
-    def test_pipelinerun_taskrun_hierarchy(self):
-        """Skill teaches PipelineRun → TaskRun → Step hierarchy to find failure."""
-        c = read_report().lower()
-        assert any(t in c for t in ["pipelinerun", "pipeline run"]) and any(t in c for t in [
-            "taskrun", "task run", "task"
-        ]), "should drill PipelineRun→TaskRun hierarchy"
-
-    def test_concrete_remediation(self):
-        """Skill teaches distinguishing transient vs config fix needed."""
-        c = read_report().lower()
-        assert any(t in c for t in ["retry", "rerun", "fix", "remediat", "resolv"]), (
-            "should provide remediation guidance"
+    def test_step_container_naming_convention(self):
+        """Skill teaches that Tekton names step containers as
+        step-<step-name> in TaskRun pods. Without skill, agents
+        don't know this naming convention for log retrieval."""
+        c = read_report()
+        assert "step-" in c, (
+            "must reference step-<step-name> container naming convention"
         )
 
-    def test_taskrun_label_filter(self):
-        """Docs teach filtering TaskRuns by parent pipeline using
-        tekton.dev/pipelineRun=<name> label. Without docs, agents list all TaskRuns."""
-        c = read_report().lower()
-        assert "tekton.dev/pipelinerun" in c or ("label" in c and "pipelinerun" in c) or (
-            "filter" in c and "taskrun" in c
-        ), "should filter TaskRuns by pipelineRun label"
+    def test_resources_get_mcp_tool(self):
+        """Skill teaches using resources_get MCP tool to inspect
+        PipelineRun and TaskRun status. Without skill, agents
+        describe kubectl commands."""
+        c = read_report()
+        assert "resources_get" in c, (
+            "must reference resources_get MCP tool"
+        )
+
+    def test_tekton_crd_api_version(self):
+        """Skill teaches the exact apiVersion tekton.dev/v1 for
+        PipelineRun/TaskRun CRDs. Without skill, agents may use
+        wrong version or omit it."""
+        c = read_report()
+        assert "tekton.dev/v1" in c, (
+            "must reference tekton.dev/v1 apiVersion"
+        )
+
+    def test_trigger_resources(self):
+        """Skill teaches EventListener/TriggerTemplate/TriggerBinding
+        CRDs under triggers.tekton.dev/v1beta1 for debugging
+        trigger-related failures."""
+        c = read_report()
+        has_trigger = "EventListener" in c or "TriggerTemplate" in c or "TriggerBinding" in c
+        has_api = "triggers.tekton.dev" in c
+        assert has_trigger or has_api, (
+            "must reference Tekton trigger CRDs"
+        )
+
+    def test_status_child_references(self):
+        """Skill teaches extracting task statuses from PipelineRun
+        .status.childReferences field path. Without skill, agents
+        don't know this specific status structure."""
+        c = read_report()
+        assert "childReferences" in c or "taskRuns" in c, (
+            "must reference .status.childReferences or .status.taskRuns"
+        )

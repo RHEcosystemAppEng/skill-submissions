@@ -1,7 +1,14 @@
-"""Model monitor skill tests - TrustyAI bias/drift metrics."""
-import os, re, pytest
+"""
+Tests for rh-ai-engineer-model-monitor per-skill evaluation.
+
+Only differentiating tests kept — dead-weight tests where both
+control and treatment pass 3/3 have been removed.
+"""
+import os
+import pytest
 
 REPORT = "/solution/report.md"
+
 
 def read_report():
     if not os.path.exists(REPORT):
@@ -9,47 +16,52 @@ def read_report():
     with open(REPORT) as f:
         return f.read()
 
+
 class TestBaseline:
     def test_report_exists(self):
-        assert os.path.exists(REPORT)
-    def test_report_has_content(self):
-        assert len(read_report()) > 500
+        assert os.path.exists(REPORT), "report.md must exist"
 
-class TestTrustyAI:
-    """TrustyAI-specific knowledge."""
-    def test_trustyai_mentioned(self):
-        c = read_report().lower()
-        assert "trustyai" in c
-    def test_trustyai_service_crd(self):
-        c = read_report().lower()
-        assert "trustyaiservice" in c or "trustyai service" in c or "crd" in c
 
-class TestBiasMetrics:
-    """SPD and DIR are TrustyAI-specific fairness metrics."""
-    def test_spd_metric(self):
-        c = read_report().lower()
-        assert "spd" in c or "statistical parity difference" in c
-    def test_dir_metric(self):
-        c = read_report().lower()
-        assert "dir" in c or "disparate impact ratio" in c
-    def test_protected_attribute(self):
-        c = read_report().lower()
-        assert "protected" in c or "attribute" in c or "applicant" in c
-    def test_threshold_values(self):
+class TestSkillDependent:
+    def test_mcp_tool_resources_create_or_update(self):
+        """Skill teaches using resources_create_or_update MCP tool to create
+        TrustyAIService CR and metric ConfigMaps. Without skill, agents
+        describe generic kubectl or manual steps."""
         c = read_report()
-        assert re.search(r'0\.[01]\d*', c), "Must specify numeric threshold"
+        assert "resources_create_or_update" in c, (
+            "must reference resources_create_or_update MCP tool"
+        )
 
-class TestDriftDetection:
-    """Drift detection methods are skill-specific."""
-    def test_drift_mentioned(self):
-        c = read_report().lower()
-        assert "drift" in c
-    def test_meanshift_or_fouriermmd(self):
-        c = read_report().lower()
-        assert "meanshift" in c or "mean shift" in c or "fouriermmd" in c or "fourier" in c or "mmd" in c
+    def test_trustyai_cr_api_version(self):
+        """Skill teaches the exact apiVersion trustyai.opendatahub.io/v1alpha1
+        for the TrustyAIService CR. Without skill, agents omit or guess."""
+        c = read_report()
+        assert "trustyai.opendatahub.io/v1alpha1" in c, (
+            "must reference trustyai.opendatahub.io/v1alpha1 apiVersion"
+        )
 
-class TestPrometheusMetrics:
-    """Skill requires querying trustyai_spd/trustyai_dir metrics."""
-    def test_prometheus_metrics(self):
-        c = read_report().lower()
-        assert "trustyai_spd" in c or "trustyai_dir" in c or "prometheus" in c
+    def test_prometheus_query_tool(self):
+        """Skill teaches using prometheus_query MCP tool to validate
+        TrustyAI metrics. Without skill, agents describe manual PromQL."""
+        c = read_report()
+        assert "prometheus_query" in c, (
+            "must reference prometheus_query MCP tool for metrics validation"
+        )
+
+    def test_raw_deployment_payload_logging(self):
+        """Skill teaches that RawDeployment mode prevents payload logging
+        to TrustyAI. Without skill, agents don't know this limitation."""
+        c = read_report()
+        has_raw = "RawDeployment" in c
+        has_payload = "payload logging" in c.lower() or "payload" in c.lower()
+        assert has_raw or has_payload, (
+            "must address RawDeployment payload logging limitation"
+        )
+
+    def test_trustyai_pod_label_selector(self):
+        """Skill teaches using labelSelector app.kubernetes.io/name=trustyai-service
+        to find TrustyAI pods. Without skill, agents don't know this label."""
+        c = read_report()
+        assert "app.kubernetes.io/name" in c or "trustyai-service" in c, (
+            "must reference TrustyAI pod label selector"
+        )

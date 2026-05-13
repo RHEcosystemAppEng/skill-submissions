@@ -1,7 +1,14 @@
-"""Pipeline manage skill tests - DSPA, KFP 2.0, scheduling."""
-import os, re, pytest
+"""
+Tests for rh-ai-engineer-pipeline-manage per-skill evaluation.
+
+Only differentiating tests kept — dead-weight tests where both
+control and treatment pass 3/3 have been removed.
+"""
+import os
+import pytest
 
 REPORT = "/solution/report.md"
+
 
 def read_report():
     if not os.path.exists(REPORT):
@@ -9,44 +16,52 @@ def read_report():
     with open(REPORT) as f:
         return f.read()
 
+
 class TestBaseline:
     def test_report_exists(self):
-        assert os.path.exists(REPORT)
-    def test_report_has_content(self):
-        assert len(read_report()) > 500
+        assert os.path.exists(REPORT), "report.md must exist"
 
-class TestDSPA:
-    """DSPA (DataSciencePipelinesApplication) is RHOAI-specific."""
-    def test_dspa_mentioned(self):
-        c = read_report().lower()
-        assert "dspa" in c or "datasciencepipelinesapplication" in c or "pipeline server" in c
-    def test_kubeflow_pipelines(self):
-        c = read_report().lower()
-        assert "kubeflow" in c or "kfp" in c or "data science pipeline" in c
 
-class TestPipelineRun:
-    """Pipeline run submission and monitoring."""
-    def test_pipeline_run(self):
-        c = read_report().lower()
-        assert "pipelinerun" in c or "pipeline run" in c
-    def test_yaml_definition(self):
-        c = read_report().lower()
-        assert "yaml" in c or "definition" in c
-    def test_step_level_monitoring(self):
-        c = read_report().lower()
-        assert "step" in c and ("log" in c or "status" in c or "progress" in c)
-
-class TestScheduling:
-    """Scheduled/recurring runs use ScheduledWorkflow CR or cron."""
-    def test_scheduling(self):
-        c = read_report().lower()
-        assert "schedul" in c or "recurring" in c or "cron" in c
-    def test_cron_expression(self):
+class TestSkillDependent:
+    def test_dspa_api_version(self):
+        """Skill teaches the DSPA CRD apiVersion
+        datasciencepipelinesapplications.opendatahub.io/v1alpha1.
+        Without skill, agents don't know how to create/check DSPA."""
         c = read_report()
-        assert re.search(r'\d+\s+\d+\s+\*', c) or "cron" in c.lower()
+        assert "datasciencepipelinesapplications.opendatahub.io" in c, (
+            "must reference DSPA CRD apiVersion"
+        )
 
-class TestLifecycle:
-    """Pipeline lifecycle management."""
-    def test_delete_warning(self):
-        c = read_report().lower()
-        assert "delet" in c and ("warn" in c or "confirm" in c or "caution" in c)
+    def test_scheduled_workflow_crd(self):
+        """Skill teaches ScheduledWorkflow CRD from
+        scheduledworkflows.kubeflow.org/v1beta1 for recurring runs.
+        Without skill, agents describe generic cron jobs."""
+        c = read_report()
+        assert "ScheduledWorkflow" in c or "scheduledworkflows.kubeflow.org" in c, (
+            "must reference ScheduledWorkflow CRD for recurring pipeline runs"
+        )
+
+    def test_status_child_references(self):
+        """Skill teaches extracting task statuses from PipelineRun
+        .status.childReferences. Without skill, agents don't know
+        the field path for step-level progress."""
+        c = read_report()
+        assert "childReferences" in c or "taskRuns" in c, (
+            "must reference .status.childReferences or .status.taskRuns"
+        )
+
+    def test_tekton_pipelinerun_label(self):
+        """Skill teaches using labelSelector tekton.dev/pipelineRun to
+        find pipeline step pods. Without skill, agents list all pods."""
+        c = read_report()
+        assert "tekton.dev/pipelineRun" in c, (
+            "must reference tekton.dev/pipelineRun label selector"
+        )
+
+    def test_resources_create_or_update_tool(self):
+        """Skill teaches using resources_create_or_update MCP tool to
+        create DSPA, PipelineRun, and ScheduledWorkflow CRs."""
+        c = read_report()
+        assert "resources_create_or_update" in c, (
+            "must reference resources_create_or_update MCP tool"
+        )

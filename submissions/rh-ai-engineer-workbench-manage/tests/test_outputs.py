@@ -1,7 +1,8 @@
 """
-Tests for rh-ai-engineer__workbench-manage per-skill evaluation.
-Baseline tests: report structure.
-Skill-dependent tests: methodology checks that require skill knowledge.
+Tests for rh-ai-engineer-workbench-manage per-skill evaluation.
+
+Only differentiating tests kept — dead-weight tests where both
+control and treatment pass 3/3 have been removed.
 """
 import os
 import pytest
@@ -20,54 +21,53 @@ class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
-    def test_mentions_topic(self):
-        content = read_report().lower()
-        assert any(t in content for t in ["workbench", "notebook"]), (
-            "report should mention workbench or notebook"
-        )
-
-    def test_report_has_structure(self):
-        content = read_report()
-        assert len(content) > 200, "report should have substantial content"
-
 
 class TestSkillDependent:
-    def test_stop_preserves_data(self):
-        """Skill teaches: stopping a workbench preserves PVC data; only delete removes it."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "stop", "preserve", "data", "pvc", "storage",
-            "stopped", "restart", "start again",
-        ]), "should explain that stop preserves data vs delete"
-
-    def test_delete_pvc_warning(self):
-        """Skill teaches: deleting workbench requires separate confirmation for PVC; warn about permanent data loss."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "pvc", "delete", "data loss", "permanent", "warning",
-            "volume", "storage", "backup", "cannot be undone",
-        ]), "should warn about PVC/data loss on deletion"
-
-    def test_lifecycle_operations(self):
-        """Skill teaches: create, start, stop, delete with distinct implications."""
-        c = read_report().lower()
-        ops = sum(1 for t in ["start", "stop", "delet", "creat"] if t in c)
-        assert ops >= 2, "should describe lifecycle operations (create, start, stop, delete)"
-
-    def test_list_notebook_images_tool(self):
-        """Skill teaches: list_notebook_images MCP tool to discover available notebook images."""
-        c = read_report().lower()
-        assert any(t in c for t in ["list_notebook_images", "notebook images", "available images"]), (
-            "should reference list_notebook_images tool (skill)"
+    def test_notebook_cr_kind(self):
+        """Skill teaches Notebook CR (kubeflow.org/v1) as the underlying
+        resource for RHOAI workbenches. Without skill, agents describe
+        the dashboard UI or generic pod creation."""
+        c = read_report()
+        assert "kubeflow.org/v1" in c or "kind: Notebook" in c or "Notebook CR" in c, (
+            "must reference kubeflow.org/v1 Notebook CR"
         )
 
-    def test_gpu_tuning_awareness(self):
-        """Docs teach GPU scheduling triage and OOM mitigation using
-        model/context-size controls for workbenches with GPU resources.
-        Without docs, agents don't address GPU resource tuning."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "gpu", "oom", "context size", "max-model-len", "memory",
-        ]) and any(t in c for t in ["workbench", "notebook", "resource", "gpu"]), (
-            "should address GPU/OOM tuning for workbench resources"
+    def test_kubeflow_resource_stopped_annotation(self):
+        """Skill teaches kubeflow-resource-stopped annotation to stop/start
+        workbenches. Without skill, agents don't know this mechanism."""
+        c = read_report()
+        assert "kubeflow-resource-stopped" in c, (
+            "must reference kubeflow-resource-stopped annotation for stop/start"
+        )
+
+    def test_notebook_image_label(self):
+        """Skill teaches discovering notebook images via ImageStream with
+        label opendatahub.io/notebook-image=true. Without skill, agents
+        use generic image references."""
+        c = read_report()
+        has_label = "opendatahub.io/notebook-image" in c
+        has_imagestream = "ImageStream" in c and "redhat-ods-applications" in c
+        assert has_label or has_imagestream, (
+            "must reference notebook image discovery via opendatahub.io/notebook-image label"
+        )
+
+    def test_rhoai_mcp_workbench_tools(self):
+        """Skill teaches using create_workbench / start_workbench /
+        stop_workbench MCP tools from rhoai server. Without skill,
+        agents use generic kubectl."""
+        c = read_report()
+        has_create = "create_workbench" in c
+        has_start = "start_workbench" in c
+        has_stop = "stop_workbench" in c
+        assert has_create or has_start or has_stop, (
+            "must reference rhoai MCP workbench tools"
+        )
+
+    def test_image_openshift_io_imagestream(self):
+        """Skill teaches browsing image.openshift.io/v1 ImageStreams to
+        discover available notebook images and tags. Without skill,
+        agents hardcode image references."""
+        c = read_report()
+        assert "image.openshift.io" in c or "ImageStream" in c, (
+            "must reference image.openshift.io ImageStream for image discovery"
         )

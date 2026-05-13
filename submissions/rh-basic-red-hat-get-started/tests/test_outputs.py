@@ -1,7 +1,14 @@
-"""Red Hat Get Started (skills installer) tests."""
-import os, pytest
+"""
+Tests for rh-basic-red-hat-get-started per-skill evaluation.
+
+Only differentiating tests kept — dead-weight tests where both
+control and treatment pass 3/3 have been removed.
+"""
+import os
+import pytest
 
 REPORT = "/solution/report.md"
+
 
 def read_report():
     if not os.path.exists(REPORT):
@@ -9,39 +16,57 @@ def read_report():
     with open(REPORT) as f:
         return f.read()
 
+
 class TestBaseline:
     def test_report_exists(self):
-        assert os.path.exists(REPORT)
-    def test_report_has_content(self):
-        assert len(read_report()) > 300
+        assert os.path.exists(REPORT), "report.md must exist"
 
-class TestSkillsList:
-    """The 5 specific skills are defined in the SKILL.md."""
-    def test_cve_explainer(self):
-        assert "red-hat-cve-explainer" in read_report().lower() or "cve explainer" in read_report().lower()
-    def test_diagnostics(self):
-        assert "red-hat-diagnostics" in read_report().lower() or "diagnostics" in read_report().lower()
-    def test_product_lifecycle(self):
-        assert "red-hat-product-lifecycle" in read_report().lower() or "product lifecycle" in read_report().lower()
-    def test_security_mcp_setup(self):
-        assert "red-hat-security-mcp-setup" in read_report().lower() or "security mcp" in read_report().lower()
-    def test_support_severity(self):
-        assert "red-hat-support-severity" in read_report().lower() or "support severity" in read_report().lower()
 
-class TestSkillsRepo:
-    """Must reference the specific SKILLS_REPO URL."""
+class TestSkillDependent:
     def test_skills_repo_url(self):
+        """Skill teaches the exact SKILLS_REPO URL pointing to
+        agentic-collections/tree/main/rh-basic/skills. Without skill,
+        agents don't know where to fetch skills from."""
         c = read_report()
-        assert "agentic-collections" in c or "RHEcosystemAppEng" in c
+        assert "agentic-collections" in c, (
+            "must reference agentic-collections repo"
+        )
 
-class TestInstallerWorkflow:
-    """Installer-specific behaviors: post-install summary and self-destruct."""
-    def test_post_install_summary(self):
+    def test_red_hat_cve_explainer_skill(self):
+        """Skill teaches installing red-hat-cve-explainer as one of
+        the 5 specific skills. Without skill, agents don't know the
+        exact skill names."""
+        c = read_report()
+        assert "red-hat-cve-explainer" in c or "cve-explainer" in c, (
+            "must reference red-hat-cve-explainer skill"
+        )
+
+    def test_red_hat_security_mcp_setup_skill(self):
+        """Skill teaches installing red-hat-security-mcp-setup as one
+        of the 5 skills, and recommending it as first post-install step."""
+        c = read_report()
+        assert "red-hat-security-mcp-setup" in c or "security-mcp-setup" in c, (
+            "must reference red-hat-security-mcp-setup skill"
+        )
+
+    def test_self_destruct_behavior(self):
+        """Skill teaches self-destructing after installation — removing
+        its own directory. Without skill, agents don't know this pattern."""
+        c = read_report()
+        has_self = "self-destruct" in c.lower() or "removed itself" in c.lower()
+        has_remove = "remove" in c.lower() and "installer" in c.lower()
+        assert has_self or has_remove, (
+            "must reference installer self-destruct behavior"
+        )
+
+    def test_five_specific_skills(self):
+        """Skill teaches exactly 5 skills to install. Without skill,
+        agents don't know the full list."""
         c = read_report().lower()
-        assert "install" in c and ("summary" in c or "available" in c or "command" in c)
-    def test_failure_handling(self):
-        c = read_report().lower()
-        assert "fail" in c or "error" in c or "manual" in c
-    def test_self_destruct(self):
-        c = read_report().lower()
-        assert "self" in c or "remov" in c or "delet" in c
+        count = sum(1 for s in [
+            "cve-explainer", "diagnostics", "product-lifecycle",
+            "security-mcp-setup", "support-severity"
+        ] if s in c)
+        assert count >= 4, (
+            "must reference at least 4 of 5 specific skill names"
+        )

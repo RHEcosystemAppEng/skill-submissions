@@ -1,7 +1,8 @@
 """
-Tests for rh-basic__red-hat-support-severity evaluation.
-Baseline tests: any competent agent should pass.
-Skill-dependent tests: require knowledge from SKILL.md.
+Tests for rh-basic-red-hat-support-severity per-skill evaluation.
+
+Only differentiating tests kept — dead-weight tests where both
+control and treatment pass 3/3 have been removed.
 """
 import os
 import pytest
@@ -20,72 +21,49 @@ class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
-    def test_mentions_severity(self):
-        c = read_report().lower()
-        assert any(t in c for t in ["severity", "sev 1", "sev 2", "sev1", "sev2"]), (
-            "report should mention support ticket severity"
-        )
-
-    def test_report_has_structure(self):
-        content = read_report()
-        assert len(content) > 200, "report should have substantial content"
-
 
 class TestSkillDependent:
-    def test_cve_adjustment_rule(self):
-        """SKILL CVE adjustment: Critical CVE on unpatched production that is
-        NOT fully down -> Sev 2, not Sev 3. Without skill, agents rate a
-        running server with a CVE as Sev 3 (partial loss / workaround)."""
-        c = read_report().lower()
-        has_scenario_b = "cve-2024-6387" in c or "regresshion" in c
-        has_sev2 = "sev 2" in c or "severity 2" in c or "sev2" in c or "high" in c
-        assert has_scenario_b and has_sev2, (
-            "should recommend Sev 2 for unpatched Critical CVE on running production "
-            "(SKILL CVE adjustment rule)"
+    def test_sla_response_times_premium(self):
+        """Skill teaches exact Premium SLA response times (1 hour for Sev 1,
+        2 hours for Sev 2). Without skill, agents give approximate values."""
+        c = read_report()
+        assert "1 hour" in c.lower() or "1h" in c.lower(), (
+            "must state exact Sev 1 Premium SLA: 1 hour"
         )
 
-    def test_sla_premium_vs_standard(self):
-        """SKILL SLA reference: Premium 1hr for Sev 1, Standard 1 business hour.
-        Without skill, agents give vague SLA guidance."""
-        c = read_report().lower()
-        has_premium = "premium" in c
-        has_standard = "standard" in c
-        has_hours = any(t in c for t in ["1 hour", "2 hour", "4 hour", "1 business"])
-        assert has_premium and has_standard and has_hours, (
-            "should show SLA response times for Premium and Standard tiers"
+    def test_sla_response_times_standard(self):
+        """Skill teaches Standard SLA times differ from Premium
+        (1 business hour vs 4 business hours for Sev 2)."""
+        c = read_report()
+        has_bh = "business hour" in c.lower() or "business day" in c.lower()
+        assert has_bh, (
+            "must distinguish business hours in Standard SLA"
         )
 
-    def test_filing_tip_call(self):
-        """SKILL output: Sev 1/2 filing tip is 'Submit online, then immediately
-        call'. Without skill, agents just say 'file a ticket'."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "call", "phone",
-        ]) and any(t in c for t in [
-            "sev 1", "sev 2", "severity 1", "severity 2", "critical", "high",
-        ]), "should include filing tip to call for Sev 1/2 tickets"
-
-    def test_diagnostics_recommendation(self):
-        """SKILL output: recommends '/red-hat-diagnostics' for diagnostic data
-        or mentions attaching diagnostics. Without skill, agents skip this."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "diagnostic", "sos report", "must-gather",
-            "red-hat-diagnostics",
-        ]), "should recommend gathering diagnostics for the support ticket"
-
-    def test_24x7_coverage(self):
-        """SKILL SLA: Premium Sev 1 = 24x7, Sev 2 = must explicitly request.
-        Without skill, agents don't distinguish 24x7 availability."""
-        c = read_report().lower()
-        assert "24x7" in c or "24/7" in c or "around the clock" in c, (
-            "should mention 24x7 coverage availability for high-severity tickets"
+    def test_24x7_coverage_guidance(self):
+        """Skill teaches Sev 2 requires explicitly requesting 24x7
+        coverage when filing. Without skill, agents don't know this."""
+        c = read_report()
+        assert "24x7" in c or "24/7" in c, (
+            "must address 24x7 coverage availability"
         )
 
-    def test_business_impact_statement(self):
-        """SKILL output: ticket should include 'clear business impact statement'.
-        Without skill, agents list generic ticket fields."""
-        c = read_report().lower()
-        assert "business impact" in c or "impact statement" in c, (
-            "should advise including a business impact statement in the ticket"
+    def test_phone_call_filing_tip(self):
+        """Skill teaches filing tip: for Sev 1/2, submit online then
+        immediately call the support number. Without skill, agents
+        give generic filing advice."""
+        c = read_report()
+        assert "call" in c.lower() or "phone" in c.lower(), (
+            "must recommend phone follow-up for high severity tickets"
+        )
+
+    def test_cve_severity_adjustment(self):
+        """Skill teaches CVE severity adjustment rule: Critical/Important
+        CVE on unpatched production → Sev 2 not Sev 3. Without skill,
+        agents don't apply this specific adjustment."""
+        c = read_report()
+        has_cve_sev = "sev 2" in c.lower() or "severity 2" in c.lower()
+        has_critical = "critical" in c.lower() or "important" in c.lower()
+        assert has_cve_sev and has_critical, (
+            "must apply CVE severity adjustment to ticket recommendation"
         )

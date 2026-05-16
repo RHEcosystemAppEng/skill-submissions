@@ -2,7 +2,7 @@
 Tests for rh-basic-red-hat-get-started per-skill evaluation.
 
 Only differentiating tests kept — dead-weight tests where both
-control and treatment pass 3/3 have been removed.
+control and treatment pass have been removed.
 """
 import os
 import pytest
@@ -23,50 +23,72 @@ class TestBaseline:
 
 
 class TestSkillDependent:
-    def test_skills_repo_url(self):
-        """Skill teaches the exact SKILLS_REPO URL pointing to
-        agentic-collections/tree/main/rh-basic/skills. Without skill,
-        agents don't know where to fetch skills from."""
+    def test_slash_commands(self):
+        """Skill teaches the exact slash-command invocations for each
+        installed skill (e.g., /red-hat-cve-explainer). Without skill,
+        agents list skill names but not their invocation commands."""
         c = read_report()
-        assert "agentic-collections" in c, (
-            "must reference agentic-collections repo"
+        commands = [
+            "/red-hat-cve-explainer",
+            "/red-hat-diagnostics",
+            "/red-hat-product-lifecycle",
+            "/red-hat-security-mcp-setup",
+            "/red-hat-support-severity",
+        ]
+        found = sum(1 for cmd in commands if cmd in c)
+        assert found >= 4, (
+            "must list at least 4 of 5 slash-command invocations"
         )
 
-    def test_red_hat_cve_explainer_skill(self):
-        """Skill teaches installing red-hat-cve-explainer as one of
-        the 5 specific skills. Without skill, agents don't know the
-        exact skill names."""
+    def test_post_install_summary_format(self):
+        """Skill teaches the exact post-install summary block with
+        'Available commands:' heading. Without skill, agents produce
+        generic summaries without the structured format."""
         c = read_report()
-        assert "red-hat-cve-explainer" in c or "cve-explainer" in c, (
-            "must reference red-hat-cve-explainer skill"
+        assert "Available commands" in c or "available commands" in c.lower(), (
+            "must include 'Available commands' post-install summary"
         )
 
-    def test_red_hat_security_mcp_setup_skill(self):
-        """Skill teaches installing red-hat-security-mcp-setup as one
-        of the 5 skills, and recommending it as first post-install step."""
+    def test_security_mcp_setup_recommendation(self):
+        """Skill teaches recommending /red-hat-security-mcp-setup as
+        the first post-install action. Without skill, agents don't
+        know which skill to run first."""
         c = read_report()
-        assert "red-hat-security-mcp-setup" in c or "security-mcp-setup" in c, (
-            "must reference red-hat-security-mcp-setup skill"
-        )
+        assert "/red-hat-security-mcp-setup" in c and (
+            "first" in c.lower() or "configure" in c.lower() or "type" in c.lower()
+        ), "must recommend /red-hat-security-mcp-setup as first step"
 
-    def test_self_destruct_behavior(self):
-        """Skill teaches self-destructing after installation — removing
-        its own directory. Without skill, agents don't know this pattern."""
-        c = read_report()
-        has_self = "self-destruct" in c.lower() or "removed itself" in c.lower()
-        has_remove = "remove" in c.lower() and "installer" in c.lower()
-        assert has_self or has_remove, (
-            "must reference installer self-destruct behavior"
-        )
-
-    def test_five_specific_skills(self):
-        """Skill teaches exactly 5 skills to install. Without skill,
-        agents don't know the full list."""
+    def test_raw_download_methodology(self):
+        """Skill teaches downloading raw files directly without reading
+        and re-writing content (to avoid truncation). Without skill,
+        agents describe generic file operations."""
         c = read_report().lower()
-        count = sum(1 for s in [
-            "cve-explainer", "diagnostics", "product-lifecycle",
-            "security-mcp-setup", "support-severity"
-        ] if s in c)
-        assert count >= 4, (
-            "must reference at least 4 of 5 specific skill names"
+        assert "raw" in c or "direct" in c and "download" in c or (
+            "truncat" in c or "re-writ" in c or "reformat" in c
+        ), "must describe raw download methodology (not read+rewrite)"
+
+    def test_self_destruct_confirmation(self):
+        """Skill teaches the self-destruct pattern: delete installer
+        directory and confirm removal. Without skill, agents don't
+        include the deletion confirmation step."""
+        c = read_report().lower()
+        has_destruct = "self-destruct" in c or "removed itself" in c
+        has_delete = "delet" in c and ("installer" in c or "get-started" in c)
+        assert has_destruct or has_delete, (
+            "must describe installer self-destruct and confirm removal"
+        )
+
+    def test_skill_descriptions(self):
+        """Skill teaches specific one-line descriptions for each command
+        (e.g., 'Explain a CVE', 'Gather diagnostic data'). Without
+        skill, agents produce generic summaries."""
+        c = read_report().lower()
+        descriptions = [
+            "explain a cve", "diagnostic data",
+            "lifecycle status", "security mcp server",
+            "support ticket severity", "sla",
+        ]
+        found = sum(1 for d in descriptions if d in c)
+        assert found >= 3, (
+            "must include specific skill descriptions from installer"
         )

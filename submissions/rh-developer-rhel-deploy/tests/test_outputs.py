@@ -1,7 +1,8 @@
 """
-Tests for rh-developer__rhel-deploy per-skill evaluation.
-Baseline tests: report structure.
-Skill-dependent tests: methodology checks that require skill knowledge.
+Tests for rh-developer-rhel-deploy per-skill evaluation.
+
+Only differentiating tests kept — dead-weight tests where both
+control and treatment pass have been removed.
 """
 import os
 import pytest
@@ -20,79 +21,65 @@ class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
-    def test_mentions_rhel_or_podman(self):
-        content = read_report().lower()
-        assert "rhel" in content or "podman" in content, "report should mention RHEL or Podman"
-
-    def test_report_has_structure(self):
-        content = read_report()
-        assert len(content) > 150, "report should have substantial content"
-
 
 class TestSkillDependent:
-    def test_selinux_volume_labels(self):
-        """Skill teaches SELinux volume labels: :z = shared (relabeled for multi-container),
-        :Z = private. Without skill, agents skip SELinux mount context."""
-        c = read_report()
-        assert ":z" in c or ":Z" in c or "selinux" in c.lower(), (
-            "should address SELinux volume labels (:z shared, :Z private)"
+    def test_rootless_vs_rootful_strategy(self):
+        """Skill teaches the dual strategy fork: Container (Podman+systemd)
+        vs Native (dnf+systemd), with rootless vs rootful decision.
+        Without skill, agents only describe rootful deployment."""
+        c = read_report().lower()
+        assert "rootless" in c, (
+            "must address rootless deployment option"
         )
 
     def test_rootless_systemd_path(self):
-        """Skill teaches rootless systemd service location ~/.config/systemd/user/
-        vs /etc/systemd/system/ for rootful. Without skill, agents only know rootful."""
+        """Skill teaches rootless systemd service location
+        ~/.config/systemd/user/ for user-level units. Without skill,
+        agents only know /etc/systemd/system/ for rootful."""
         c = read_report()
-        assert ".config/systemd/user" in c or "rootless" in c.lower(), (
-            "should address rootless systemd path (~/.config/systemd/user/)"
+        assert ".config/systemd/user" in c, (
+            "must reference rootless systemd path (~/.config/systemd/user/)"
         )
 
     def test_enable_linger(self):
-        """Skill teaches loginctl enable-linger required for rootless user services
-        to survive logout. Without skill, agents miss this requirement."""
+        """Skill teaches loginctl enable-linger as required for rootless
+        user services to survive logout. Without skill, agents miss
+        this critical requirement."""
         c = read_report().lower()
-        assert "enable-linger" in c or "loginctl" in c or "linger" in c, (
-            "should mention loginctl enable-linger for rootless services"
+        assert "enable-linger" in c or "loginctl" in c, (
+            "must mention loginctl enable-linger for rootless services"
         )
 
-    def test_semanage_fcontext(self):
-        """Skill teaches semanage fcontext + restorecon for setting SELinux context
-        on application files. Without skill, agents skip file context management."""
-        c = read_report().lower()
-        assert ("semanage fcontext" in c or "semanage" in c) and (
-            "restorecon" in c or "fcontext" in c
-        ), "should use semanage fcontext + restorecon for file SELinux context"
+    def test_mock_host_profile(self):
+        """Skill-equipped agents discover the host profile via MCP:
+        RHEL 9.3, Podman 4.9.4. Without skill, agents write generic
+        plans without host-specific context."""
+        c = read_report()
+        assert "9.3" in c or "4.9.4" in c, (
+            "must reference host profile from MCP "
+            "(RHEL 9.3, Podman 4.9.4)"
+        )
 
-    def test_firewall_port(self):
-        """Skill teaches firewall-cmd for opening application ports."""
-        c = read_report().lower()
-        assert "firewall-cmd" in c or ("firewall" in c and "port" in c), (
-            "should address firewall port configuration"
+    def test_selinux_volume_labels(self):
+        """Skill teaches SELinux volume labels :z (shared) and :Z
+        (private) for container mounts. Without skill, agents skip
+        SELinux mount context entirely."""
+        c = read_report()
+        assert ":z" in c or ":Z" in c, (
+            "must specify SELinux volume labels (:z shared, :Z private)"
         )
 
     def test_systemd_hardening_directives(self):
-        """Docs teach systemd hardening directives: NoNewPrivileges=true,
-        ProtectSystem=strict, ReadWritePaths. Without docs, agents create basic
-        unit files without security hardening."""
+        """Skill teaches specific systemd hardening directives:
+        NoNewPrivileges, ProtectSystem, ReadWritePaths. Without skill,
+        agents create basic unit files without security hardening."""
         c = read_report()
-        assert any(t in c for t in [
+        directives = [
             "NoNewPrivileges", "ProtectSystem", "ReadWritePaths",
             "PrivateTmp", "ProtectHome",
-        ]) or "hardening" in c.lower(), (
-            "should include systemd hardening directives (NoNewPrivileges, ProtectSystem)"
-        )
-
-    def test_container_security_practices(self):
-        """Skill teaches defence-in-depth for containers: dropping capabilities,
-        resource limits, read-only root, security options. Without skill,
-        agents deploy containers with default security settings."""
-        c = read_report().lower()
-        practices = sum(1 for t in [
-            "cap-drop", "cap_drop", "capability",
-            "--read-only", "read-only root",
-            "resource limit", "memory", "cpus",
-            "no-new-privileges", "security-opt",
-        ] if t in c)
-        assert practices >= 2, (
-            "should address at least 2 container security practices "
-            "(capability dropping, resource limits, read-only root, security options)"
+        ]
+        found = sum(1 for d in directives if d in c)
+        assert found >= 2, (
+            "must include at least 2 systemd hardening directives "
+            "(NoNewPrivileges, ProtectSystem, ReadWritePaths, etc.)"
         )

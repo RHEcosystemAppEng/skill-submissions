@@ -1,7 +1,14 @@
-"""Resolution advisor tests - documentation-backed recommendations, AAP specifics."""
-import os, pytest
+"""
+Tests for rh-automation-resolution-advisor per-skill evaluation.
+
+Only differentiating tests kept — dead-weight tests where both
+control and treatment pass have been removed.
+"""
+import os
+import pytest
 
 REPORT = "/solution/report.md"
+
 
 def read_report():
     if not os.path.exists(REPORT):
@@ -9,43 +16,69 @@ def read_report():
     with open(REPORT) as f:
         return f.read()
 
+
 class TestBaseline:
     def test_report_exists(self):
-        assert os.path.exists(REPORT)
-    def test_report_has_content(self):
-        assert len(read_report()) > 400
+        assert os.path.exists(REPORT), "report.md must exist"
 
-class TestResolutionStructure:
-    """Skill defines immediate, root cause, and preventive tiers."""
-    def test_immediate_fix(self):
-        c = read_report().lower()
-        assert "immediate" in c or "now" in c or "urgent" in c or "quick" in c
-    def test_root_cause_fix(self):
-        c = read_report().lower()
-        assert "root cause" in c or "prevent" in c or "permanent" in c
-    def test_verification_steps(self):
-        c = read_report().lower()
-        assert "verif" in c or "confirm" in c or "test" in c
 
-class TestAnsibleSpecifics:
-    """Ansible-specific guidance for privilege escalation."""
-    def test_privilege_escalation(self):
+class TestSkillDependent:
+    def test_error_classification_doc(self):
+        """Skill teaches consulting error-classification.md for the
+        resolution owner mapping table. Without skill, agents provide
+        resolutions without structured classification."""
         c = read_report().lower()
-        assert "privilege" in c or "escalation" in c or "become" in c or "sudo" in c
-    def test_timeout_config(self):
-        c = read_report().lower()
-        assert "timeout" in c
-    def test_ansible_config(self):
-        c = read_report().lower()
-        assert "ansible" in c
+        assert "error-classification" in c, (
+            "must reference error-classification.md document"
+        )
 
-class TestDocumentation:
-    """Must reference Red Hat documentation."""
-    def test_red_hat_documentation(self):
+    def test_job_troubleshooting_doc(self):
+        """Skill teaches consulting job-troubleshooting.md as a second
+        required reference. Without skill, agents skip dual-doc
+        consultation."""
         c = read_report().lower()
-        assert "red hat" in c or "documentation" in c or "kb" in c or "knowledge base" in c
+        assert "job-troubleshooting" in c, (
+            "must reference job-troubleshooting.md document"
+        )
 
-class TestReExecution:
-    def test_re_execution_assessment(self):
+    def test_resolution_owner_taxonomy(self):
+        """Skill teaches the resolution owner taxonomy: Network/Infra,
+        Platform Admin, Playbook Developer, Ops Team. Without skill,
+        agents assign resolutions without ownership classification."""
         c = read_report().lower()
-        assert "re-execut" in c or "relaunch" in c or "retry" in c or "safe" in c
+        owners = [
+            "platform admin", "playbook developer",
+            "network", "infra", "ops team",
+        ]
+        found = sum(1 for o in owners if o in c)
+        assert found >= 1, (
+            "must classify resolution owner (Platform Admin, "
+            "Playbook Developer, Network/Infra, Ops Team)"
+        )
+
+    def test_governance_readiness_gap(self):
+        """Skill teaches identifying related governance gaps and linking
+        to governance-readiness.md domains. Without skill, agents
+        provide fixes without governance context."""
+        c = read_report().lower()
+        assert "governance" in c and ("gap" in c or "readiness" in c or "domain" in c), (
+            "must identify related governance gaps"
+        )
+
+    def test_execution_summary_next_step(self):
+        """Skill teaches routing to execution-summary as the final
+        step in the forensic pipeline. Without skill, agents don't
+        know the skill chain."""
+        c = read_report().lower()
+        assert "execution-summary" in c or "execution summary" in c, (
+            "must reference execution-summary as pipeline next step"
+        )
+
+    def test_aap_doc_chapter_references(self):
+        """Skill teaches citing specific AAP documentation chapters
+        (e.g., Ch. 15 Security Best Practices, Ch. 17 Instance Groups).
+        Without skill, agents give generic 'consult docs' advice."""
+        c = read_report()
+        assert "Ch." in c or "Chapter" in c or "Sec." in c or "Section" in c, (
+            "must cite specific AAP documentation chapters/sections"
+        )

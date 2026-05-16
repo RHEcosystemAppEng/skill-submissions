@@ -1,7 +1,14 @@
-"""Job failure analyzer tests - events, host summaries, error classification."""
-import os, pytest
+"""
+Tests for rh-automation-job-failure-analyzer per-skill evaluation.
+
+Only differentiating tests kept — dead-weight tests where both
+control and treatment pass have been removed.
+"""
+import os
+import pytest
 
 REPORT = "/solution/report.md"
+
 
 def read_report():
     if not os.path.exists(REPORT):
@@ -9,45 +16,68 @@ def read_report():
     with open(REPORT) as f:
         return f.read()
 
+
 class TestBaseline:
     def test_report_exists(self):
-        assert os.path.exists(REPORT)
-    def test_report_has_content(self):
-        assert len(read_report()) > 400
+        assert os.path.exists(REPORT), "report.md must exist"
 
-class TestEventExtraction:
-    """Job events extraction is the core of failure analysis."""
-    def test_events_mentioned(self):
-        c = read_report().lower()
-        assert "event" in c
-    def test_timeline(self):
-        c = read_report().lower()
-        assert "timeline" in c or "time" in c or "sequence" in c or "order" in c
 
-class TestHostAnalysis:
-    def test_host_summaries(self):
+class TestSkillDependent:
+    def test_job_troubleshooting_doc(self):
+        """Skill teaches consulting job-troubleshooting.md for error
+        classification patterns. Without skill, agents skip the
+        structured troubleshooting reference."""
         c = read_report().lower()
-        assert "host" in c and ("summar" in c or "failed" in c or "success" in c)
-    def test_affected_hosts_listed(self):
-        c = read_report().lower()
-        assert "host" in c and ("error" in c or "fail" in c)
+        assert "job-troubleshooting" in c, (
+            "must reference job-troubleshooting.md document"
+        )
 
-class TestErrorClassification:
-    """Error type classification is a specific skill requirement."""
-    def test_error_type_classified(self):
-        c = read_report().lower()
-        error_types = ["connectivity", "privilege", "escalation", "package",
-                       "timeout", "syntax", "permission", "unreachable"]
-        found = sum(1 for t in error_types if t in c)
-        assert found >= 1, "Must classify the error type"
-    def test_ansible_task_identified(self):
-        c = read_report().lower()
-        assert "task" in c or "module" in c or "play" in c
+    def test_runner_event_types(self):
+        """Skill teaches filtering for specific runner event types:
+        runner_on_failed, runner_on_unreachable, playbook_on_stats.
+        Without skill, agents describe events generically."""
+        c = read_report()
+        events = [
+            "runner_on_failed", "runner_on_unreachable",
+            "playbook_on_stats",
+        ]
+        found = sum(1 for e in events if e in c)
+        assert found >= 1, (
+            "must reference specific runner event types "
+            "(runner_on_failed/runner_on_unreachable/playbook_on_stats)"
+        )
 
-class TestMCPToolUsage:
-    def test_job_data(self):
+    def test_event_data_fields(self):
+        """Skill teaches extracting specific event_data fields:
+        event_data.res.msg, event_data.task_action. Without skill,
+        agents describe error messages without structured field paths."""
+        c = read_report()
+        assert "event_data" in c or "task_action" in c or "res.msg" in c, (
+            "must reference event_data fields (res.msg, task_action)"
+        )
+
+    def test_dark_hosts_concept(self):
+        """Skill teaches 'dark' hosts as unreachable in host summaries,
+        distinct from 'failures'. Without skill, agents conflate
+        unreachable and failed hosts."""
         c = read_report().lower()
-        assert "job" in c and ("detail" in c or "status" in c or "retrieve" in c)
-    def test_stdout(self):
+        assert "dark" in c, (
+            "must reference 'dark' hosts (unreachable) from host summaries"
+        )
+
+    def test_host_fact_inspector_next_step(self):
+        """Skill teaches routing to host-fact-inspector as the next
+        forensic step. Without skill, agents don't know the pipeline."""
         c = read_report().lower()
-        assert "output" in c or "stdout" in c or "log" in c
+        assert "host-fact-inspector" in c or "host fact" in c, (
+            "must reference host-fact-inspector as next forensic step"
+        )
+
+    def test_error_classification_reference(self):
+        """Skill teaches using the error-classification.md reference for
+        structured error categorization. Without skill, agents classify
+        errors ad-hoc."""
+        c = read_report().lower()
+        assert "error-classification" in c or "classification" in c, (
+            "must reference error-classification document or framework"
+        )

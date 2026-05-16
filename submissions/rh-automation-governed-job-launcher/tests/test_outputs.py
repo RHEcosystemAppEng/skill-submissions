@@ -1,7 +1,14 @@
-"""Governed job launcher tests - check mode, approval, relaunch, rollback."""
-import os, pytest
+"""
+Tests for rh-automation-governed-job-launcher per-skill evaluation.
+
+Only differentiating tests kept — dead-weight tests where both
+control and treatment pass have been removed.
+"""
+import os
+import pytest
 
 REPORT = "/solution/report.md"
+
 
 def read_report():
     if not os.path.exists(REPORT):
@@ -9,45 +16,62 @@ def read_report():
     with open(REPORT) as f:
         return f.read()
 
+
 class TestBaseline:
     def test_report_exists(self):
-        assert os.path.exists(REPORT)
-    def test_report_has_content(self):
-        assert len(read_report()) > 500
+        assert os.path.exists(REPORT), "report.md must exist"
 
-class TestCheckMode:
-    """Check mode is a core requirement for governed launches."""
-    def test_check_mode_execution(self):
-        c = read_report().lower()
-        assert "check mode" in c or "check" in c or "dry run" in c
-    def test_job_type_check(self):
-        c = read_report().lower()
-        assert "job_type" in c or "check" in c
 
-class TestApprovalGate:
-    def test_human_approval(self):
+class TestSkillDependent:
+    def test_execution_governance_doc(self):
+        """Skill teaches consulting execution-governance.md before any MCP
+        calls. Without skill, agents skip document consultation."""
         c = read_report().lower()
-        assert "approv" in c or "confirm" in c or "human" in c
+        assert "execution-governance" in c, (
+            "must reference execution-governance.md document"
+        )
 
-class TestJobMonitoring:
-    """Skill requires polling jobs_retrieve and host summaries."""
-    def test_job_monitoring(self):
+    def test_phased_rollout(self):
+        """Skill teaches phased rollout strategy: canary -> 25% -> full
+        production. Without skill, agents execute on all hosts at once."""
         c = read_report().lower()
-        assert "monitor" in c or "poll" in c or "status" in c
-    def test_per_host_tracking(self):
-        c = read_report().lower()
-        assert "host" in c and ("summar" in c or "status" in c or "fail" in c)
+        assert "canary" in c or "phased" in c or "25%" in c or "rolling" in c, (
+            "must describe phased rollout strategy (canary/25%/full)"
+        )
 
-class TestFailureHandling:
-    """Relaunch and rollback are skill-specific features."""
-    def test_relaunch_option(self):
+    def test_host_summary_columns(self):
+        """Skill teaches interpreting host summary columns: failures, dark,
+        changed, skipped from jobs_job_host_summaries_list. Without skill,
+        agents only check pass/fail."""
         c = read_report().lower()
-        assert "relaunch" in c or "retry" in c or "failed hosts" in c
-    def test_rollback_option(self):
-        c = read_report().lower()
-        assert "rollback" in c or "revert" in c
+        cols = ["dark", "failures", "changed", "skipped"]
+        found = sum(1 for col in cols if col in c)
+        assert found >= 2, (
+            "must reference host summary columns (dark/failures/changed/skipped)"
+        )
 
-class TestRiskAwareness:
-    def test_prior_risk_analysis(self):
+    def test_execution_risk_analyzer_prerequisite(self):
+        """Skill teaches that execution-risk-analyzer results are a
+        prerequisite for governed launches. Without skill, agents launch
+        without prior risk assessment."""
         c = read_report().lower()
-        assert "risk" in c and ("analysis" in c or "assess" in c or "prior" in c)
+        assert "execution-risk-analyzer" in c or "risk-analyzer" in c or (
+            "risk" in c and "prior" in c and "analys" in c
+        ), "must reference execution-risk-analyzer as prerequisite"
+
+    def test_diff_mode_for_critical(self):
+        """Skill teaches using diff_mode for CRITICAL/HIGH risk check-mode
+        runs to show what would change. Without skill, agents use plain
+        check mode without diff insight."""
+        c = read_report().lower()
+        assert "diff_mode" in c or "diff mode" in c, (
+            "must reference diff_mode for check-mode enrichment"
+        )
+
+    def test_forensic_troubleshooter_escalation(self):
+        """Skill teaches escalating to forensic-troubleshooter when recent
+        failures exist. Without skill, agents don't know the skill chain."""
+        c = read_report().lower()
+        assert "forensic-troubleshooter" in c or "forensic" in c, (
+            "must reference forensic-troubleshooter escalation path"
+        )

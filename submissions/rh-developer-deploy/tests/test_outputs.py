@@ -1,7 +1,8 @@
 """
-Tests for rh-developer__deploy per-skill evaluation.
-Baseline tests: report structure.
-Skill-dependent tests: methodology checks that require skill knowledge.
+Tests for rh-developer-deploy per-skill evaluation.
+
+Only differentiating tests kept — dead-weight tests where both
+control and treatment pass have been removed.
 """
 import os
 import pytest
@@ -20,68 +21,63 @@ class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
-    def test_mentions_deploy(self):
-        content = read_report().lower()
-        assert "deploy" in content, "report should mention deployment"
-
-    def test_report_has_structure(self):
-        content = read_report()
-        assert len(content) > 150, "report should have substantial content"
-
 
 class TestSkillDependent:
-    def test_insecure_redirect_policy(self):
-        """Skill teaches insecureEdgeTerminationPolicy: Redirect on Route to force
-        HTTP→HTTPS. Without skill, agents create Routes without redirect policy,
-        leaving HTTP access open."""
-        c = read_report()
-        assert "insecureEdgeTerminationPolicy" in c or (
-            "Redirect" in c and ("http" in c.lower() and "https" in c.lower())
-        ), "should configure insecureEdgeTerminationPolicy: Redirect on Route"
-
-    def test_framework_port_detection(self):
-        """Skill teaches port inference by framework defaults (Node 3000/8080,
-        Python 5000/8000, Java 8080). Without skill, agents hardcode 8080."""
+    def test_port_detection_methodology(self):
+        """Skill teaches systematic port detection: Dockerfile EXPOSE,
+        web server config, framework defaults (Flask 5000, Node 3000).
+        Without skill, agents hardcode 8080 without detection logic."""
         c = read_report().lower()
-        assert any(t in c for t in ["port", "8080", "3000", "5000"]) and any(t in c for t in [
-            "detect", "expose", "listen", "framework", "default", "infer"
-        ]), "should address port detection from framework defaults"
-
-    def test_deployment_service_route_triad(self):
-        """Skill teaches creating Deployment, Service, Route in sequence."""
-        c = read_report().lower()
-        assert any(t in c for t in ["deployment"]) and "service" in c and any(t in c for t in [
-            "route", "external", "https"
-        ]), "should define Deployment + Service + Route"
-
-    def test_selector_alignment(self):
-        """Skill teaches Service selector must match Deployment pod labels."""
-        c = read_report().lower()
-        assert any(t in c for t in ["selector", "label", "targetport", "target port"]) or (
-            "service" in c and "port" in c and "match" in c
-        ), "should address selector/port alignment"
-
-    def test_tls_route_config(self):
-        """Skill teaches Route with TLS termination (edge/passthrough)."""
-        c = read_report().lower()
-        assert any(t in c for t in ["tls", "https", "edge", "termination"]), (
-            "should address Route TLS for external access"
+        methods = ["expose", "framework default", "flask", "5000", "3000"]
+        found = sum(1 for m in methods if m in c)
+        assert found >= 2, (
+            "must describe port detection methodology "
+            "(Dockerfile EXPOSE, framework defaults, etc.)"
         )
 
-    def test_hpa_autoscaling(self):
-        """Skill teaches including HorizontalPodAutoscaler configuration for
-        production deployments. Without skill, agents set static replica count
-        without autoscaling."""
-        c = read_report()
-        assert "HorizontalPodAutoscaler" in c or "autoscaling/v2" in c or (
-            "hpa" in c.lower() and "autoscal" in c.lower()
-        ), "should include HorizontalPodAutoscaler for production scaling"
+    def test_mock_namespace_discovery(self):
+        """Skill-equipped agents use MCP to discover cluster state and
+        reference actual namespaces. Without skill, agents write generic
+        plans without cluster-specific context."""
+        c = read_report().lower()
+        ns = ["api-platform", "web-frontend", "order-system"]
+        found = sum(1 for n in ns if n in c)
+        assert found >= 2, (
+            "must reference cluster namespaces discovered via MCP"
+        )
 
-    def test_hsts_security_headers(self):
-        """Skill teaches HSTS headers or Strict-Transport-Security configuration
-        on OpenShift Routes. Without skill, agents skip transport security headers."""
+    def test_selector_mismatch_diagnosis(self):
+        """Skill-equipped agents discover the Service selector mismatch
+        (order-svc vs order-service) via MCP. Without skill, agents
+        skip cluster diagnostics."""
+        c = read_report().lower()
+        assert "order-svc" in c or "selector" in c and "mismatch" in c or (
+            "selector" in c and "label" in c and "match" in c
+        ), "must diagnose selector/label alignment issues from cluster"
+
+    def test_rollout_monitoring(self):
+        """Skill teaches monitoring rollout status after applying
+        resources, with timeout handling and failure menu. Without
+        skill, agents stop after applying manifests."""
+        c = read_report().lower()
+        assert "rollout" in c or "rollback" in c or (
+            "monitor" in c and "deploy" in c
+        ), "must describe rollout monitoring or rollback strategy"
+
+    def test_s2i_build_context(self):
+        """Skill teaches that /deploy follows /s2i-build in the
+        workflow. Without skill, agents don't reference the build-to-
+        deploy pipeline."""
+        c = read_report().lower()
+        assert "s2i" in c or "source-to-image" in c or "imagestream" in c or (
+            "build" in c and "image" in c
+        ), "must reference S2I build context or ImageStream source"
+
+    def test_resources_create_or_update_tool(self):
+        """Skill teaches using resources_create_or_update MCP tool to
+        apply manifests. Without skill, agents describe oc apply/create
+        without MCP tool context."""
         c = read_report()
-        assert any(t in c for t in [
-            "HSTS", "Strict-Transport-Security", "hsts",
-            "haproxy.router.openshift.io",
-        ]), "should configure HSTS or transport security headers on Route"
+        assert "resources_create_or_update" in c or "create_or_update" in c or (
+            "MCP" in c and "resource" in c.lower()
+        ), "must reference resources_create_or_update MCP tool or MCP-based resource creation"

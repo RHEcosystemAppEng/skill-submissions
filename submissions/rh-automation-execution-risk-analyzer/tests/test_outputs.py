@@ -2,7 +2,7 @@
 Tests for rh-automation-execution-risk-analyzer per-skill evaluation.
 
 Only differentiating tests kept — dead-weight tests where both
-control and treatment pass 3/3 have been removed.
+control and treatment pass have been removed.
 """
 import os
 import pytest
@@ -23,9 +23,17 @@ class TestBaseline:
 
 
 class TestSkillDependent:
+    def test_execution_governance_doc(self):
+        """Skill teaches consulting execution-governance.md before any
+        risk analysis. Without skill, agents skip structured governance
+        reference."""
+        c = read_report().lower()
+        assert "execution-governance" in c, (
+            "must reference execution-governance.md document"
+        )
+
     def test_ask_launch_flags(self):
-        """Skill teaches checking ask_* launch flags (ask_diff_mode_on_launch,
-        ask_job_type_on_launch, ask_limit_on_launch) as risk indicators.
+        """Skill teaches checking ask_* launch flags as risk indicators.
         Without skill, agents don't check these AAP-specific flags."""
         c = read_report()
         has_ask = any(f in c for f in [
@@ -38,34 +46,38 @@ class TestSkillDependent:
             "must check ask_*_on_launch flags as risk indicators"
         )
 
-    def test_job_templates_retrieve_tool(self):
-        """Skill teaches using job_templates_retrieve MCP tool to get
-        template details for risk analysis."""
+    def test_inventories_list_tool(self):
+        """Skill teaches using inventories_list to enumerate available
+        inventories for scope assessment. Without skill, agents only
+        use job_templates_retrieve."""
         c = read_report()
-        assert "job_templates_retrieve" in c, (
-            "must reference job_templates_retrieve MCP tool"
+        assert "inventories_list" in c or "inventories" in c, (
+            "must reference inventories_list for scope assessment"
         )
 
-    def test_hosts_list_fleet_scope(self):
-        """Skill teaches using hosts_list to count target hosts and
-        calculate fleet percentage for scope assessment."""
+    def test_job_history_analysis(self):
+        """Skill teaches querying jobs_list to check recent execution
+        history for failure patterns. Without skill, agents assess
+        risk without operational context."""
         c = read_report()
-        assert "hosts_list" in c, (
-            "must reference hosts_list tool for scope assessment"
+        assert "jobs_list" in c or "job history" in c.lower() or "recent job" in c.lower(), (
+            "must analyze job history for failure patterns"
         )
 
-    def test_extra_vars_secret_scanning(self):
-        """Skill teaches scanning extra_vars for secret patterns
-        (passwords, tokens, keys). Without skill, agents skip this."""
-        c = read_report()
-        assert "extra_vars" in c, (
-            "must reference extra_vars scanning for secrets"
+    def test_governed_job_launcher_next_step(self):
+        """Skill teaches routing to governed-job-launcher as the next
+        step after risk classification. Without skill, agents don't
+        know the execution pipeline."""
+        c = read_report().lower()
+        assert "governed-job-launcher" in c or "job-launcher" in c, (
+            "must reference governed-job-launcher as next step"
         )
 
-    def test_check_mode_recommendation(self):
-        """Skill teaches recommending check mode (dry run) before
-        production execution based on risk level."""
-        c = read_report()
-        assert "check" in c.lower() and "mode" in c.lower(), (
-            "must recommend check mode for risk mitigation"
-        )
+    def test_adaptive_risk_enhancement(self):
+        """Skill teaches adaptive risk enhancement rules that can
+        escalate risk level based on operational context (e.g., recent
+        failures, shell modules, missing notifications)."""
+        c = read_report().lower()
+        assert "adaptive" in c or "enhancement" in c or "escalat" in c or (
+            "upgrade" in c and "risk" in c
+        ), "must describe adaptive risk enhancement or escalation rules"

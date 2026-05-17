@@ -1,7 +1,8 @@
 """
-Tests for rh-developer__containerize-deploy per-skill evaluation.
-Baseline tests: report structure.
-Skill-dependent tests: methodology checks that require skill knowledge.
+Tests for rh-developer-containerize-deploy per-skill evaluation.
+
+Only differentiating tests kept — dead-weight tests where both
+control and treatment pass have been removed.
 """
 import os
 import pytest
@@ -19,17 +20,6 @@ def read_report():
 class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
-
-    def test_mentions_containerization(self):
-        content = read_report().lower()
-        assert any(t in content for t in ["container", "deploy", "image"]), (
-            "report should mention containerization or deployment"
-        )
-
-    def test_report_has_structure(self):
-        content = read_report()
-        assert len(content) > 150, "report should have substantial content"
-
 
 class TestSkillDependent:
     def test_startup_probe(self):
@@ -64,21 +54,6 @@ class TestSkillDependent:
             "SQLALCHEMY_POOL", "pool_size", "POOL_SIZE",
             "pool_recycle", "POOL_RECYCLE",
         ]), "should include SQLAlchemy connection pool settings (pool_size, pool_recycle)"
-
-    def test_strategy_comparison(self):
-        """Skill teaches comparing at least 2 containerization strategies with trade-offs."""
-        c = read_report().lower()
-        strategies = ["s2i", "dockerfile", "helm", "podman", "source-to-image"]
-        mentioned = sum(1 for s in strategies if s in c)
-        assert mentioned >= 2, "should compare at least 2 containerization strategies"
-
-    def test_session_affinity_config(self):
-        """Skill docs teach explicit sessionAffinity configuration in Service spec.
-        Without skill, agents skip this detail in the Service definition."""
-        c = read_report().lower()
-        assert "sessionaffinity" in c or "session affinity" in c, (
-            "should specify sessionAffinity in Service configuration"
-        )
 
     def test_app_module_s2i_entrypoint(self):
         """Skill teaches APP_MODULE environment variable for S2I Python startup

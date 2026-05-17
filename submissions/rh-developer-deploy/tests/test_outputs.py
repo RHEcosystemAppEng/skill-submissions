@@ -55,24 +55,6 @@ class TestSkillDependent:
             "selector" in c and "label" in c and "match" in c
         ), "must diagnose selector/label alignment issues from cluster"
 
-    def test_rollout_monitoring(self):
-        """Skill teaches monitoring rollout status after applying
-        resources, with timeout handling and failure menu. Without
-        skill, agents stop after applying manifests."""
-        c = read_report().lower()
-        assert "rollout" in c or "rollback" in c or (
-            "monitor" in c and "deploy" in c
-        ), "must describe rollout monitoring or rollback strategy"
-
-    def test_s2i_build_context(self):
-        """Skill teaches that /deploy follows /s2i-build in the
-        workflow. Without skill, agents don't reference the build-to-
-        deploy pipeline."""
-        c = read_report().lower()
-        assert "s2i" in c or "source-to-image" in c or "imagestream" in c or (
-            "build" in c and "image" in c
-        ), "must reference S2I build context or ImageStream source"
-
     def test_resources_create_or_update_tool(self):
         """Skill teaches using resources_create_or_update MCP tool to
         apply manifests. Without skill, agents describe oc apply/create

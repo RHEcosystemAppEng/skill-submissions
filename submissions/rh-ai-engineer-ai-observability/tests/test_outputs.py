@@ -1,7 +1,8 @@
 """
-Tests for rh-ai-engineer__ai-observability per-skill evaluation.
-Baseline tests: any competent agent should pass.
-Skill-dependent tests: based on empirical gaps between skilled and unskilled agent outputs.
+Tests for rh-ai-engineer-ai-observability per-skill evaluation.
+
+Only differentiating tests kept — dead-weight tests where both
+control and treatment pass have been removed.
 """
 import os
 import pytest
@@ -19,17 +20,6 @@ def read_report():
 class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
-
-    def test_mentions_topic(self):
-        content = read_report().lower()
-        assert any(t in content for t in ["monitor", "metric", "observ", "inference"]), (
-            "report should mention monitoring or observability"
-        )
-
-    def test_report_has_structure(self):
-        content = read_report()
-        assert len(content) > 200, "report should have substantial content"
-
 
 class TestSkillDependent:
     def test_tempo_distributed_tracing(self):
@@ -72,13 +62,6 @@ class TestSkillDependent:
             "max-model-len", "max_model_len", "gpu-memory-utilization",
             "gpu_memory_utilization", "tensor parallel", "tensor_parallel",
         ]), "should mention vLLM-specific configuration args for resource tuning"
-
-    def test_latency_percentiles(self):
-        """Both agents should report latency percentiles (easy test)."""
-        c = read_report().lower()
-        assert any(t in c for t in ["p50", "p95", "p99"]), (
-            "should report latency with percentiles"
-        )
 
     def test_tensor_parallel_size_tuning(self):
         """Docs teach reducing --tensor-parallel-size as GPU scheduling triage step,

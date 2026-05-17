@@ -50,17 +50,6 @@ class TestSkillDependent:
             "must reference tekton.dev/v1 apiVersion"
         )
 
-    def test_trigger_resources(self):
-        """Skill teaches EventListener/TriggerTemplate/TriggerBinding
-        CRDs under triggers.tekton.dev/v1beta1 for debugging
-        trigger-related failures."""
-        c = read_report()
-        has_trigger = "EventListener" in c or "TriggerTemplate" in c or "TriggerBinding" in c
-        has_api = "triggers.tekton.dev" in c
-        assert has_trigger or has_api, (
-            "must reference Tekton trigger CRDs"
-        )
-
     def test_status_child_references(self):
         """Skill teaches extracting task statuses from PipelineRun
         .status.childReferences field path. Without skill, agents

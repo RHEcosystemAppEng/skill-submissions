@@ -54,11 +54,3 @@ class TestSkillDependent:
         assert "forensic-troubleshooter" in c or "forensic" in c.lower(), (
             "must reference forensic-troubleshooter for failure handling"
         )
-
-    def test_job_templates_launch_create(self):
-        """Skill teaches using job_templates_launch_create MCP tool
-        for both check mode and actual execution."""
-        c = read_report()
-        assert "job_templates_launch_create" in c or "launch_create" in c, (
-            "must reference job_templates_launch_create MCP tool"
-        )

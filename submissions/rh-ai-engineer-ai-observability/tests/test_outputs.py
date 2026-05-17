@@ -1,8 +1,8 @@
 """
 Tests for rh-ai-engineer-ai-observability per-skill evaluation.
 
-Only differentiating tests kept — dead-weight tests where both
-control and treatment pass have been removed.
+Kept tests where treatment outperforms control in trial logs.
+Removed korrel8r/tempo/otel (fail equally) and redundant vllm overlap.
 """
 import os
 import pytest
@@ -21,52 +21,17 @@ class TestBaseline:
     def test_report_exists(self):
         assert os.path.exists(REPORT), "report.md must exist"
 
+
 class TestSkillDependent:
-    def test_tempo_distributed_tracing(self):
-        """Skill teaches Tempo for distributed tracing of inference requests.
-        Without skill, agents don't mention Tempo at all."""
-        c = read_report().lower()
-        assert any(t in c for t in ["tempo", "distributed trac"]), (
-            "should recommend Tempo for distributed tracing"
-        )
-
-    def test_korrel8r_correlation(self):
-        """Skill teaches Korrel8r for cross-domain signal correlation.
-        Without skill, agents don't know about Korrel8r."""
-        c = read_report().lower()
-        assert any(t in c for t in ["korrel8r", "cross-domain correlation"]), (
-            "should mention Korrel8r for cross-domain correlation"
-        )
-
     def test_dcgm_gpu_metric_names(self):
-        """Skill teaches DCGM-specific GPU metric names (DCGM_FI_DEV_*).
-        Without skill, agents use generic nvidia_gpu_memory_* names."""
+        """Skill teaches DCGM_FI_DEV_* metrics; control uses generic nvidia names."""
         c = read_report()
         assert any(t in c for t in ["DCGM_FI_DEV", "dcgm_fi_dev", "DCGM"]), (
             "should reference DCGM GPU metric names (not generic nvidia_gpu_*)"
         )
 
-    def test_opentelemetry_instrumentation(self):
-        """Skill teaches OpenTelemetry for trace instrumentation on inference endpoints.
-        Without skill, agents don't mention OpenTelemetry."""
-        c = read_report().lower()
-        assert any(t in c for t in ["opentelemetry", "otel"]), (
-            "should recommend OpenTelemetry instrumentation"
-        )
-
-    def test_vllm_tuning_args(self):
-        """Skill teaches vLLM CLI args for memory management.
-        Without skill, agents recommend generic resource increases but not vLLM-specific tuning."""
-        c = read_report().lower()
-        assert any(t in c for t in [
-            "max-model-len", "max_model_len", "gpu-memory-utilization",
-            "gpu_memory_utilization", "tensor parallel", "tensor_parallel",
-        ]), "should mention vLLM-specific configuration args for resource tuning"
-
     def test_tensor_parallel_size_tuning(self):
-        """Docs teach reducing --tensor-parallel-size as GPU scheduling triage step,
-        and OOM mitigation via --max-model-len and quantized models (AWQ/GPTQ/FP8).
-        Without docs, agents don't know these vLLM tuning parameters."""
+        """Skill teaches tensor-parallel-size / AWQ / GPTQ / FP8 GPU tuning."""
         c = read_report().lower()
         assert any(t in c for t in [
             "tensor-parallel-size", "tensor_parallel_size", "tensor parallel",

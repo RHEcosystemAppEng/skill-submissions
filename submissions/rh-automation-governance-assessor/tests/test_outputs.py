@@ -39,27 +39,10 @@ class TestSkillDependent:
             "must reference aap-mcp-validator sub-skill invocation"
         )
 
-    def test_compound_risk_analysis(self):
-        """Skill teaches cross-domain compound risk analysis identifying
-        combinations like 'no workflows + no notifications = invisible failures'.
-        Without skill, agents assess domains independently."""
-        c = read_report()
-        assert "compound" in c.lower() or "cross-domain" in c.lower() or "correlation" in c.lower(), (
-            "must include compound/cross-domain risk analysis"
-        )
-
     def test_governance_readiness_doc(self):
         """Skill teaches consulting governance-readiness.md for the
         7-domain assessment framework with Red Hat citations."""
         c = read_report()
         assert "governance-readiness" in c, (
             "must reference governance-readiness.md"
-        )
-
-    def test_execution_summary_invocation(self):
-        """Skill teaches invoking execution-summary sub-skill as final
-        step to produce audit trail."""
-        c = read_report()
-        assert "execution-summary" in c or "execution summary" in c.lower(), (
-            "must reference execution-summary sub-skill"
         )

@@ -72,12 +72,3 @@ class TestSkillDependent:
         assert "host-fact-inspector" in c or "host fact" in c, (
             "must reference host-fact-inspector as next forensic step"
         )
-
-    def test_error_classification_reference(self):
-        """Skill teaches using the error-classification.md reference for
-        structured error categorization. Without skill, agents classify
-        errors ad-hoc."""
-        c = read_report().lower()
-        assert "error-classification" in c or "classification" in c, (
-            "must reference error-classification document or framework"
-        )

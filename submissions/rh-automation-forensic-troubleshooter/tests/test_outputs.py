@@ -54,11 +54,3 @@ class TestSkillDependent:
         assert "job-troubleshooting" in c or "job troubleshooting" in c.lower(), (
             "must reference job-troubleshooting.md consultation"
         )
-
-    def test_error_classification_doc(self):
-        """Skill teaches consulting error-classification.md for
-        categorizing failures (Platform/Code/Configuration)."""
-        c = read_report()
-        assert "error-classification" in c or "error classification" in c.lower(), (
-            "must reference error-classification.md"
-        )

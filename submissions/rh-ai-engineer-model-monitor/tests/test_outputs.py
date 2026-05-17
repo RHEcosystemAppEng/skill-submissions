@@ -1,8 +1,7 @@
 """
 Tests for rh-ai-engineer-model-monitor per-skill evaluation.
 
-Only differentiating tests kept — dead-weight tests where both
-control and treatment pass 3/3 have been removed.
+Kept MCP-tool checks that differentiate; removed trustyai apiVersion (both pass 100%).
 """
 import os
 import pytest
@@ -24,25 +23,14 @@ class TestBaseline:
 
 class TestSkillDependent:
     def test_mcp_tool_resources_create_or_update(self):
-        """Skill teaches using resources_create_or_update MCP tool to create
-        TrustyAIService CR and metric ConfigMaps. Without skill, agents
-        describe generic kubectl or manual steps."""
+        """Skill teaches resources_create_or_update MCP tool."""
         c = read_report()
         assert "resources_create_or_update" in c, (
             "must reference resources_create_or_update MCP tool"
         )
 
-    def test_trustyai_cr_api_version(self):
-        """Skill teaches the exact apiVersion trustyai.opendatahub.io/v1alpha1
-        for the TrustyAIService CR. Without skill, agents omit or guess."""
-        c = read_report()
-        assert "trustyai.opendatahub.io/v1alpha1" in c, (
-            "must reference trustyai.opendatahub.io/v1alpha1 apiVersion"
-        )
-
     def test_prometheus_query_tool(self):
-        """Skill teaches using prometheus_query MCP tool to validate
-        TrustyAI metrics. Without skill, agents describe manual PromQL."""
+        """Skill teaches prometheus_query MCP tool for metrics validation."""
         c = read_report()
         assert "prometheus_query" in c, (
             "must reference prometheus_query MCP tool for metrics validation"

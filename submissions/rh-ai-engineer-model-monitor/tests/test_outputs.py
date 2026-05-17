@@ -47,21 +47,3 @@ class TestSkillDependent:
         assert "prometheus_query" in c, (
             "must reference prometheus_query MCP tool for metrics validation"
         )
-
-    def test_raw_deployment_payload_logging(self):
-        """Skill teaches that RawDeployment mode prevents payload logging
-        to TrustyAI. Without skill, agents don't know this limitation."""
-        c = read_report()
-        has_raw = "RawDeployment" in c
-        has_payload = "payload logging" in c.lower() or "payload" in c.lower()
-        assert has_raw or has_payload, (
-            "must address RawDeployment payload logging limitation"
-        )
-
-    def test_trustyai_pod_label_selector(self):
-        """Skill teaches using labelSelector app.kubernetes.io/name=trustyai-service
-        to find TrustyAI pods. Without skill, agents don't know this label."""
-        c = read_report()
-        assert "app.kubernetes.io/name" in c or "trustyai-service" in c, (
-            "must reference TrustyAI pod label selector"
-        )

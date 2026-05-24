@@ -1,9 +1,8 @@
 """
 Tests for rh-automation-job-failure-analyzer per-skill evaluation.
 
-Skill teaches extracting failure events from AAP jobs using specific MCP
-tools and classifying errors per error taxonomy. Mock AAP has 12 jobs,
-6 templates, 3 inventories.
+Reduced from 7 to 5 tests. Removed job_troubleshooting_doc and
+host_fact_inspector_next_step (dead-weight: both agents pass).
 """
 import os
 import pytest
@@ -24,13 +23,6 @@ class TestBaseline:
 
 
 class TestSkillDependent:
-    def test_job_troubleshooting_doc(self):
-        """Skill teaches consulting job-troubleshooting.md BEFORE any MCP calls."""
-        c = read_report().lower()
-        assert "job-troubleshooting" in c, (
-            "must reference job-troubleshooting.md document"
-        )
-
     def test_jobs_job_events_list_tool(self):
         """Skill teaches using jobs_job_events_list MCP tool to extract
         failure events. Without skill, agents describe generic log analysis."""
@@ -61,12 +53,4 @@ class TestSkillDependent:
         c = read_report().lower()
         assert "event_data" in c or "res.msg" in c or "task_action" in c, (
             "must reference event_data fields (res.msg, task_action)"
-        )
-
-    def test_host_fact_inspector_next_step(self):
-        """Skill teaches routing to host-fact-inspector as the next
-        step in the forensic pipeline."""
-        c = read_report().lower()
-        assert "host-fact-inspector" in c or "host fact" in c, (
-            "must reference host-fact-inspector as next forensic step"
         )

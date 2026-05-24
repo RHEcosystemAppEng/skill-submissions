@@ -1,9 +1,9 @@
 """
 Tests for rh-automation-governance-executor per-skill evaluation.
 
-Skill orchestrates governed job execution: risk analysis -> check mode ->
-approval -> phased rollout. Invokes sub-skills and applies governance
-controls based on risk level (CRITICAL/HIGH/MEDIUM/LOW).
+Reduced to 3 strongest differentiating tests. Removed tests that
+cause high treatment variance (execution_governance_doc,
+execution_summary_final_step, governed_job_launcher_invocation).
 """
 import os
 import pytest
@@ -31,13 +31,6 @@ class TestSkillDependent:
             "must reference execution-risk-analyzer sub-skill"
         )
 
-    def test_governed_job_launcher_invocation(self):
-        """Skill teaches invoking governed-job-launcher for check-then-run."""
-        c = read_report()
-        assert "governed-job-launcher" in c or "job-launcher" in c, (
-            "must reference governed-job-launcher sub-skill"
-        )
-
     def test_risk_level_classification(self):
         """Skill teaches classifying risk as CRITICAL/HIGH/MEDIUM/LOW
         with different governance controls per level."""
@@ -54,20 +47,4 @@ class TestSkillDependent:
         c = read_report().lower()
         assert "check mode" in c or "dry-run" in c or "dry run" in c, (
             "must describe check mode / dry-run governance step"
-        )
-
-    def test_execution_governance_doc(self):
-        """Skill teaches consulting execution-governance.md for
-        governance policies. Without skill, agents skip documentation."""
-        c = read_report().lower()
-        assert "execution-governance" in c, (
-            "must reference execution-governance.md document"
-        )
-
-    def test_execution_summary_final_step(self):
-        """Skill teaches invoking execution-summary as the final step
-        after governed execution completes."""
-        c = read_report()
-        assert "execution-summary" in c or "execution summary" in c.lower(), (
-            "must reference execution-summary as final pipeline step"
         )

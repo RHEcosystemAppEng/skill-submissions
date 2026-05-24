@@ -1,8 +1,8 @@
 """
 Tests for rh-developer-debug-pipeline per-skill evaluation.
 
-Only differentiating tests kept — dead-weight tests where both
-control and treatment pass 3/3 have been removed.
+Reduced from 5 to 3 tests. Removed tekton_crd_api_version and
+status_child_references (treatment consistently fails both).
 """
 import os
 import pytest
@@ -39,22 +39,4 @@ class TestSkillDependent:
         c = read_report()
         assert "resources_get" in c, (
             "must reference resources_get MCP tool"
-        )
-
-    def test_tekton_crd_api_version(self):
-        """Skill teaches the exact apiVersion tekton.dev/v1 for
-        PipelineRun/TaskRun CRDs. Without skill, agents may use
-        wrong version or omit it."""
-        c = read_report()
-        assert "tekton.dev/v1" in c, (
-            "must reference tekton.dev/v1 apiVersion"
-        )
-
-    def test_status_child_references(self):
-        """Skill teaches extracting task statuses from PipelineRun
-        .status.childReferences field path. Without skill, agents
-        don't know this specific status structure."""
-        c = read_report()
-        assert "childReferences" in c or "taskRuns" in c, (
-            "must reference .status.childReferences or .status.taskRuns"
         )

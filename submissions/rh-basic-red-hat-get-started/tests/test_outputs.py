@@ -1,8 +1,9 @@
 """
 Tests for rh-basic-red-hat-get-started per-skill evaluation.
 
-Only differentiating tests kept — dead-weight tests where both
-control and treatment pass have been removed.
+Kept only tests whose assertions rely on SKILL.md-specific knowledge
+(exact format strings, workflow steps) that the instruction alone
+does not reveal.
 """
 import os
 import pytest
@@ -23,41 +24,6 @@ class TestBaseline:
 
 
 class TestSkillDependent:
-    def test_slash_commands(self):
-        """Skill teaches the exact slash-command invocations for each
-        installed skill (e.g., /red-hat-cve-explainer). Without skill,
-        agents list skill names but not their invocation commands."""
-        c = read_report()
-        commands = [
-            "/red-hat-cve-explainer",
-            "/red-hat-diagnostics",
-            "/red-hat-product-lifecycle",
-            "/red-hat-security-mcp-setup",
-            "/red-hat-support-severity",
-        ]
-        found = sum(1 for cmd in commands if cmd in c)
-        assert found >= 4, (
-            "must list at least 4 of 5 slash-command invocations"
-        )
-
-    def test_post_install_summary_format(self):
-        """Skill teaches the exact post-install summary block with
-        'Available commands:' heading. Without skill, agents produce
-        generic summaries without the structured format."""
-        c = read_report()
-        assert "Available commands" in c or "available commands" in c.lower(), (
-            "must include 'Available commands' post-install summary"
-        )
-
-    def test_security_mcp_setup_recommendation(self):
-        """Skill teaches recommending /red-hat-security-mcp-setup as
-        the first post-install action. Without skill, agents don't
-        know which skill to run first."""
-        c = read_report()
-        assert "/red-hat-security-mcp-setup" in c and (
-            "first" in c.lower() or "configure" in c.lower() or "type" in c.lower()
-        ), "must recommend /red-hat-security-mcp-setup as first step"
-
     def test_raw_download_methodology(self):
         """Skill teaches downloading raw files directly without reading
         and re-writing content (to avoid truncation). Without skill,
@@ -78,17 +44,11 @@ class TestSkillDependent:
             "must describe installer self-destruct and confirm removal"
         )
 
-    def test_skill_descriptions(self):
-        """Skill teaches specific one-line descriptions for each command
-        (e.g., 'Explain a CVE', 'Gather diagnostic data'). Without
-        skill, agents produce generic summaries."""
-        c = read_report().lower()
-        descriptions = [
-            "explain a cve", "diagnostic data",
-            "lifecycle status", "security mcp server",
-            "support ticket severity", "sla",
-        ]
-        found = sum(1 for d in descriptions if d in c)
-        assert found >= 3, (
-            "must include specific skill descriptions from installer"
+    def test_post_install_summary_format(self):
+        """Skill teaches the exact post-install summary block with
+        'Available commands:' heading. Without skill, agents produce
+        generic summaries without the structured format."""
+        c = read_report()
+        assert "Available commands" in c or "available commands" in c.lower(), (
+            "must include 'Available commands' post-install summary"
         )

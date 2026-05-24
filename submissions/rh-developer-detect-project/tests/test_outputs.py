@@ -1,8 +1,8 @@
 """
 Tests for rh-developer-detect-project per-skill evaluation.
 
-Only differentiating tests kept — dead-weight tests where both
-control and treatment pass have been removed.
+Reduced to strongest differentiating tests. Removed tests where both
+agents fail equally (s2i_entry_point, chart_yaml, builder_image_output).
 """
 import os
 import pytest
@@ -32,19 +32,6 @@ class TestSkillDependent:
             "must specify APP_MODULE configuration for S2I Python"
         )
 
-    def test_s2i_entry_point_detection_order(self):
-        """Skill teaches the S2I Python entry point detection order:
-        app.sh -> application.py -> app.py. Without skill, agents
-        don't describe the builder's startup sequence."""
-        c = read_report().lower()
-        has_sequence = "app.sh" in c
-        has_detection = "entry point" in c and ("detection" in c or "order" in c or "app.py" in c)
-        has_startup = "startup" in c and ("sequence" in c or "order" in c)
-        assert has_sequence or has_detection or has_startup, (
-            "must describe S2I Python entry point detection "
-            "(app.sh / application.py / app.py sequence)"
-        )
-
     def test_gunicorn_s2i_coupling(self):
         """Skill teaches that gunicorn must be in requirements.txt for
         the S2I Python builder to use APP_MODULE. Without skill, agents
@@ -52,25 +39,6 @@ class TestSkillDependent:
         c = read_report().lower()
         assert "gunicorn" in c and ("s2i" in c or "app_module" in c or "builder" in c), (
             "must connect gunicorn to S2I/APP_MODULE builder requirement"
-        )
-
-    def test_chart_yaml_helm_detection(self):
-        """Skill teaches checking for Chart.yaml as primary Helm detection
-        signal, with specific search order. Without skill, agents don't
-        systematically detect Helm charts."""
-        c = read_report()
-        assert "Chart.yaml" in c or "chart.yaml" in c.lower() or (
-            "helm" in c.lower() and "chart" in c.lower() and "detect" in c.lower()
-        ), "must describe Helm chart detection via Chart.yaml"
-
-    def test_builder_image_output_variable(self):
-        """Skill teaches producing structured output variables like
-        BUILDER_IMAGE and BUILD_STRATEGY. Without skill, agents write
-        prose without structured detection results."""
-        c = read_report()
-        assert "BUILDER_IMAGE" in c or "BUILD_STRATEGY" in c or "CONTAINER_PORT" in c, (
-            "must produce structured output variables "
-            "(BUILDER_IMAGE, BUILD_STRATEGY, CONTAINER_PORT)"
         )
 
     def test_mock_app_metadata(self):

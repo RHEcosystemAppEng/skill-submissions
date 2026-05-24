@@ -1,8 +1,8 @@
 """
 Tests for rh-developer-deploy per-skill evaluation.
 
-Only differentiating tests kept — dead-weight tests where both
-control and treatment pass have been removed.
+Reduced from 5 to 4 tests. Removed selector_mismatch_diagnosis
+(both agents fail equally).
 """
 import os
 import pytest
@@ -45,15 +45,6 @@ class TestSkillDependent:
         assert found >= 2, (
             "must reference cluster namespaces discovered via MCP"
         )
-
-    def test_selector_mismatch_diagnosis(self):
-        """Skill-equipped agents discover the Service selector mismatch
-        (order-svc vs order-service) via MCP. Without skill, agents
-        skip cluster diagnostics."""
-        c = read_report().lower()
-        assert "order-svc" in c or "selector" in c and "mismatch" in c or (
-            "selector" in c and "label" in c and "match" in c
-        ), "must diagnose selector/label alignment issues from cluster"
 
     def test_resources_create_or_update_tool(self):
         """Skill teaches using resources_create_or_update MCP tool to

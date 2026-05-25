@@ -1,0 +1,13 @@
+name: rh-basic-red-hat-get-started
+description: "rh-basic red-hat-get-started Skill Evaluation"
+persona: rh-basic
+version: "1.0.0"
+generation_mode: manual
+tags:
+  - rh-basic
+  - red-hat-get-started
+cpus: 2
+memory_mb: 2048
+storage_mb: 10240
+experiment:
+  n_trials: 3

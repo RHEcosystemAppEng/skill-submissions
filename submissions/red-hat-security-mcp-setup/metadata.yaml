@@ -1,0 +1,5 @@
+name: red-hat-security-mcp-setup
+description: "Add the Red Hat Security MCP server to this project. Configures the HTTP"
+persona: rh-sre
+version: "1.0.0"
+eval_engine: ase

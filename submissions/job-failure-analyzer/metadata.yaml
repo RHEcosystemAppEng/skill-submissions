@@ -1,0 +1,5 @@
+name: job-failure-analyzer
+description: "Extract and analyze failure events from AAP jobs to classify errors"
+persona: rh-sre
+version: "1.0.0"
+eval_engine: ase

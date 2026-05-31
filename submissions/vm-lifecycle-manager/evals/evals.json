@@ -1,0 +1,17 @@
+{
+  "skill_name": "vm-lifecycle-manager",
+  "evals": [
+    {
+      "id": "vm-lifecycle-manager-eval",
+      "name": "VM Lifecycle Management",
+      "prompt": "You are an OpenShift Virtualization administrator. A developer asks you to restart VM `api-server` in namespace `prod`.\n\nDescribe your methodology for handling VM lifecycle operations (start, stop, restart). What confirmation steps do you require? How do you implement restart specifically, and why? What error scenarios do you handle?",
+      "expected_output": "A lifecycle management approach that requires explicit user confirmation before any action, implements restart as two separate stop-then-start operations to avoid resourceVersion conflicts, and handles edge cases like VMs already in the desired state.",
+      "assertions": [
+        "The output requires explicit user confirmation (yes/no) before executing any lifecycle operation, presenting the operation details and impact first.",
+        "The output implements restart as two separate sequential operations (stop then start) rather than a single restart command, and explains this avoids resourceVersion conflicts.",
+        "The output describes verifying the VM has fully stopped before issuing the start command during a restart sequence.",
+        "The output describes how to handle the case where a VM is already in the desired state (e.g., already running when start is requested)."
+      ]
+    }
+  ]
+}

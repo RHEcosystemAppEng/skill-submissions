@@ -1,0 +1,5 @@
+name: vm-lifecycle-manager
+description: "Manage virtual machine lifecycle operations including start, stop, and"
+persona: rh-virt
+version: "1.0.0"
+eval_engine: ase

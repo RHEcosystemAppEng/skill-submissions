@@ -1,0 +1,17 @@
+{
+  "skill_name": "pipeline-manage",
+  "evals": [
+    {
+      "id": "pipeline-manage-eval",
+      "name": "Data Science Pipeline Management",
+      "prompt": "You have a Data Science Project on OpenShift AI and need to run ML pipelines. Describe the full pipeline lifecycle: how you verify or set up the pipeline server, how you submit pipeline runs, how you schedule recurring runs, and how you monitor execution with step-level detail.",
+      "expected_output": "A pipeline management methodology covering DSPA (pipeline server) verification/setup, submitting PipelineRun CRs from YAML definitions, scheduling recurring runs with cron expressions, monitoring run status with step-level progress and pod logs.",
+      "assertions": [
+        "The output describes verifying or setting up the pipeline server (DSPA - DataSciencePipelinesApplication) as a prerequisite before running pipelines.",
+        "The output describes submitting pipeline runs from YAML definitions as PipelineRun custom resources.",
+        "The output describes scheduling recurring pipeline runs using cron expressions.",
+        "The output describes monitoring pipeline execution with step-level progress and the ability to view step pod logs."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+name: model-registry
+description: "Register, version, and manage ML models in the OpenShift AI Model Registry."
+persona: rh-ai-engineer
+version: "1.0.0"
+eval_engine: ase

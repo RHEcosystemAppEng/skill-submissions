@@ -1,0 +1,17 @@
+{
+  "skill_name": "model-registry",
+  "evals": [
+    {
+      "id": "model-registry-eval",
+      "name": "Model Registry Methodology",
+      "prompt": "Your team has trained a new version of a model and needs to register it, track its metadata, and promote it from development to production.\n\nDescribe your model registry methodology: how you register models, how versioning works, how you track artifacts with storage URIs, and how you promote models across environments.",
+      "expected_output": "A registry methodology covering model registration (RegisteredModel CR), versioning (ModelVersion CR), artifact tracking with S3 storage URIs (ModelArtifact CR), and cross-environment promotion (dev -> staging -> prod) using the OpenShift AI Model Registry.",
+      "assertions": [
+        "The output describes registering models using RegisteredModel resources in the OpenShift AI Model Registry.",
+        "The output describes model versioning using ModelVersion resources linked to a registered model.",
+        "The output describes tracking model artifacts with storage URIs (e.g., S3 paths) using ModelArtifact resources.",
+        "The output describes promoting models across environments (dev -> staging -> production) as a registry workflow."
+      ]
+    }
+  ]
+}

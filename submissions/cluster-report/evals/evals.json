@@ -1,0 +1,17 @@
+{
+  "skill_name": "cluster-report",
+  "evals": [
+    {
+      "id": "cluster-report-eval",
+      "name": "Multi-Cluster Health Report",
+      "prompt": "You manage several OpenShift clusters and need a consolidated health overview to present to management.\n\nDescribe your multi-cluster health reporting methodology: what data you collect from each cluster, how you verify a context is actually an OpenShift cluster, how you handle non-OpenShift contexts in kubeconfig, and what the final report format looks like.",
+      "expected_output": "A multi-cluster report methodology that verifies each kubeconfig context is a genuine OpenShift cluster, collects node resources (CPU, memory, GPUs), namespace counts, and pod status, and presents a single comparison view across clusters.",
+      "assertions": [
+        "The output describes verifying each kubeconfig context is a genuine OpenShift cluster before including it in the report, with non-OpenShift contexts skipped by default.",
+        "The output describes collecting per-cluster metrics: node resources (CPU, memory, GPUs), namespace counts, and pod status.",
+        "The output presents the multi-cluster report in a comparison view or table format for easy cross-cluster comparison.",
+        "The output distinguishes this skill from single-cluster deep-dives or pod-level troubleshooting."
+      ]
+    }
+  ]
+}

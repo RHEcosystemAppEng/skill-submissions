@@ -1,0 +1,18 @@
+{
+  "skill_name": "governance-executor",
+  "evals": [
+    {
+      "id": "governance-executor-eval",
+      "name": "Governed Execution Methodology",
+      "prompt": "You need to execute a security patching job template targeting production infrastructure in Ansible Automation Platform. The inventory includes 200 production hosts and the template has never been run before.\n\nDescribe your governed execution methodology: what risk analysis you perform and what signals could escalate the risk level, how you handle check mode for different risk tiers, what phased rollout strategy you use for the highest risk level, and how you detect governance gaps like missing failure notifications.",
+      "expected_output": "A governed execution workflow with adaptive risk analysis that escalates risk based on operational signals (first-time execution, no check mode override, missing notifications), uses check mode with shell/command module coverage reporting, implements phased rollout (25% → full) for CRITICAL risk, and proactively reports governance gaps.",
+      "assertions": [
+        "The output describes adjusting the risk classification based on operational signals beyond just inventory type: factors like first-time execution, recent job failures, or missing check mode support can escalate a HIGH risk to CRITICAL.",
+        "The output describes scanning extra_vars or job parameters for plain-text secrets and stopping execution if secrets are detected.",
+        "The output describes a phased rollout strategy for the highest risk tier (CRITICAL) where execution targets a subset of hosts first (such as 25%) before proceeding to the full inventory, with human approval between phases.",
+        "The output describes that check mode (dry run) has limited coverage for shell and command modules, and reports the dry-run coverage percentage or warns about uncovered tasks.",
+        "The output describes proactively identifying governance gaps such as missing failure notification bindings or standalone production templates without workflow coverage, and recommending remediation."
+      ]
+    }
+  ]
+}

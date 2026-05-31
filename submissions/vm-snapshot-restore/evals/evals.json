@@ -1,0 +1,17 @@
+{
+  "skill_name": "vm-snapshot-restore",
+  "evals": [
+    {
+      "id": "vm-snapshot-restore-eval",
+      "name": "VM Snapshot Restore Methodology",
+      "prompt": "You are an OpenShift Virtualization administrator. A developer's upgrade went wrong and they need to restore VM `api-server` from snapshot `pre-upgrade-20240115` in namespace `prod`.\n\nDescribe your complete restore methodology: what safety checks you perform, what the user must understand about data loss, how you handle a running VM, and how you verify the restore completed successfully.",
+      "expected_output": "A restore methodology with strict safety protocols: requires the VM to be stopped first, warns about data loss (all changes since snapshot will be lost), requires typed snapshot name confirmation, creates a VirtualMachineRestore resource, and monitors restore completion.",
+      "assertions": [
+        "The output requires the VM to be stopped before performing a restore and describes stopping it if it is currently running.",
+        "The output explicitly warns that restoring from a snapshot replaces the current VM state and all changes since the snapshot will be permanently lost.",
+        "The output requires typed confirmation (exact snapshot name) before proceeding with the restore operation.",
+        "The output describes creating a VirtualMachineRestore resource referencing the target snapshot and monitoring its completion status."
+      ]
+    }
+  ]
+}

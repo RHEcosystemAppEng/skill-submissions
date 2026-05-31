@@ -1,0 +1,5 @@
+name: vm-snapshot-restore
+description: "Restore virtual machines from snapshots with strict safety confirmations"
+persona: rh-virt
+version: "1.0.0"
+eval_engine: ase

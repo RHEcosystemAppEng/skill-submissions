@@ -1,0 +1,5 @@
+name: s2i-build
+description: "Create BuildConfig and ImageStream resources on OpenShift and trigger"
+persona: rh-developer
+version: "1.0.0"
+eval_engine: ase

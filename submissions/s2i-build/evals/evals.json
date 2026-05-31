@@ -1,0 +1,17 @@
+{
+  "skill_name": "s2i-build",
+  "evals": [
+    {
+      "id": "s2i-build-eval",
+      "name": "S2I Build Methodology",
+      "prompt": "You need to build a container image from source code on OpenShift using Source-to-Image (S2I). The project is a Node.js application with a package.json.\n\nDescribe your S2I build methodology: what OpenShift resources you create, how you select the right builder image, how you monitor the build progress, and how you handle build failures.",
+      "expected_output": "An S2I methodology that creates BuildConfig and ImageStream resources, selects the appropriate S2I builder image based on detected language/version, monitors build logs, and handles failures with diagnostic guidance.",
+      "assertions": [
+        "The output describes creating both a BuildConfig and an ImageStream resource on OpenShift as part of the S2I build setup.",
+        "The output describes selecting an S2I builder image based on the detected programming language and version from the project.",
+        "The output describes monitoring build progress by streaming build logs and checking build status.",
+        "The output requires user confirmation of the build configuration before triggering the build."
+      ]
+    }
+  ]
+}

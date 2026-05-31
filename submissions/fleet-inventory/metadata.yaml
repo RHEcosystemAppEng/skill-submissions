@@ -1,0 +1,5 @@
+name: fleet-inventory
+description: "Query and display Red Hat Lightspeed managed system inventory. This"
+persona: rh-sre
+version: "1.0.0"
+eval_engine: ase

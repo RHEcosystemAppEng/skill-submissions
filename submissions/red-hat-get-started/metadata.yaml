@@ -1,0 +1,5 @@
+name: red-hat-get-started
+description: "Bootstrap installer. Fetches and installs all Red Hat agent skills into"
+persona: rh-sre
+version: "1.0.0"
+eval_engine: ase

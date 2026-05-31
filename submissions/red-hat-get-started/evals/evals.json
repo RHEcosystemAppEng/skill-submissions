@@ -1,0 +1,17 @@
+{
+  "skill_name": "red-hat-get-started",
+  "evals": [
+    {
+      "id": "red-hat-get-started-eval",
+      "name": "Red Hat Skills Installer",
+      "prompt": "You are setting up Red Hat agent skills for a new project. Describe the installation process: what skills are included in the pack, how each skill is installed, what happens if a download fails, and what the user should do after installation completes.",
+      "expected_output": "A bootstrap installer workflow that downloads 5 Red Hat skills (cve-explainer, diagnostics, product-lifecycle, security-mcp-setup, support-severity) from the agentic-collections repository, handles failures gracefully, and provides a post-install summary with available commands.",
+      "assertions": [
+        "The output lists the 5 Red Hat skills to install: red-hat-cve-explainer, red-hat-diagnostics, red-hat-product-lifecycle, red-hat-security-mcp-setup, and red-hat-support-severity.",
+        "The output describes continuing installation even if a single skill download fails, reporting failures at the end for manual recovery.",
+        "The output describes a post-install summary listing available slash commands for each installed skill.",
+        "The output recommends running /red-hat-security-mcp-setup after installation to configure the Security MCP server."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+name: validate-environment
+description: "Check and report the status of required tools and environment for rh-developer"
+persona: rh-developer
+version: "1.0.0"
+eval_engine: ase

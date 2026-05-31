@@ -1,0 +1,18 @@
+{
+  "skill_name": "fleet-inventory",
+  "evals": [
+    {
+      "id": "fleet-inventory-eval",
+      "name": "Fleet Inventory Methodology",
+      "prompt": "You are a Red Hat SRE. Your manager needs a current snapshot of all RHEL systems in the managed fleet ahead of a compliance audit.\n\nDescribe your fleet inventory methodology: how you enumerate managed systems, what data points you collect per host, how you identify compliance risks (stale systems, unsupported versions, outstanding CVEs), and how you present the results.",
+      "expected_output": "A fleet inventory methodology that queries Lightspeed for host details and CVE data, collects per-host information (hostname, RHEL version, check-in date, patch status), identifies stale and unsupported systems, breaks down by environment tier, and tracks system UUIDs for remediation follow-up.",
+      "assertions": [
+        "The output describes validating Lightspeed MCP connectivity before querying fleet data.",
+        "The output describes collecting per-host details including hostname, RHEL version, last check-in date, and patch status.",
+        "The output describes identifying compliance risks: stale systems (not checking in) and systems running unsupported RHEL versions.",
+        "The output describes tracking system identifiers (UUIDs) for linking inventory data to remediation follow-up actions, not just display names.",
+        "The output describes breaking down the fleet by environment tiers (production, staging, development) for a structured view."
+      ]
+    }
+  ]
+}

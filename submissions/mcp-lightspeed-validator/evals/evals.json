@@ -1,0 +1,17 @@
+{
+  "skill_name": "mcp-lightspeed-validator",
+  "evals": [
+    {
+      "id": "mcp-lightspeed-validator-eval",
+      "name": "Lightspeed MCP Validation Methodology",
+      "prompt": "You are a Red Hat SRE about to query CVE data from Red Hat Lightspeed. First you need to verify the Lightspeed MCP connection is healthy.\n\nDescribe your Lightspeed MCP validation methodology: what you test, how you handle the known limit parameter bug, what credentials are needed, and how you present results.",
+      "expected_output": "A validation methodology that calls get_cves with no parameters to avoid the limit_ serialization bug, identifies LIGHTSPEED_CLIENT_ID/CLIENT_SECRET as required credentials, warns against echoing credentials, and presents structured PASSED/FAILED results.",
+      "assertions": [
+        "The output describes calling get_cves with no parameters to avoid a known limit_ serialization bug in some clients.",
+        "The output identifies LIGHTSPEED_CLIENT_ID and LIGHTSPEED_CLIENT_SECRET as the required environment variables for authentication.",
+        "The output warns against echoing or logging credential values in plaintext.",
+        "The output presents validation results in a structured table format with PASSED/FAILED outcomes."
+      ]
+    }
+  ]
+}

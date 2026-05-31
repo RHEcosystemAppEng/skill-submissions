@@ -1,0 +1,17 @@
+{
+  "skill_name": "forensic-troubleshooter",
+  "evals": [
+    {
+      "id": "forensic-troubleshooter-eval",
+      "name": "Forensic Troubleshooting Methodology",
+      "prompt": "An AAP job has failed and you need to perform a complete forensic analysis. Describe your forensic troubleshooting methodology: what sequential steps you follow, how you correlate job events with host facts, how you classify the failure, and how you arrive at resolution recommendations.",
+      "expected_output": "A forensic workflow that orchestrates: MCP validation, job failure analysis (event extraction, timeline reconstruction, error classification), host fact inspection (correlating errors with system state), and resolution advisory with Red Hat documentation backing.",
+      "assertions": [
+        "The output describes a sequential workflow: first validate MCP connectivity, then analyze job failure events, then inspect host facts, then provide resolution recommendations.",
+        "The output describes classifying failures into categories (Platform, Code, Configuration) to determine the resolution owner.",
+        "The output describes correlating job failure events with host system facts to identify root cause (e.g., disk full, network unreachable).",
+        "The output describes providing resolution recommendations backed by Red Hat documentation references."
+      ]
+    }
+  ]
+}

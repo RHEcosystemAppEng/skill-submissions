@@ -1,0 +1,5 @@
+name: containerize-deploy
+description: "Complete end-to-end workflow for containerizing and deploying applications"
+persona: ocp-admin
+version: "1.0.0"
+eval_engine: ase

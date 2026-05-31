@@ -1,0 +1,5 @@
+name: governance-assessor
+description: "Orchestrates AAP governance readiness assessments -- full platform audit"
+persona: rh-sre
+version: "1.0.0"
+eval_engine: ase

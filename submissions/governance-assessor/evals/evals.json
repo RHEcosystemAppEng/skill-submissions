@@ -1,0 +1,17 @@
+{
+  "skill_name": "governance-assessor",
+  "evals": [
+    {
+      "id": "governance-assessor-eval",
+      "name": "AAP Governance Assessment",
+      "prompt": "You are asked to audit an AAP platform's governance readiness before it goes into production use.\n\nDescribe your governance assessment methodology: what domains you assess, how you determine the scope (full vs scoped assessment), and what rating system you use for each domain.",
+      "expected_output": "A governance assessment covering 7 domains (Workflow Governance, Notification Coverage, Access Control/RBAC, Credential Security, Execution Environments, Workload Isolation, Audit Trail) plus a bonus domain (External Authentication), with PASS/GAP/WARN ratings per domain.",
+      "assertions": [
+        "The output describes assessing 7 governance domains: Workflow Governance, Notification Coverage, Access Control/RBAC, Credential Security, Execution Environments, Workload Isolation, and Audit Trail.",
+        "The output describes supporting both full platform assessment (all domains) and scoped assessment (specific domains based on user request).",
+        "The output describes rating each domain with a structured outcome (PASS, GAP, or WARN) rather than just descriptive text.",
+        "The output describes external authentication (LDAP, SAML, SSO) as a bonus assessment domain."
+      ]
+    }
+  ]
+}

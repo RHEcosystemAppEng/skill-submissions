@@ -1,0 +1,5 @@
+name: execution-summary
+description: "Generate concise execution audit reports tracking documents consulted,"
+persona: rh-sre
+version: "1.0.0"
+eval_engine: ase

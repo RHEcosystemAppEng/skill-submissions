@@ -1,0 +1,17 @@
+{
+  "skill_name": "execution-summary",
+  "evals": [
+    {
+      "id": "execution-summary-eval",
+      "name": "Execution Audit Summary",
+      "prompt": "After completing a governed AAP execution workflow, you need to generate an audit trail.\n\nDescribe your execution summary methodology: what information you collect from the session, how you structure the audit report, and what categories of data you track (documents consulted, tools used, decisions made, outcomes).",
+      "expected_output": "An audit summary methodology that tracks documents consulted, MCP tools invoked with parameters, governance decisions made with classifications, human approval interactions, and final outcomes in a structured report format.",
+      "assertions": [
+        "The output describes tracking which governance documents were consulted during the workflow and what topics they informed.",
+        "The output describes tracking MCP tools invoked with their parameters and summarized results.",
+        "The output describes tracking governance decisions made (risk classifications, PASS/GAP/WARN assessments) and their basis.",
+        "The output describes tracking human interactions: what approvals were requested and what the user decided."
+      ]
+    }
+  ]
+}

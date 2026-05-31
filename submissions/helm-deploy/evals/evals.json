@@ -1,0 +1,17 @@
+{
+  "skill_name": "helm-deploy",
+  "evals": [
+    {
+      "id": "helm-deploy-eval",
+      "name": "Helm Deployment Methodology",
+      "prompt": "A developer has a project with a Helm chart detected in the repository. They want to deploy it to OpenShift.\n\nDescribe your Helm deployment methodology: how you detect and validate the chart, how you customize values, how you handle install vs upgrade, and what rollback options are available if the deployment fails.",
+      "expected_output": "A Helm deployment workflow that searches for Chart.yaml in standard locations, allows values customization, uses helm install or helm upgrade --install, and supports rollback to a previous revision on failure.",
+      "assertions": [
+        "The output describes searching for Helm charts in standard project locations (Chart.yaml, chart/, charts/*, helm/, deploy/helm/).",
+        "The output describes allowing users to review and customize Helm values before installation, rather than deploying with defaults automatically.",
+        "The output distinguishes between initial install and upgrade operations, describing when to use each.",
+        "The output describes rollback options on deployment failure, such as helm rollback to a previous release revision."
+      ]
+    }
+  ]
+}

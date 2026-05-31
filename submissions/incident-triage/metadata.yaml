@@ -1,0 +1,5 @@
+name: incident-triage
+description: "Structured incident investigation for OpenShift using the Five Whys"
+persona: rh-sre
+version: "1.0.0"
+eval_engine: ase

@@ -1,0 +1,5 @@
+name: forensic-troubleshooter
+description: "Orchestrates forensic analysis of failed jobs with event extraction,"
+persona: rh-sre
+version: "1.0.0"
+eval_engine: ase

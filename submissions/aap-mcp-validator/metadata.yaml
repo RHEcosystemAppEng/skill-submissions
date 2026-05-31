@@ -1,0 +1,5 @@
+name: aap-mcp-validator
+description: "Validate that required AAP MCP servers are accessible before executing"
+persona: rh-sre
+version: "1.0.0"
+eval_engine: ase

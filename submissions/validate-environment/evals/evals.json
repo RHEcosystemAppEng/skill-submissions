@@ -1,0 +1,17 @@
+{
+  "skill_name": "validate-environment",
+  "evals": [
+    {
+      "id": "validate-environment-eval",
+      "name": "Environment Validation Methodology",
+      "prompt": "You are a developer setting up your environment to work with OpenShift deployments. You want to make sure all required tools and connections are working before running any deployment skills.\n\nDescribe your environment validation methodology: what scopes of validation are available, what tools you check, how you verify OpenShift connectivity, and how you check container runtime readiness.",
+      "expected_output": "A validation methodology with multiple scopes (All, OpenShift, RHEL/Containers, Minimal), tool checks for git/curl/jq/oc/helm/podman/docker/skopeo/ssh, OpenShift connectivity checks (whoami, project, permissions), and container runtime verification.",
+      "assertions": [
+        "The output describes multiple validation scopes the user can choose from: All, OpenShift, RHEL/Containers, and Minimal (core tools only).",
+        "The output lists specific tools to check including oc, helm, podman, git, and describes verifying each tool's availability and version.",
+        "The output describes checking OpenShift connectivity by verifying login status (oc whoami), current project, and permissions for key resource types like deployments and buildconfigs.",
+        "The output describes checking container runtime readiness by verifying podman or docker availability and testing image pull capability."
+      ]
+    }
+  ]
+}

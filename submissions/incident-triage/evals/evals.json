@@ -1,0 +1,18 @@
+{
+  "skill_name": "incident-triage",
+  "evals": [
+    {
+      "id": "incident-triage-eval",
+      "name": "Incident Triage Methodology",
+      "prompt": "An OpenShift application has been intermittently failing for the past hour. Multiple pods are restarting and alerts are firing. You need to perform a structured incident investigation.\n\nDescribe your incident triage methodology: what investigation framework you use, how you trace from symptoms to root cause across multiple resource types, what guardrails prevent you from going down rabbit holes, and how you verify your conclusion before recommending a fix.",
+      "expected_output": "A structured triage using the Five Whys methodology, investigation guardrails to prevent scope creep, multi-resource diagnosis across Deployments/ReplicaSets/Pods/Services, Prometheus metric analysis, and adversarial due diligence to verify conclusions.",
+      "assertions": [
+        "The output uses the Five Whys methodology or equivalent structured root cause analysis framework rather than ad-hoc debugging.",
+        "The output describes investigation guardrails that prevent scope creep and keep the investigation focused on the most likely cause.",
+        "The output describes tracing across multiple resource types (Deployments, ReplicaSets, Pods, Services, events) to build a complete picture.",
+        "The output describes adversarial due diligence: verifying the proposed root cause by looking for evidence that contradicts the hypothesis before recommending a fix.",
+        "The output requires user confirmation before applying any remediation action, presenting a preview of what will change."
+      ]
+    }
+  ]
+}

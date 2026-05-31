@@ -1,0 +1,5 @@
+name: vm-inventory
+description: "List and view virtual machines across namespaces with status, resource"
+persona: rh-virt
+version: "1.0.0"
+eval_engine: ase

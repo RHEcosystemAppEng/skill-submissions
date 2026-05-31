@@ -1,0 +1,17 @@
+{
+  "skill_name": "execution-risk-analyzer",
+  "evals": [
+    {
+      "id": "execution-risk-analyzer-eval",
+      "name": "Execution Risk Analysis Methodology",
+      "prompt": "You are about to execute an AAP job template targeting a production inventory. Before launching, you need to assess the execution risk.\n\nDescribe your risk analysis methodology: how you classify inventory risk, how you scan extra_vars for secrets, how you assess execution scope, and what risk levels you assign with their corresponding governance controls.",
+      "expected_output": "A risk analysis that consults execution governance documentation first, classifies inventory by environment criticality, scans extra_vars for secrets or unsafe patterns, and assigns risk levels (CRITICAL/HIGH/MEDIUM/LOW) with escalating governance controls.",
+      "assertions": [
+        "The output describes consulting execution governance documentation before performing any risk analysis.",
+        "The output classifies inventory risk based on environment type (production = highest risk, development = lowest).",
+        "The output describes scanning extra_vars for secrets, unsafe patterns, or potentially dangerous values.",
+        "The output assigns risk levels (CRITICAL, HIGH, MEDIUM, LOW) with different governance controls per level (e.g., CRITICAL/HIGH require check mode before execution)."
+      ]
+    }
+  ]
+}

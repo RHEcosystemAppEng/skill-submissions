@@ -1,0 +1,5 @@
+name: execution-risk-analyzer
+description: "Analyze execution risk by classifying inventory, scanning extra_vars"
+persona: rh-sre
+version: "1.0.0"
+eval_engine: ase

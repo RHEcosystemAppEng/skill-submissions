@@ -1,0 +1,5 @@
+name: pipeline-manage
+description: "Create, run, schedule, and monitor Data Science Pipelines (Kubeflow"
+persona: ocp-admin
+version: "1.0.0"
+eval_engine: ase

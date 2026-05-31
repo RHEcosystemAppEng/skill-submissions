@@ -1,0 +1,19 @@
+{
+  "skill_name": "vm-delete",
+  "evals": [
+    {
+      "id": "vm-delete-eval",
+      "name": "VM Deletion Safety Methodology",
+      "prompt": "You are an OpenShift Virtualization administrator. A team lead asks you to delete VM `legacy-app` in namespace `decommission`.\n\nDescribe your complete deletion methodology: what safety checks you would perform, how you handle different deletion scopes, what safeguards prevent accidental deletion, and how you handle edge cases like stuck VMs or protected resources.",
+      "expected_output": "A deletion methodology with strict safety protocols: typed name confirmation, protected label checks, stop-before-delete, deletion scope options (VM-only vs VM+storage), finalizer handling for stuck VMs, and PV reclaim policy considerations.",
+      "assertions": [
+        "The output describes stopping a running VM before deletion as a required pre-deletion step.",
+        "The output presents deletion scope options distinguishing VM-only deletion from VM+storage deletion, and warns about orphaned PVCs or DataVolumes.",
+        "The output requires typed VM name confirmation (exact match) as a safeguard before proceeding with deletion.",
+        "The output describes checking for a protected: true label that blocks deletion and explains how to handle it.",
+        "The output describes a finalizer removal procedure for VMs stuck in Terminating state.",
+        "The output addresses PV reclaim policy Retain potentially blocking PVC cleanup after VM deletion."
+      ]
+    }
+  ]
+}

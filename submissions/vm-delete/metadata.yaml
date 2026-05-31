@@ -1,0 +1,5 @@
+name: vm-delete
+description: "Permanently delete virtual machines and their associated resources from"
+persona: rh-virt
+version: "1.0.0"
+eval_engine: ase

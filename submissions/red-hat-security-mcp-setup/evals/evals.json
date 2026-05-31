@@ -1,0 +1,17 @@
+{
+  "skill_name": "red-hat-security-mcp-setup",
+  "evals": [
+    {
+      "id": "red-hat-security-mcp-setup-eval",
+      "name": "Red Hat Security MCP Setup",
+      "prompt": "A developer wants to enable live CVE and advisory lookups in their project. They need to add the Red Hat Security MCP server.\n\nDescribe the setup process: what file to modify, what the server configuration looks like, how authentication works, and what happens after setup.",
+      "expected_output": "A setup guide that adds a red-hat-security HTTP server entry to .mcp.json at the project root, configures the endpoint URL, and explains the Red Hat Customer Portal SSO browser-based authentication flow.",
+      "assertions": [
+        "The output describes adding a server entry to .mcp.json at the project root, with key 'red-hat-security' and type 'http'.",
+        "The output specifies the MCP endpoint URL as https://security-mcp.api.redhat.com/mcp.",
+        "The output explains the authentication flow: Red Hat Customer Portal SSO via browser, with automatic browser window opening on first tool call.",
+        "The output describes merging the new server entry into existing .mcp.json without removing other servers already configured."
+      ]
+    }
+  ]
+}

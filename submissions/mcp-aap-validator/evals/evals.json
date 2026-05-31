@@ -1,0 +1,17 @@
+{
+  "skill_name": "mcp-aap-validator",
+  "evals": [
+    {
+      "id": "mcp-aap-validator-eval",
+      "name": "AAP MCP Validation Methodology",
+      "prompt": "You are a Red Hat SRE about to run a remediation workflow that uses Ansible Automation Platform. First you need to verify AAP connectivity.\n\nDescribe your AAP MCP validation methodology: what servers you test, what tool calls you use for validation, what the common failure modes are, and how you present the results.",
+      "expected_output": "A validation methodology that tests both AAP MCP servers (job-management and inventory-management), explains that AAP_MCP_SERVER must point to the MCP gateway endpoint (not the UI URL), and presents per-server PASSED/FAILED outcomes in a structured table.",
+      "assertions": [
+        "The output describes testing both AAP MCP servers: job-management (job_templates_list) and inventory-management (inventories_list).",
+        "The output explains that AAP_MCP_SERVER must point to the MCP gateway endpoint, not the main AAP UI URL, and that 404 errors indicate a wrong URL.",
+        "The output describes common failure modes including expired tokens (401), insufficient RBAC permissions (403), and wrong URL (404).",
+        "The output presents validation results in a structured table with per-server PASSED/FAILED/PARTIAL outcomes."
+      ]
+    }
+  ]
+}

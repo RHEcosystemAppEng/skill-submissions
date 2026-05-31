@@ -1,0 +1,5 @@
+name: mcp-aap-validator
+description: "Validate AAP (Ansible Automation Platform) MCP server connectivity."
+persona: rh-sre
+version: "1.0.0"
+eval_engine: ase

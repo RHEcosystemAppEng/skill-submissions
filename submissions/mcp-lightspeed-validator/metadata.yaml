@@ -1,0 +1,5 @@
+name: mcp-lightspeed-validator
+description: "Validate Red Hat Lightspeed MCP server connectivity. Use when the user"
+persona: rh-sre
+version: "1.0.0"
+eval_engine: ase

@@ -1,0 +1,5 @@
+name: helm-deploy
+description: "Deploy applications to OpenShift using Helm charts. Use this skill when"
+persona: ocp-admin
+version: "1.0.0"
+eval_engine: ase

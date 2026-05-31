@@ -1,0 +1,17 @@
+{
+  "skill_name": "model-deploy",
+  "evals": [
+    {
+      "id": "model-deploy-eval",
+      "name": "AI Model Deployment Methodology",
+      "prompt": "You need to deploy a Llama 3 model on OpenShift AI. The cluster has NVIDIA GPUs available.\n\nDescribe your model deployment methodology: what serving runtimes are available, how you select the right one, how you validate GPU availability, how you create the InferenceService, and how you monitor the deployment rollout.",
+      "expected_output": "A deployment methodology using KServe InferenceService with runtime selection (vLLM, NVIDIA NIM, Caikit+TGIS), GPU pre-flight checks (node availability, taints, tolerations), hardware profile lookup, and rollout monitoring with pod status checks.",
+      "assertions": [
+        "The output describes selecting between serving runtimes: vLLM, NVIDIA NIM, and Caikit+TGIS, explaining when each is appropriate.",
+        "The output describes GPU pre-flight validation: checking node availability, GPU taints, and configuring tolerations on the InferenceService.",
+        "The output describes creating a KServe InferenceService custom resource as the deployment mechanism.",
+        "The output describes monitoring the deployment rollout by checking predictor pod status and InferenceService readiness conditions."
+      ]
+    }
+  ]
+}

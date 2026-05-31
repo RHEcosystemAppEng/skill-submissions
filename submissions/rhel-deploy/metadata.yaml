@@ -1,0 +1,5 @@
+name: rhel-deploy
+description: "CRITICAL: When user types /rhel-deploy, use THIS skill immediately."
+persona: ocp-admin
+version: "1.0.0"
+eval_engine: ase

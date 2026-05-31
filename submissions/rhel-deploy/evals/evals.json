@@ -1,0 +1,18 @@
+{
+  "skill_name": "rhel-deploy",
+  "evals": [
+    {
+      "id": "rhel-deploy-eval",
+      "name": "RHEL Deployment Methodology",
+      "prompt": "You need to deploy a Python web application to a standalone RHEL 9 host via SSH, not to OpenShift. The host has Podman installed. The application needs persistent data stored at /var/data/myapp.\n\nDescribe your complete deployment methodology: how you analyze the target host capabilities, the two deployment strategies available and when to choose each, how you handle Podman container volume mounts with SELinux labels, the difference between rootful and rootless Podman systemd units, and what pre-deploy checks you would perform if Red Hat Insights is available.",
+      "expected_output": "A RHEL deployment methodology covering host analysis (OS version, Podman availability, SELinux status, firewall), two strategies (Container with Podman + systemd vs Native with dnf + systemd), SELinux volume labels :z (shared) vs :Z (private) for Podman mounts, rootful vs rootless systemd unit paths and linger, and optional Insights checks for RHEL lifecycle and CVEs.",
+      "assertions": [
+        "The output describes two distinct deployment strategies: container-based (Podman with systemd) and native (direct installation with systemd), and provides guidance on when each is appropriate.",
+        "The output describes SELinux volume labeling for Podman container mounts using :z for shared volumes and :Z for private (exclusive) volumes to avoid SELinux denials on bind mounts.",
+        "The output distinguishes between rootful and rootless Podman deployments, noting different systemd unit file locations (/etc/systemd/system/ for rootful vs ~/.config/systemd/user/ for rootless) and that rootless requires loginctl enable-linger.",
+        "The output describes analyzing the target RHEL host capabilities before deployment, including checking RHEL version, Podman availability, SELinux enforcement status, and firewall state.",
+        "The output describes optionally checking Red Hat Insights before deployment for the RHEL version lifecycle status (active support vs end of life) and known critical CVEs on the target system."
+      ]
+    }
+  ]
+}

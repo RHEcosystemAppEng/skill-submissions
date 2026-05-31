@@ -1,0 +1,18 @@
+{
+  "skill_name": "deploy",
+  "evals": [
+    {
+      "id": "deploy-eval",
+      "name": "OpenShift Deployment Methodology",
+      "prompt": "You have a container image built via S2I that is ready in an OpenShift ImageStream. You need to deploy it and make it accessible externally.\n\nDescribe your complete deployment methodology: what Kubernetes resources you create and in what order, how you detect the correct container port when it is not explicitly provided, how you configure external access with HTTPS, how you monitor the rollout, and what you do when deployment fails including how you triage between different failure types.",
+      "expected_output": "A deployment methodology that creates Deployment, Service, and Route in order, detects container port from multiple sources with framework-specific defaults, configures TLS edge termination on the Route, monitors rollout with pod status polling, and offers failure triage options including delegating to debug-pod or debug-network skills.",
+      "assertions": [
+        "The output describes creating resources in a specific order: Deployment first, then Service, then Route, as three distinct steps.",
+        "The output describes a port detection strategy that checks multiple sources including Dockerfile EXPOSE directives, web server config files (such as nginx.conf or httpd.conf), and framework-specific defaults with concrete port numbers (e.g., Node.js 3000/8080, Python Flask 5000, Java Spring Boot 8080, Go 8080).",
+        "The output describes configuring the Route with TLS edge termination for HTTPS access rather than only plain HTTP.",
+        "The output describes monitoring the rollout by checking pod readiness status and handling a timeout period (such as 5 minutes) after which the deployment is considered failed.",
+        "The output describes offering multiple triage paths when deployment fails, including at least: investigating pod failures, investigating network/connectivity issues, viewing logs, and rolling back the deployment."
+      ]
+    }
+  ]
+}

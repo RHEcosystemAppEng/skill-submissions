@@ -1,0 +1,17 @@
+{
+  "skill_name": "job-failure-analyzer",
+  "evals": [
+    {
+      "id": "job-failure-analyzer-eval",
+      "name": "Job Failure Analysis Methodology",
+      "prompt": "An AAP job has failed and you need to analyze what went wrong. Describe your job failure analysis methodology: what data you retrieve from the job, how you extract and interpret failure events, how you classify the error type, and how you reconstruct the failure timeline.",
+      "expected_output": "A failure analysis that consults troubleshooting documentation first, retrieves job status and events, extracts failure events from host summaries, classifies errors into categories (Platform/Code/Configuration), and reconstructs a failure timeline.",
+      "assertions": [
+        "The output describes consulting job troubleshooting documentation before analyzing the failure.",
+        "The output describes retrieving job status, events, and host summaries from the job management MCP.",
+        "The output describes classifying errors into categories such as Platform, Code, or Configuration to determine the resolution owner.",
+        "The output describes reconstructing a failure timeline from job events to show the sequence of what happened."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "skill_name": "host-fact-inspector",
+  "evals": [
+    {
+      "id": "host-fact-inspector-eval",
+      "name": "Host Fact Inspection Methodology",
+      "prompt": "A job failed on several hosts and you need to correlate the failure with host system facts.\n\nDescribe your host fact inspection methodology: what documentation you consult, how you identify which host facts are relevant to the failure type, and how you correlate errors with system state.",
+      "expected_output": "A host fact inspection methodology that consults troubleshooting documentation for error-to-fact mapping, queries host details from inventory MCP, and correlates failure patterns with specific host facts (disk space, memory, connectivity).",
+      "assertions": [
+        "The output describes consulting job troubleshooting documentation to understand which host facts correlate with the identified failure patterns.",
+        "The output describes looking up affected hosts from the job failure analysis results.",
+        "The output describes correlating specific error types with relevant host facts (e.g., disk full errors -> check ansible_mounts, connectivity errors -> check ansible_default_ipv4).",
+        "The output describes retrieving host variables and facts from the inventory management MCP server."
+      ]
+    }
+  ]
+}

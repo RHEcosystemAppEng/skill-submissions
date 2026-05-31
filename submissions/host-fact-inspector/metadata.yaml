@@ -1,0 +1,5 @@
+name: host-fact-inspector
+description: "Correlate job failures with host system facts to determine platform"
+persona: general
+version: "1.0.0"
+eval_engine: ase

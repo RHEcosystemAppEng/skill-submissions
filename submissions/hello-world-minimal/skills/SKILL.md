@@ -1,3 +1,8 @@
+---
+name: hello-world
+description: A trivial file-creation skill for smoke testing
+---
+
 # Hello World Skill
 
 A trivial file-creation skill used as a smoke test for the ABEvalFlow pipeline.

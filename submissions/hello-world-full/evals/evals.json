@@ -1,0 +1,16 @@
+{
+  "skill_name": "hello-world",
+  "evals": [
+    {
+      "id": "hello-world-eval",
+      "name": "File Creation Knowledge",
+      "prompt": "A user asks you to create a file called hello.txt with 'Hello, world!' as the content.\n\nExplain how you would accomplish this task. Describe the file path, the exact content, and the method you would use to create the file.",
+      "expected_output": "A response that describes creating a file named hello.txt with the exact content 'Hello, world!' (including the comma and exclamation mark).",
+      "assertions": [
+        "The output specifies creating a file named 'hello.txt' in the current directory.",
+        "The output includes the exact content 'Hello, world!' with proper punctuation (comma after Hello, exclamation mark at end).",
+        "The output describes a method to create the file (e.g., using a text editor, echo command, write function, or file creation API)."
+      ]
+    }
+  ]
+}

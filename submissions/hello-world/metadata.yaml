@@ -1,12 +1,8 @@
 name: hello-world
 description: "Create a file with specific content -- minimal smoke-test submission"
 persona: general
-version: "0.1.3"
+version: "0.2.0"
 tags:
   - smoke-test
   - trivial
-cpus: 1
-memory_mb: 512
-storage_mb: 1024
-experiment:
-  n_trials: 1
+eval_engine: ase

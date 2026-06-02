@@ -1,0 +1,18 @@
+{
+  "skill_name": "containerize-deploy",
+  "evals": [
+    {
+      "id": "containerize-deploy-eval",
+      "name": "Containerize and Deploy Workflow",
+      "prompt": "A developer has a Python Flask application in a local directory and wants to get it running on OpenShift. They don't know much about containers or Kubernetes.\n\nDescribe the complete end-to-end workflow you would guide them through: from analyzing their source code to having a running, accessible application. What phases does the workflow have, what decisions need user input at each phase, and what deployment strategies are available?",
+      "expected_output": "A multi-phase guided workflow covering project detection, target selection (OpenShift vs RHEL), build strategy selection (S2I, Podman, Helm), deployment with user confirmation checkpoints at each phase, and support for resume and rollback.",
+      "assertions": [
+        "The output describes a multi-phase workflow that starts with project detection (language/framework analysis) before selecting a build or deployment strategy.",
+        "The output presents deployment target options including both OpenShift and standalone RHEL hosts.",
+        "The output describes multiple build strategies such as S2I (Source-to-Image), Podman, and Helm, and explains when each is appropriate.",
+        "The output requires user confirmation checkpoints at each major phase transition rather than proceeding automatically.",
+        "The output describes the orchestration of sub-skills or sub-workflows (detect-project, s2i-build, deploy, helm-deploy, rhel-deploy) as discrete steps in the pipeline."
+      ]
+    }
+  ]
+}

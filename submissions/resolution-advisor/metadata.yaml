@@ -1,0 +1,5 @@
+name: resolution-advisor
+description: "Provide Red Hat documentation-backed resolution recommendations for"
+persona: rh-sre
+version: "1.0.0"
+eval_engine: ase

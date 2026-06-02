@@ -1,0 +1,17 @@
+{
+  "skill_name": "resolution-advisor",
+  "evals": [
+    {
+      "id": "resolution-advisor-eval",
+      "name": "Resolution Advisory Methodology",
+      "prompt": "After analyzing a failed AAP job and inspecting host facts, you need to provide resolution recommendations. The failure was classified as a Configuration error (privilege escalation timeout).\n\nDescribe your resolution advisory methodology: what documentation you consult, how you map error classifications to resolution paths, and how you determine the resolution owner.",
+      "expected_output": "A resolution methodology that consults error classification and troubleshooting documentation, maps error types to resolution paths and owners (Platform team, Developer, Ops), and provides Red Hat documentation-backed recommendations.",
+      "assertions": [
+        "The output describes consulting error classification documentation to determine the resolution path based on the error type.",
+        "The output describes mapping error classifications to resolution owners (e.g., Platform errors -> platform team, Code errors -> developer, Configuration errors -> ops).",
+        "The output describes providing resolution recommendations backed by specific Red Hat documentation references.",
+        "The output describes this skill as running after job-failure-analyzer and host-fact-inspector have already completed their analysis."
+      ]
+    }
+  ]
+}

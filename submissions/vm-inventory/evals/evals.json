@@ -1,0 +1,17 @@
+{
+  "skill_name": "vm-inventory",
+  "evals": [
+    {
+      "id": "vm-inventory-eval",
+      "name": "VM Inventory Methodology",
+      "prompt": "You are an OpenShift Virtualization administrator. Your manager asks for a complete inventory of all VMs across the cluster.\n\nDescribe your methodology for listing VMs: what information you would collect per VM, how you handle large clusters, what table format you would present, and how you distinguish between running and stopped VMs in terms of available data.",
+      "expected_output": "An inventory methodology that queries VirtualMachine and VirtualMachineInstance resources, includes a large-cluster safeguard (skip VMI queries for 20+ VMs), presents results in a structured table with columns for status, resources, storage, guest OS, IP, node, and conditions.",
+      "assertions": [
+        "The output describes querying both VirtualMachine (VM) and VirtualMachineInstance (VMI) resources to get complete information, explaining that VMI provides runtime details like IP, guest OS, and node placement.",
+        "The output describes a large-cluster safeguard: when more than 20 VMs are found, skip detailed VMI queries and show a summary-only view, suggesting the user narrow by namespace.",
+        "The output explains that stopped VMs have limited information available (no IP, no guest OS, no node) compared to running VMs, and describes how to handle this difference in the output table.",
+        "The output describes presenting VM inventory in a structured table format with columns including namespace, name, status, resources, storage, and conditions."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "skill_name": "detect-project",
+  "evals": [
+    {
+      "id": "detect-project-eval",
+      "name": "Project Detection Methodology",
+      "prompt": "A developer points you at a GitHub repository URL and wants to containerize and deploy it. You don't know what language or framework it uses yet.\n\nDescribe your project detection methodology: how you analyze a project (local vs remote), what indicator files you look for per language, what build strategy you recommend based on findings, and how you handle remote repositories without cloning them.",
+      "expected_output": "A detection methodology that uses GitHub API to inspect remote repos without cloning, identifies language from indicator files (package.json, requirements.txt, pom.xml, go.mod, etc.), recommends build strategies, and supports multiple languages including Node.js, Python, Java, Go, Ruby, .NET, PHP.",
+      "assertions": [
+        "The output describes using GitHub API tools to analyze remote repositories without cloning them first.",
+        "The output identifies programming languages by scanning for indicator files: package.json (Node.js), requirements.txt/Pipfile (Python), pom.xml/build.gradle (Java), go.mod (Go), Gemfile (Ruby).",
+        "The output recommends a build strategy (S2I, Podman, Helm) based on the detected project type and available resources.",
+        "The output describes a fallback path when the remote repository cannot be accessed directly (e.g., asking the user to confirm language/framework manually)."
+      ]
+    }
+  ]
+}

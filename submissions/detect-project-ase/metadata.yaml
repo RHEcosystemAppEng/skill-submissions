@@ -1,0 +1,5 @@
+name: detect-project-ase
+description: "Analyze a project folder or GitHub repository to detect programming"
+persona: ocp-admin
+version: "1.0.0"
+eval_engine: ase

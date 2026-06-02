@@ -1,0 +1,17 @@
+{
+  "skill_name": "governed-job-launcher",
+  "evals": [
+    {
+      "id": "governed-job-launcher-eval",
+      "name": "Governed Job Launch Methodology",
+      "prompt": "After completing a risk analysis that classified an execution as HIGH risk, you need to launch the job with appropriate governance controls.\n\nDescribe your governed launch methodology: how you adapt the execution strategy based on risk signals, how check mode works and what you check in its results, what the approval flow looks like, and how you handle a failed execution.",
+      "expected_output": "A governed launch that consults execution governance documentation first, runs check mode and interprets results, requires human approval before actual run, monitors execution, and supports rollback on failure.",
+      "assertions": [
+        "The output describes consulting execution governance documentation before any job launch.",
+        "The output describes running check mode first for HIGH risk targets and interpreting the check mode results before proceeding.",
+        "The output describes requiring explicit human approval between check mode and the actual job launch.",
+        "The output describes rollback procedures when a job execution fails, including the ability to relaunch with different parameters."
+      ]
+    }
+  ]
+}

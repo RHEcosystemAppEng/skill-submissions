@@ -1,0 +1,5 @@
+name: governed-job-launcher
+description: "Execute governed job launches with check mode, approval gates, phased"
+persona: rh-sre
+version: "1.0.0"
+eval_engine: ase

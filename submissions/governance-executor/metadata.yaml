@@ -1,0 +1,5 @@
+name: governance-executor
+description: "Orchestrates governed job execution with risk analysis, check mode,"
+persona: rh-sre
+version: "1.0.0"
+eval_engine: ase

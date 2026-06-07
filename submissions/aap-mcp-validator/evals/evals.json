@@ -1,0 +1,17 @@
+{
+  "skill_name": "aap-mcp-validator",
+  "evals": [
+    {
+      "id": "aap-mcp-validator-eval",
+      "name": "AAP MCP Server Validation",
+      "prompt": "You are about to execute an AAP governance workflow. Before starting, you need to validate that all required AAP MCP servers are accessible.\n\nDescribe your validation methodology: what 6 AAP MCP servers exist, how you map workflows to required servers, how you test each server, and how you report results.",
+      "expected_output": "A validation methodology covering all 6 AAP MCP servers (job-management, inventory-management, configuration, security-compliance, system-monitoring, user-management), mapping workflows to required server subsets, and structured PASSED/FAILED reporting.",
+      "assertions": [
+        "The output lists the 6 AAP MCP servers: job-management, inventory-management, configuration, security-compliance, system-monitoring, and user-management.",
+        "The output describes mapping common workflows to their required server subsets (e.g., execution needs job-management + inventory-management, full assessment needs all 6).",
+        "The output describes testing each server with a lightweight tool call to verify connectivity.",
+        "The output presents results in a structured table with per-server PASSED/FAILED/PARTIAL outcomes."
+      ]
+    }
+  ]
+}

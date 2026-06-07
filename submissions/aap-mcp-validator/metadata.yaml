@@ -3,3 +3,5 @@ description: "Validate that required AAP MCP servers are accessible before execu
 persona: rh-sre
 version: "1.0.0"
 eval_engine: ase
+experiment:
+  n_trials: 1

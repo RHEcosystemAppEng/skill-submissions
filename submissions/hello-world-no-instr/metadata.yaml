@@ -1,0 +1,13 @@
+name: hello-world-no-instr
+description: "Create a file with specific content -- tests pipeline AI generation (no instruction.md)"
+persona: general
+version: "0.1.0"
+tags:
+  - smoke-test
+  - ai-generated
+generation_mode: ai
+cpus: 1
+memory_mb: 512
+storage_mb: 1024
+experiment:
+  n_trials: 1

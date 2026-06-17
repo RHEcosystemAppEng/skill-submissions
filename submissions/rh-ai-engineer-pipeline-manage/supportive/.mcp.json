@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "ai-observability": {
+      "command": "python3",
+      "args": ["/workspace/supportive/mcp-servers/mock-observability-mcp.py"]
+    },
+    "openshift": {
+      "command": "python3",
+      "args": ["/workspace/supportive/mcp-servers/mock-openshift-mcp.py"]
+    },
+    "rhoai": {
+      "command": "python3",
+      "args": ["/workspace/supportive/mcp-servers/mock-rhoai-mcp.py"]
+    }
+  }
+}

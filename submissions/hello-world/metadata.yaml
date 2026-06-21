@@ -20,9 +20,9 @@ gate_policy:
     fact_ref_prefix: catalog:default/abevalflow_
     bearer_token: ${COMPASS_API_TOKEN}
   gates:
-    harbor:
+    evaluation:
       mode: block
       push_fact: true
-    cisco:
+    security:
       mode: warn
       push_fact: true

@@ -18,6 +18,7 @@ gate_policy:
     endpoint: https://compass.stage.redhat.com/api/soundcheck/facts/
     entity_ref: component:default/hello-world-skill
     fact_ref_prefix: catalog:default/abevalflow_
+    bearer_token: ${COMPASS_API_TOKEN}
   gates:
     harbor:
       mode: block

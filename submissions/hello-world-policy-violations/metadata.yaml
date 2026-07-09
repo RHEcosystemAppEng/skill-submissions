@@ -1,0 +1,10 @@
+name: hello-world-policy-violations
+description: "Hello-world variant with intentional operational policy violations"
+persona: general
+version: "0.1.0"
+tags:
+  - smoke-test
+  - ase
+  - policy-test
+eval_engine: ase
+cpus: 8

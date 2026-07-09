@@ -1,0 +1,12 @@
+name: hello-world-policy-pass
+description: "Hello-world variant that passes all operational policy checks"
+persona: general
+version: "0.1.0"
+tags:
+  - smoke-test
+  - ase
+  - policy-test
+eval_engine: ase
+cpus: 2
+memory_mb: 4096
+agent_timeout_sec: 600

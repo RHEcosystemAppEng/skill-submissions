@@ -8,3 +8,6 @@ tags:
   - policy-test
 eval_engine: ase
 cpus: 8
+certification_policy:
+  operational_limits:
+    enabled: true

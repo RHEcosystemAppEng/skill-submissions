@@ -10,3 +10,6 @@ eval_engine: ase
 cpus: 2
 memory_mb: 4096
 agent_timeout_sec: 600
+certification_policy:
+  operational_limits:
+    enabled: true

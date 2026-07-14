@@ -1,0 +1,80 @@
+name: aeh-hello-world-pairwise-treatment
+description: Treatment variant for pairwise A/B test (with enhanced capabilities)
+skill: aeh-hello-world-pairwise
+
+execution:
+  mode: case
+  arguments: "{prompt}"
+  timeout: 60
+
+runner:
+  type: claude-code
+  plugin_dirs:
+    - skills
+
+models:
+  skill: claude-sonnet-4-5
+  judge: claude-sonnet-4-5
+
+permissions:
+  allow:
+    - "Write"
+    - "Read"
+    - "Edit"
+    - "Bash"
+  deny: []
+
+dataset:
+  path: cases
+  schema: |
+    Each case directory contains:
+    - input.yaml: prompt field with the task description
+    - annotations.yaml: expected_file and expected_content for validation
+
+outputs:
+  - path: output
+    schema: Files created during skill execution
+
+traces:
+  stdout: true
+  stderr: true
+  events: false
+  metrics: true
+
+judges:
+  - name: exit_success
+    description: Check that Claude Code exited successfully
+    check: |
+      exit_code = outputs.get("exit_code")
+      if exit_code is None or exit_code == 0:
+          return True, f"Success (exit code {exit_code})"
+      return False, f"Failed with exit code {exit_code}"
+
+  - name: file_created
+    description: Verify the expected file was created with correct content
+    check: |
+      annotations = outputs.get("annotations", {})
+      expected_file = annotations.get("expected_file", "")
+      expected_content = annotations.get("expected_content", "")
+
+      if not expected_file:
+          return False, "No expected_file specified in annotations"
+
+      files = outputs.get("files", {})
+
+      for path, content in files.items():
+          if expected_file in path and isinstance(content, str):
+              if expected_content and expected_content in content:
+                  return True, f"Found {expected_file} with correct content"
+              elif not expected_content:
+                  return True, f"Found {expected_file}"
+              else:
+                  return False, f"Found {expected_file} but content mismatch"
+
+      return False, f"File {expected_file} not found in outputs"
+
+thresholds:
+  exit_success:
+    min_pass_rate: 1.0
+  file_created:
+    min_pass_rate: 1.0

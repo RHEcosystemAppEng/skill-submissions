@@ -1,0 +1,5 @@
+name: cluster-report
+description: "Generate a consolidated health report across multiple OpenShift clusters."
+persona: ocp-admin
+version: "1.0.0"
+eval_engine: ase

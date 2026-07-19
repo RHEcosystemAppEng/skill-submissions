@@ -1,6 +1,7 @@
 name: aeh-hello-world-pairwise-control
-description: Control variant for pairwise A/B test
-skill: aeh-hello-world-pairwise
+description: Control variant for pairwise A/B test (no skill slash-command)
+# Empty skill → Harbor instruction is the raw prompt (baseline without /skill)
+skill: ""
 
 execution:
   mode: case
@@ -11,8 +12,8 @@ runner:
   type: claude-code
 
 models:
-  skill: claude-sonnet-4-5
-  judge: claude-sonnet-4-5
+  skill: claude-sonnet
+  judge: claude-sonnet
 
 permissions:
   allow:
@@ -71,8 +72,21 @@ judges:
 
       return False, f"File {expected_file} not found in outputs"
 
+  - name: pairwise
+    type: llm
+    prompt: |
+      Compare the two agent outputs and determine which better accomplishes the task.
+
+      Evaluation criteria:
+      - Correctness: Does it solve the problem accurately?
+      - Completeness: Does it fully address all requirements?
+      - Quality: Is the solution well-structured and clear?
+      - Efficiency: Is it concise without sacrificing correctness?
+
+      Prefer the output that scores higher across these criteria.
+
 thresholds:
   exit_success:
     min_pass_rate: 1.0
-  file_created:
-    min_pass_rate: 1.0
+  pairwise:
+    min_win_rate: 0.5

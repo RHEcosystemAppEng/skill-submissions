@@ -1,0 +1,2 @@
+prompt: |
+  Create a file called output/greeting.txt with exactly the text "Hello, World!"

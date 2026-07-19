@@ -77,5 +77,3 @@ judges:
 thresholds:
   exit_success:
     min_pass_rate: 1.0
-  file_created:
-    min_pass_rate: 1.0

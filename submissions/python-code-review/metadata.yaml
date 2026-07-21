@@ -1,0 +1,11 @@
+name: python-code-review
+description: "Review Python code for common issues, anti-patterns, and suggest improvements"
+persona: rh-developer
+version: "0.1.0"
+tags:
+  - code-quality
+  - python
+  - behavioral-test
+eval_engine: ase
+experiment:
+  n_trials: 2

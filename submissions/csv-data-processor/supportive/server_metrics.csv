@@ -1,0 +1,11 @@
+hostname,region,cpu_pct,memory_mb,response_ms,status
+web-01,us-east,72.3,4096,145,running
+web-02,us-east,89.1,8192,312,running
+web-03,us-west,,4096,89,running
+db-01,us-east,45.6,16384,,running
+db-02,us-west,93.2,16384,45,degraded
+api-01,eu-west,67.8,8192,203,running
+api-02,eu-west,78.4,,178,running
+cache-01,us-east,12.1,2048,8,running
+cache-02,us-west,15.7,2048,11,stopped
+lb-01,us-east,34.5,4096,22,running

@@ -1,0 +1,11 @@
+name: csv-data-processor
+description: "Process CSV files — filter, aggregate, and produce summary reports"
+persona: rh-developer
+version: "0.1.0"
+tags:
+  - data-processing
+  - csv
+  - behavioral-test
+eval_engine: ase
+experiment:
+  n_trials: 2

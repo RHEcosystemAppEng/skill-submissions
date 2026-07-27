@@ -1,0 +1,11 @@
+name: docx-template-filler
+description: "Fill Word document templates with data using python-docx"
+persona: rh-developer
+version: "0.1.0"
+tags:
+  - document-processing
+  - python-docx
+  - templates
+eval_engine: ase
+experiment:
+  n_trials: 2

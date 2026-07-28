@@ -1,0 +1,10 @@
+name: docx-skillbench
+description: "Word document manipulation with python-docx - handling split placeholders, headers/footers, nested tables"
+persona: rh-developer
+version: "0.1.0"
+tags:
+  - document-processing
+  - python-docx
+eval_engine: ase
+experiment:
+  n_trials: 2

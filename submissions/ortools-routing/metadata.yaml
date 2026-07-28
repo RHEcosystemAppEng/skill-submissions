@@ -1,0 +1,10 @@
+name: ortools-routing
+description: "Build OR-Tools RoutingModel vehicle-routing models with transit matrices, dimensions, and constraints"
+persona: rh-developer
+version: "0.1.0"
+tags:
+  - optimization
+  - vehicle-routing
+eval_engine: ase
+experiment:
+  n_trials: 2

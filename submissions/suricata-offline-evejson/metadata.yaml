@@ -1,0 +1,10 @@
+name: suricata-offline-evejson
+description: "Running Suricata against PCAPs offline and validating results via eve.json"
+persona: rh-developer
+version: "0.1.0"
+tags:
+  - security
+  - suricata
+eval_engine: ase
+experiment:
+  n_trials: 2

@@ -1,0 +1,10 @@
+name: lean4-memories
+description: "Persistent memory of Lean 4 proof patterns, failed approaches, and working strategies"
+persona: rh-developer
+version: "0.1.0"
+tags:
+  - formal-verification
+  - lean4
+eval_engine: ase
+experiment:
+  n_trials: 2

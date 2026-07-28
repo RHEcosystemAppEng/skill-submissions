@@ -1,0 +1,10 @@
+name: rl-post-training
+description: "Diagnostic guide for RL-based post-training of language models (GRPO, PPO, REINFORCE, DPO)"
+persona: rh-developer
+version: "0.1.0"
+tags:
+  - machine-learning
+  - reinforcement-learning
+eval_engine: ase
+experiment:
+  n_trials: 2

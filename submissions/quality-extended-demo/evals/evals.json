@@ -1,0 +1,11 @@
+[
+  {
+    "prompt": "Help me set up a production deployment pipeline",
+    "assertions": [
+      {
+        "type": "contains",
+        "value": "deploy"
+      }
+    ]
+  }
+]

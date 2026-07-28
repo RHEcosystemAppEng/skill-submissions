@@ -1,0 +1,11 @@
+[
+  {
+    "prompt": "Set up my development environment with persistent aliases",
+    "assertions": [
+      {
+        "type": "contains",
+        "value": "alias"
+      }
+    ]
+  }
+]

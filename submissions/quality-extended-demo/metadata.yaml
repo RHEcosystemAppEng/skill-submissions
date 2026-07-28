@@ -1,0 +1,12 @@
+name: quality-extended-demo
+description: "Intentionally poor quality skill for testing new quality scanner checks"
+eval_engine: ase
+persona: general
+version: "0.1.0"
+tags:
+  - validation
+  - quality-test
+cpus: 1
+memory_mb: 512
+experiment:
+  n_trials: 1

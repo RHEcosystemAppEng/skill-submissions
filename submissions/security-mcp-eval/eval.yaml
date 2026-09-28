@@ -1,0 +1,90 @@
+kind: Eval
+apiVersion: mcpchecker/v1alpha2
+metadata:
+  name: security-mcp-eval
+  description: Security MCP pilot. 25 Lightforge cases, no Compass push.
+config:
+  agent:
+    type: builtin.llm-agent
+    model: google:gemini-2.5-flash
+  llmJudge:
+    ref:
+      type: builtin.llm-agent
+      model: google:gemini-2.5-flash
+  mcpConfigFile: mcp-config.yaml
+  taskSets:
+  - path: tasks/cve-02.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/cve-06.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/cve-07.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/cve-09.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/cve-13.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/cve-14.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/cve-15.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/cve-19.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/cve-21.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/cve-35.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/cve-36.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/cve-40.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/cve-43.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/cve-46.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/errata-01.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/errata-04.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/errata-05.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/errata-06.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/errata-09.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/errata-12.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/errata-15.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/errata-17.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/errata-21.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/errata-34.yaml
+    assertions:
+      minToolCalls: 1
+  - path: tasks/errata-42.yaml
+    assertions:
+      minToolCalls: 1

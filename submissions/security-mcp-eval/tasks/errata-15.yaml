@@ -1,0 +1,27 @@
+kind: Task
+apiVersion: mcpchecker/v1alpha2
+metadata:
+  name: errata-15
+  description: RHEA-2024:0537
+  labels:
+    suite: security
+    source: lightforge
+    scenario: errata_end_to_end
+    gt_id: '15'
+    scoring: contains_must_have
+    expected_tools: get_errata_by_id
+    argument_matchers: '{"advisory_id":{"type":"exact","value":"RHEA-2024:0537"}}'
+    should_tool_error: 'false'
+spec:
+  prompt:
+    inline: |
+      RHEA-2024:0537
+  verify:
+  - llmJudge:
+      contains: |
+        The following is the COMPLETE set of required core facts for CONTAINS. PASS if the agent answer covers them in substance (paraphrase OK). Extra correct detail is fine. FAIL if empty, clarifying-only, title/link dump with no substance, contradictory, or missing required core facts.
+
+        ===== REQUIRED_CORE_FACTS =====
+        RHEA-2024:0537 is a Product Enhancement Advisory titled "ExternalDNS Operator 1.0 operator/operand containers".
+        It was published on 2024-01-29, severity is None, and it affects the ExternalDNS Operator.
+        ===== END REQUIRED_CORE_FACTS =====

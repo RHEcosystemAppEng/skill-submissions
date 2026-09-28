@@ -1,0 +1,31 @@
+kind: Task
+apiVersion: mcpchecker/v1alpha2
+metadata:
+  name: errata-06
+  description: 'can you list all the advisories available for this cve: CVE-2023-54206'
+  labels:
+    suite: security
+    source: lightforge
+    scenario: errata_end_to_end
+    gt_id: '6'
+    scoring: contains_must_have
+    expected_tools: list_advisories_by_cve
+    argument_matchers: '{"cve_id":{"type":"exact","value":"CVE-2023-54206"}}'
+    should_tool_error: 'false'
+spec:
+  prompt:
+    inline: |
+      can you list all the advisories available for this cve: CVE-2023-54206
+  verify:
+  - llmJudge:
+      contains: |
+        The following is the COMPLETE set of required core facts for CONTAINS. PASS if the agent answer covers them in substance (paraphrase OK). Extra correct detail is fine. FAIL if empty, clarifying-only, title/link dump with no substance, contradictory, or missing required core facts.
+
+        ===== REQUIRED_CORE_FACTS =====
+        CVE-2023-54206 has a Moderate severity and a CVSS3 score of 4.7. The public date is 2025-12-30.
+
+        One advisory is available for this CVE:
+        *   RHSA-2023:7077 for Red Hat Enterprise Linux 8, which fixes the vulnerability in kernel-0:4.18.0-513.5.1.el8_9.
+
+        Red Hat Enterprise Linux 8 / kernel-rt, Red Hat Enterprise Linux 9 / kernel, and Red Hat Enterprise Linux 9 / kernel-rt are listed as Affected. Red Hat Enterprise Linux 6, 7, and 10 are Not affected.
+        ===== END REQUIRED_CORE_FACTS =====

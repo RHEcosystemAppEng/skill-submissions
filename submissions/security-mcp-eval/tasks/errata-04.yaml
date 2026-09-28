@@ -1,0 +1,26 @@
+kind: Task
+apiVersion: mcpchecker/v1alpha2
+metadata:
+  name: errata-04
+  description: find the packages for RHSA-2002:294
+  labels:
+    suite: security
+    source: lightforge
+    scenario: errata_end_to_end
+    gt_id: '4'
+    scoring: contains_must_have
+    expected_tools: list_advisory_packages
+    argument_matchers: '{"advisory_id":{"type":"exact","value":"RHSA-2002:294"}}'
+    should_tool_error: 'false'
+spec:
+  prompt:
+    inline: |
+      find the packages for RHSA-2002:294
+  verify:
+  - llmJudge:
+      contains: |
+        The following is the COMPLETE set of required core facts for CONTAINS. PASS if the agent answer covers them in substance (paraphrase OK). Extra correct detail is fine. FAIL if empty, clarifying-only, title/link dump with no substance, contradictory, or missing required core facts.
+
+        ===== REQUIRED_CORE_FACTS =====
+        RHSA-2002:294, a Critical severity advisory, provides updated Fetchmail packages for Red Hat Linux Advanced Server and Advanced Workstation. These errata packages contain a backported fix for CVE-2002-1365, which addresses a remotely-exploitable vulnerability in Fetchmail versions prior to 6.2.0. The advisory was published on 2002-12-17, with an update on 2003-02-06. The specific package names are not detailed in the provided source data.
+        ===== END REQUIRED_CORE_FACTS =====

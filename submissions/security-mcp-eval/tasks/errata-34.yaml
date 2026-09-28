@@ -1,0 +1,26 @@
+kind: Task
+apiVersion: mcpchecker/v1alpha2
+metadata:
+  name: errata-34
+  description: Red Hat Update for libarchive RHSA 2025 14135 download package
+  labels:
+    suite: security
+    source: lightforge
+    scenario: errata_end_to_end
+    gt_id: '34'
+    scoring: contains_must_have
+    expected_tools: list_advisory_packages
+    argument_matchers: '{"advisory_id":{"type":"exact","value":"RHSA-2025:14135"}}'
+    should_tool_error: 'false'
+spec:
+  prompt:
+    inline: |
+      Red Hat Update for libarchive RHSA 2025 14135 download package
+  verify:
+  - llmJudge:
+      contains: |
+        The following is the COMPLETE set of required core facts for CONTAINS. PASS if the agent answer covers them in substance (paraphrase OK). Extra correct detail is fine. FAIL if empty, clarifying-only, title/link dump with no substance, contradictory, or missing required core facts.
+
+        ===== REQUIRED_CORE_FACTS =====
+        Red Hat Security Advisory RHSA-2025:14135, titled "libarchive security update," was published on 2025-08-20. This update has a security impact rating of Important. It addresses a double free vulnerability (CVE-2025-5914) in libarchive at `archive_read_format_rar_seek_data()`. An update for libarchive is available for Red Hat Enterprise Linux 8. The advisory indicates that packages are available for download as part of this update.
+        ===== END REQUIRED_CORE_FACTS =====

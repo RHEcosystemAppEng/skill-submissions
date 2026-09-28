@@ -1,0 +1,27 @@
+kind: Task
+apiVersion: mcpchecker/v1alpha2
+metadata:
+  name: errata-09
+  description: I'm checking the information about cves which have id CVE-2023-46445, can you provide me
+    details
+  labels:
+    suite: security
+    source: lightforge
+    scenario: errata_end_to_end
+    gt_id: '9'
+    scoring: contains_must_have
+    expected_tools: get_cve_by_id
+    argument_matchers: '{"cve_id":{"type":"exact","value":"CVE-2023-46445"}}'
+    should_tool_error: 'false'
+spec:
+  prompt:
+    inline: |
+      I'm checking the information about cves which have id CVE-2023-46445, can you provide me details
+  verify:
+  - llmJudge:
+      contains: |
+        The following is the COMPLETE set of required core facts for CONTAINS. PASS if the agent answer covers them in substance (paraphrase OK). Extra correct detail is fine. FAIL if empty, clarifying-only, title/link dump with no substance, contradictory, or missing required core facts.
+
+        ===== REQUIRED_CORE_FACTS =====
+        CVE-2023-46445 is a Moderate severity vulnerability with a public date of 2023-11-13 and a CVSSv3 score of 5.9. It describes a "Rogue Extension Negotiation" flaw in AsyncSSH before version 2.14.1. This allows a man-in-the-middle attacker to control the extension info message, potentially downgrading the algorithm used for client authentication. Red Hat Ceph Storage 7 / python-asyncssh is affected. Red Hat Ceph Storage 6 / python-asyncssh and Red Hat Openshift Data Foundation 4 / odf4/cephcsi-rhel9 are marked as "Will not fix".
+        ===== END REQUIRED_CORE_FACTS =====

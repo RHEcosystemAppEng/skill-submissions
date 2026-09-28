@@ -1,0 +1,26 @@
+kind: Task
+apiVersion: mcpchecker/v1alpha2
+metadata:
+  name: errata-21
+  description: severity of RHSA-2013:0856
+  labels:
+    suite: security
+    source: lightforge
+    scenario: errata_end_to_end
+    gt_id: '21'
+    scoring: contains_must_have
+    expected_tools: get_errata_by_id
+    argument_matchers: '{"advisory_id":{"type":"exact","value":"RHSA-2013:0856"}}'
+    should_tool_error: 'false'
+spec:
+  prompt:
+    inline: |
+      severity of RHSA-2013:0856
+  verify:
+  - llmJudge:
+      contains: |
+        The following is the COMPLETE set of required core facts for CONTAINS. PASS if the agent answer covers them in substance (paraphrase OK). Extra correct detail is fine. FAIL if empty, clarifying-only, title/link dump with no substance, contradictory, or missing required core facts.
+
+        ===== REQUIRED_CORE_FACTS =====
+        The severity of RHSA-2013:0856 is Important. This rating is assigned by the Red Hat Security Response Team. The advisory addresses two security issues in the pki-tps package for Red Hat Certificate System 8.1. These include CVE-2013-1886 (format string flaw) and CVE-2013-1885 (cross-site scripting flaw). The advisory was published on 2013-05-22.
+        ===== END REQUIRED_CORE_FACTS =====

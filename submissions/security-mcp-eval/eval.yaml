@@ -6,11 +6,11 @@ metadata:
 config:
   agent:
     type: builtin.llm-agent
-    model: openai:gpt-4o
+    model: openai:claude-sonnet
   llmJudge:
     ref:
       type: builtin.llm-agent
-      model: openai:gpt-4o
+      model: openai:claude-sonnet
   mcpConfigFile: mcp-config.yaml
   taskSets:
     - path: tasks/cve-02.yaml

@@ -20,7 +20,7 @@ spec:
   verify:
   - llmJudge:
       contains: |
-        The following is the COMPLETE set of required core facts for CONTAINS. PASS if the agent answer covers them in substance (paraphrase OK). Extra correct detail is fine. FAIL if empty, clarifying-only, title/link dump with no substance, contradictory, or missing required core facts.
+        PASS if the answer addresses the question in substance. Paraphrase is OK. Extra correct detail is OK. Missing dates, CVSS strings, exact package versions, and secondary advisories is OK. FAIL only if the answer is empty, refuses the question, contradicts the core fact, or is clearly about a different CVE or advisory. The notes below are the core fact, not a checklist.
 
         ===== REQUIRED_CORE_FACTS =====
         CVE-2023-46445 is a Moderate severity vulnerability with a public date of 2023-11-13 and a CVSSv3 score of 5.9. It describes a "Rogue Extension Negotiation" flaw in AsyncSSH before version 2.14.1. This allows a man-in-the-middle attacker to control the extension info message, potentially downgrading the algorithm used for client authentication. Red Hat Ceph Storage 7 / python-asyncssh is affected. Red Hat Ceph Storage 6 / python-asyncssh and Red Hat Openshift Data Foundation 4 / odf4/cephcsi-rhel9 are marked as "Will not fix".

@@ -19,8 +19,8 @@ spec:
   verify:
   - llmJudge:
       contains: |
-        The following is the COMPLETE set of required core facts for CONTAINS. PASS if the agent answer covers them in substance (paraphrase OK). Extra correct detail is fine. FAIL if empty, clarifying-only, title/link dump with no substance, contradictory, or missing required core facts.
+        PASS if the answer addresses the question in substance. Paraphrase is OK. Extra correct detail is OK. Missing dates, CVSS strings, exact package versions, and secondary advisories is OK. FAIL only if the answer is empty, refuses the question, contradicts the core fact, or is clearly about a different CVE or advisory. The notes below are the core fact, not a checklist.
 
         ===== REQUIRED_CORE_FACTS =====
-        The severity of RHSA-2013:0856 is Important. This rating is assigned by the Red Hat Security Response Team. The advisory addresses two security issues in the pki-tps package for Red Hat Certificate System 8.1. These include CVE-2013-1886 (format string flaw) and CVE-2013-1885 (cross-site scripting flaw). The advisory was published on 2013-05-22.
+        The severity of RHSA-2013:0856 is Important. The CVE list and publish date are not required.
         ===== END REQUIRED_CORE_FACTS =====

@@ -1,0 +1,8 @@
+name: security-mcp-eval
+description: 'Security MCP pilot: 25 cases mapped from Lightforge datasets/security/scenarios.yaml. First
+  run does not push Compass facts.'
+version: 0.1.0
+eval_engine: mcpchecker
+mcp:
+  credentials_secret: security-mcp-credentials
+agent_timeout_sec: 300

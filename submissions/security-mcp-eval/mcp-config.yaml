@@ -1,0 +1,9 @@
+# Filled by the pipeline via envsubst from the ab-eval-flow secret
+# named in metadata.yaml (MCP_URL, MCP_BEARER_TOKEN). Do not commit tokens.
+mcpServers:
+  security:
+    type: http
+    url: ${MCP_URL}
+    headers:
+      Authorization: "Bearer ${MCP_BEARER_TOKEN}"
+    enableAllTools: true

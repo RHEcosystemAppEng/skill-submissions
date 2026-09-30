@@ -1,0 +1,26 @@
+kind: Task
+apiVersion: mcpchecker/v1alpha2
+metadata:
+  name: errata-06
+  description: 'can you list all the advisories available for this cve: CVE-2023-54206'
+  labels:
+    suite: security
+    source: lightforge
+    scenario: errata_end_to_end
+    gt_id: '6'
+    scoring: contains_must_have
+    expected_tools: list_advisories_by_cve
+    argument_matchers: '{"cve_id":{"type":"exact","value":"CVE-2023-54206"}}'
+    should_tool_error: 'false'
+spec:
+  prompt:
+    inline: |
+      can you list all the advisories available for this cve: CVE-2023-54206
+  verify:
+  - llmJudge:
+      contains: |
+        PASS if the answer addresses the question in substance. Paraphrase is OK. Extra correct detail is OK. Missing dates, CVSS strings, exact package versions, and secondary advisories is OK. FAIL only if the answer is empty, refuses the question, contradicts the core fact, or is clearly about a different CVE or advisory. The notes below are the core fact, not a checklist.
+
+        ===== REQUIRED_CORE_FACTS =====
+        The answer lists at least one advisory for CVE-2023-54206, such as RHSA-2023:7077. A full affected-product matrix is not required.
+        ===== END REQUIRED_CORE_FACTS =====

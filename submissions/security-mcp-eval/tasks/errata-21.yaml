@@ -1,0 +1,26 @@
+kind: Task
+apiVersion: mcpchecker/v1alpha2
+metadata:
+  name: errata-21
+  description: severity of RHSA-2013:0856
+  labels:
+    suite: security
+    source: lightforge
+    scenario: errata_end_to_end
+    gt_id: '21'
+    scoring: contains_must_have
+    expected_tools: get_errata_by_id
+    argument_matchers: '{"advisory_id":{"type":"exact","value":"RHSA-2013:0856"}}'
+    should_tool_error: 'false'
+spec:
+  prompt:
+    inline: |
+      severity of RHSA-2013:0856
+  verify:
+  - llmJudge:
+      contains: |
+        PASS if the answer addresses the question in substance. Paraphrase is OK. Extra correct detail is OK. Missing dates, CVSS strings, exact package versions, and secondary advisories is OK. FAIL only if the answer is empty, refuses the question, contradicts the core fact, or is clearly about a different CVE or advisory. The notes below are the core fact, not a checklist.
+
+        ===== REQUIRED_CORE_FACTS =====
+        The severity of RHSA-2013:0856 is Important. The CVE list and publish date are not required.
+        ===== END REQUIRED_CORE_FACTS =====

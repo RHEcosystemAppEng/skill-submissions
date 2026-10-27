@@ -1,0 +1,8 @@
+name: hello-world-minimal
+description: "Create a file with specific content -- ASE smoke-test (no evals.json)"
+persona: general
+version: "0.1.0"
+tags:
+  - smoke-test
+  - ase
+eval_engine: ase

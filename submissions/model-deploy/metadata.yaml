@@ -1,0 +1,5 @@
+name: model-deploy
+description: "Deploy AI/ML models on OpenShift AI using KServe with vLLM, NVIDIA NIM,"
+persona: rh-ai-engineer
+version: "1.0.0"
+eval_engine: ase

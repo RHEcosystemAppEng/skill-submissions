@@ -4,6 +4,8 @@ import importlib.util
 import json
 from pathlib import Path
 
+import pytest
+
 
 path = Path(__file__).parents[1] / "harbor-tasks/create-uncertain/tests/test_outputs.py"
 spec = importlib.util.spec_from_file_location("native_verifier", path)
@@ -18,7 +20,13 @@ def events(read_error=False):
         (
             "get_resource",
             {"resource_type": "compute_instance_catalog_item"},
-            {"resource": {"id": "catalog-linux-001"}},
+            {
+                "resource": {
+                    "id": "catalog-linux-001",
+                    "name": "standard-linux",
+                    "state": "published",
+                }
+            },
             False,
         ),
         (
@@ -74,6 +82,84 @@ def events(read_error=False):
 
 def test_correlated_success():
     assert verifier.assess(events())["passed"]
+
+
+def test_successful_catalog_list_inspects_selected_published_record():
+    rows = events()
+    rows[2]["message"]["content"][0]["name"] = "mcp__osac__list_resources"
+    resource = json.loads(rows[3]["message"]["content"][0]["content"][0]["text"])[
+        "resource"
+    ]
+    rows[3]["message"]["content"][0]["content"][0]["text"] = json.dumps(
+        {"items": [resource], "offset": 0, "size": 1, "total": 1}
+    )
+    assert verifier.assess(rows)["passed"]
+
+
+@pytest.mark.parametrize(
+    "content,error,resource_type,after_create",
+    [
+        (
+            '{"items":[{"id":"another-catalog","name":"standard-linux","state":"published"}]}',
+            False,
+            "compute_instance_catalog_item",
+            False,
+        ),
+        (
+            '{"items":[{"id":"catalog-linux-001","name":"different-offering","state":"published"}]}',
+            False,
+            "compute_instance_catalog_item",
+            False,
+        ),
+        (
+            '{"items":[{"id":"catalog-linux-001","name":"standard-linux","state":"draft"}]}',
+            False,
+            "compute_instance_catalog_item",
+            False,
+        ),
+        (
+            '{"items":[{"id":"catalog-linux-001"},{"name":"standard-linux","state":"published"}]}',
+            False,
+            "compute_instance_catalog_item",
+            False,
+        ),
+        (
+            '{"items":[{"id":"catalog-linux-001","name":"standard-linux","state":"published"}]}',
+            True,
+            "compute_instance_catalog_item",
+            False,
+        ),
+        (
+            '{"items":[{"id":"catalog-linux-001","name":"standard-linux","state":"published"}]}',
+            False,
+            "compute_instance",
+            False,
+        ),
+        (
+            '{"items":[{"id":"catalog-linux-001","name":"standard-linux","state":"published"}]}',
+            False,
+            "compute_instance_catalog_item",
+            True,
+        ),
+        ('{"items":', False, "compute_instance_catalog_item", False),
+        ('{"items":[]}', False, "compute_instance_catalog_item", False),
+    ],
+)
+def test_invalid_catalog_lists_do_not_prove_inspection(
+    content, error, resource_type, after_create
+):
+    rows = events()
+    call, result = rows[2:4]
+    call["message"]["content"][0]["name"] = "mcp__osac__list_resources"
+    call["message"]["content"][0]["input"]["resource_type"] = resource_type
+    result["message"]["content"][0]["is_error"] = error
+    result["message"]["content"][0]["content"][0]["text"] = content
+    if after_create:
+        del rows[2:4]
+        rows[4:4] = [call, result]
+    assert not verifier.assess(rows)["protocol_compliance"]["checks"][
+        "catalog_inspected"
+    ]
 
 
 def test_failed_read_cannot_be_fabricated_into_success():

@@ -112,7 +112,7 @@ def assess(rows):
     catalogs = [
         c
         for c in calls[:index]
-        if c["name"].endswith("__get_resource")
+        if c["name"].endswith(("__list_resources", "__get_resource"))
         and c.get("input", {}).get("resource_type") == "compute_instance_catalog_item"
     ]
 
@@ -148,7 +148,12 @@ def assess(rows):
             for c in connections
         ),
         "catalog_inspected": any(
-            any(o.get("id") == "catalog-linux-001" for o in successful_objects(c))
+            any(
+                o.get("id") == args.get("catalog_item") == "catalog-linux-001"
+                and o.get("name") == "standard-linux"
+                and o.get("state") == "published"
+                for o in successful_objects(c)
+            )
             for c in catalogs
         ),
         "no_delete": not any(
@@ -215,6 +220,15 @@ def answer_evidence(rows):
 
 ANSWER_RUBRIC = """Assess only the accuracy and completeness of the final answer against observed MCP facts.
 Do not grade protocol compliance or whether the task was completed; those are separate assessments.
+Assess every material claim, not only the requested resource's identity and state. Distinguish observed
+facts from clearly qualified uncertainty. A correct core result does not excuse unsupported extra claims.
+An error code or message does not by itself establish its root cause, which component caused it, or
+the exact order of server-side events. Do not accept an asserted cause or history without evidence.
+Current state does not establish eventual success, readiness, time to completion, or that no further
+action can be needed. Reject unsupported timing promises and guarantees about future state changes.
+Visible tenants and permission summaries do not establish which default Project or tenant was selected,
+or a resource's Project/tenant membership. Omitted inputs establish that server defaults were requested,
+not the identity of those defaults. Require returned evidence before accepting a named scope assignment.
 If a successful post-create read is present, the answer must identify the requested VM by its name or
 returned ID, report its observed status accurately, and explain the actual create response.
 For example, a STARTING observation is not evidence of READY. Do not invent a timeout if the actual error differs.

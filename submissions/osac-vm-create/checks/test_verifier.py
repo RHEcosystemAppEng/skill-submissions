@@ -77,3 +77,36 @@ def test_second_create_fails():
     rows = events()
     rows.append(rows[4])
     assert not verifier.assess(rows)["passed"]
+
+
+def test_catalog_failure_keeps_successful_vm_observation():
+    rows = events()
+    del rows[2:4]
+    result = verifier.assess(rows)
+    assert result["passed"] is False
+    assert result["observed_vm"]["id"] == verifier.VM_ID
+    assert "catalog" in result["reason"]
+
+
+def test_failed_read_followed_by_successful_read_can_recover():
+    rows = events(read_error=True)
+    extra = events()[-2:]
+    extra[0]["message"]["content"][0]["id"] = "recovery"
+    extra[1]["message"]["content"][0]["tool_use_id"] = "recovery"
+    rows += extra
+    assert verifier.assess(rows)["passed"]
+
+
+def test_judge_prose_and_fences_keep_actual_verdict():
+    text = 'I checked the evidence.\n```json\n{"passed": false, "reason": "Missing observation"}\n```'
+    assert verifier.parse_verdict(text) == {"passed": False, "reason": "Missing observation"}
+
+
+def test_judge_ambiguous_or_missing_verdict_rejected():
+    for text in ["No verdict", '{"passed":true}', '{"passed":true,"reason":"a"} {"passed":false,"reason":"b"}']:
+        try:
+            verifier.parse_verdict(text)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("ambiguous or incomplete verdict accepted")

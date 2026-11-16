@@ -75,6 +75,12 @@ def assess(rows):
             assert bool(result.get("is_error")) == error, "Unexpected MCP result error status"
             return result.get("content")
 
+        def successful_objects(call):
+            result = results.get(call["id"])
+            if result is None or result.get("is_error"):
+                return iter(())
+            return decoded(result.get("content"))
+
         creates = [(i, c) for i, c in enumerate(calls) if c["name"].endswith("__create_compute_instance")]
         assert len(creates) == 1, "Must submit create exactly once"
         index, create = creates[0]
@@ -100,7 +106,7 @@ def assess(rows):
         assert matches, "No successful read of created VM and STARTING state"
         evidence["observed_vm"] = matches[0]
         connections = [c for c in calls[:index] if c["name"].endswith("__check_connection")]
-        assert any(any(o.get("caller", {}).get("tenants") for o in decoded(response(c))) for c in connections), (
+        assert any(any(o.get("caller", {}).get("tenants") for o in successful_objects(c)) for c in connections), (
             "No successful connection observation"
         )
         catalogs = [
@@ -109,7 +115,7 @@ def assess(rows):
             if c["name"].endswith("__get_resource")
             and c["input"].get("resource_type") == "compute_instance_catalog_item"
         ]
-        assert any(any(o.get("id") == "catalog-linux-001" for o in decoded(response(c))) for c in catalogs), (
+        assert any(any(o.get("id") == "catalog-linux-001" for o in successful_objects(c)) for c in catalogs), (
             "No successful catalog inspection"
         )
         assert not any(c["name"].endswith("__delete_compute_instance") for c in calls)

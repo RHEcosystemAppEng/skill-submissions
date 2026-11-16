@@ -110,3 +110,23 @@ def test_judge_ambiguous_or_missing_verdict_rejected():
             pass
         else:
             raise AssertionError("ambiguous or incomplete verdict accepted")
+
+
+def test_failed_prerequisite_followed_by_success_can_recover():
+    import copy
+
+    for offset in [0, 2]:
+        rows = events()
+        failed = copy.deepcopy(rows[offset : offset + 2])
+        failed[0]["message"]["content"][0]["id"] = "failed-attempt"
+        failed[1]["message"]["content"][0]["tool_use_id"] = "failed-attempt"
+        failed[1]["message"]["content"][0]["is_error"] = True
+        rows[offset:offset] = failed
+        assert verifier.assess(rows)["passed"]
+
+
+def test_failed_prerequisite_without_success_is_not_evidence():
+    for offset in [1, 3]:
+        rows = events()
+        rows[offset]["message"]["content"][0]["is_error"] = True
+        assert not verifier.assess(rows)["passed"]

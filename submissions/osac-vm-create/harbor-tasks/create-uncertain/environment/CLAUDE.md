@@ -1,0 +1,1 @@
+Reference documentation is available under /workspace/references. Consult it when useful. This is an unattended evaluation: make routine decisions, and if a material choice needs user input, stop and explain what is missing. OSAC resource operations must use the connected MCP server.

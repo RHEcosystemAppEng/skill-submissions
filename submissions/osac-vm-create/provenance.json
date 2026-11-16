@@ -1,0 +1,14 @@
+{
+  "skill_commit": "3c1c53a7e0bbcc2d42d58e7dfbbc7136c35d9a53",
+  "skill_sha256": "ee2dcb2c6eb27a2cc7569e2c1cf8a82b39540e2ac95b65a378c5f804939d0f14",
+  "skill_matches_previous_matrix": false,
+  "reference_sha256": {
+    "AGENTS.md": "b96f92ae7c607561051151105d516a77dab568ff663224dda063a45ab9c53e10",
+    "docs/codex-getting-started.md": "f94514f44359dfcc3e6ba64e92316e1142e8b12dac2e2aad13ab34f2022ee6ce",
+    "docs/guides/developer/mcp-local-clients.md": "cfbedd063bbdfa41cd93e9a79eb6e670334ec723772b7aa6791e85872bb7f2db",
+    "docs/guides/developer/osac-test-cluster-mcp-access.md": "6322b44d28b2de3c74908985bbf33208be68a1137a8cfa8c59b06e5235c14419",
+    "fulfillment-service/docs/FILTER.md": "9687dfa1ca6977a76ebf4a5048d5f6d8f7f2b0441f43734b97f6ac3187d908f5",
+    "fulfillment-service/docs/MCP.md": "8a722ce9ea27a4ef8748710a462b19e8645179a75d62280f2b54e51b9d1aefe4"
+  },
+  "prompt_note": "Adds the caller-default authorization used for headless CREATE-UNCERTAIN; same prompt in both conditions."
+}

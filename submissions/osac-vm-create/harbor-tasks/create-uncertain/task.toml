@@ -1,0 +1,11 @@
+version = "1.0"
+[agent]
+timeout_sec = 600
+setup_timeout_sec = 180
+[verifier]
+timeout_sec = 180
+[environment]
+cpus = 1
+memory_mb = 2048
+skills_dir = "/workspace/skills"
+workdir = "/workspace"

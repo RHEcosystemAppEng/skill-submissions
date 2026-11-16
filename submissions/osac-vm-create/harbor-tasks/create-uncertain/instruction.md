@@ -1,0 +1,1 @@
+Create a VM named uncertain-vm-01 using the standard-linux catalog item. Use the caller’s default Project and tenant and let the server apply defaults for unspecified fields. This is my confirmed request.

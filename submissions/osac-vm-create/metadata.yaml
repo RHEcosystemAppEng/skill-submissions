@@ -1,0 +1,11 @@
+name: osac-vm-create
+description: 'Native Harbor Sonnet skill/control smoke: uncertain OSAC VM creation'
+eval_engine: harbor
+security_scan: disabled
+skip_quality_review: true
+mcp:
+  mock: osac-create-uncertain
+experiment:
+  n_trials: 1
+agent_timeout_sec: 600
+memory_mb: 2048

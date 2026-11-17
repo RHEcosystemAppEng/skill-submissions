@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pytest
 
-
 path = Path(__file__).parents[1] / "harbor-tasks/create-uncertain/tests/test_outputs.py"
 spec = importlib.util.spec_from_file_location("native_verifier", path)
 verifier = importlib.util.module_from_spec(spec)
@@ -365,8 +364,8 @@ def test_full_trace_judge_receives_exact_context_and_trace_and_keeps_partial_cre
         verifier,
         "Path",
         lambda value: (
-            tmp_path / real_path(value).name
-            if str(value).startswith("/logs/verifier/")
+            tmp_path / real_path(value).relative_to("/logs/verifier")
+            if str(value).startswith("/logs/verifier")
             else real_path(value)
         ),
     )
@@ -572,3 +571,77 @@ def test_trace_selection_uses_real_codex_filename_and_rejects_ambiguity(
     (tmp_path / "claude-code.txt").write_text("{}")
     with pytest.raises(AssertionError, match="unambiguous"):
         verifier.trace_path()
+
+
+def test_enmaas_uses_responses_and_saves_exact_request(tmp_path, monkeypatch):
+    import io
+
+    monkeypatch.setenv("JUDGE_PROVIDER", "openai-responses")
+    monkeypatch.setenv("JUDGE_API_KEY", "test-key")
+    monkeypatch.setenv("JUDGE_BASE_URL", "https://api.enmaas.devshift.net/v1")
+    payload = {
+        "model": "gpt-6.1-terra",
+        "temperature": 0,
+        "messages": [
+            {"role": "system", "content": "rubric"},
+            {"role": "user", "content": "full trace"},
+        ],
+    }
+
+    def send(request, timeout):
+        assert request.full_url == "https://api.enmaas.devshift.net/v1/responses"
+        assert request.get_header("Authorization") == "Bearer test-key"
+        body = json.loads(request.data)
+        assert body["input"] == payload["messages"]
+        assert body["reasoning"] == {"effort": "low"}
+        assert body["max_output_tokens"] == 4096
+        assert "temperature" not in body
+        assert json.loads((tmp_path / "llm-judge-input.json").read_text()) == body
+        return io.StringIO(
+            json.dumps(
+                {
+                    "status": "completed",
+                    "output": [
+                        {
+                            "type": "message",
+                            "content": [
+                                {
+                                    "type": "output_text",
+                                    "text": json.dumps(
+                                        {
+                                            "score": 0.8,
+                                            "reason": "Evidence gap",
+                                            "findings": [
+                                                {
+                                                    "issue": "Gap",
+                                                    "evidence": "trace",
+                                                    "deduction": 0.2,
+                                                }
+                                            ],
+                                        }
+                                    ),
+                                }
+                            ],
+                        }
+                    ],
+                }
+            )
+        )
+
+    monkeypatch.setattr(verifier.urllib.request, "urlopen", send)
+    assert verifier.request_judgment(payload, tmp_path)["score"] == 0.8
+
+
+@pytest.mark.parametrize("status", ["failed", "incomplete"])
+def test_incomplete_responses_is_infrastructure_error(tmp_path, monkeypatch, status):
+    import io
+
+    monkeypatch.setenv("JUDGE_PROVIDER", "openai-responses")
+    monkeypatch.setenv("JUDGE_API_KEY", "test-key")
+    monkeypatch.setattr(
+        verifier.urllib.request,
+        "urlopen",
+        lambda *a, **k: io.StringIO(json.dumps({"status": status, "output": []})),
+    )
+    with pytest.raises(ValueError, match="did not complete"):
+        verifier.request_judgment({"model": "gpt-6.1-terra", "messages": []}, tmp_path)

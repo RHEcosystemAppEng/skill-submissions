@@ -426,23 +426,58 @@ def test_full_trace_judgment():
             },
         ],
     }
-    Path("/logs/verifier/llm-judge-input.json").write_text(
+    verdict = request_judgment(payload, Path("/logs/verifier"))
+    Path("/logs/verifier/answer-judge.json").write_text(json.dumps(verdict, indent=2))
+
+
+def request_judgment(payload, output_dir):
+    """Send the complete evidence to the selected native model API."""
+    provider = os.environ.get("JUDGE_PROVIDER", "chat-completions")
+    if provider == "openai-responses":
+        payload = {
+            "model": payload["model"],
+            "reasoning": {"effort": "low"},
+            "max_output_tokens": 4096,
+            "input": payload["messages"],
+        }
+    elif provider != "chat-completions":
+        raise ValueError("unsupported judge provider")
+    output_dir = Path(output_dir)
+    (output_dir / "llm-judge-input.json").write_text(
         json.dumps(payload, indent=2, allow_nan=False)
     )
     endpoint = os.environ.get(
         "JUDGE_BASE_URL", "http://litellm.ab-eval-flow.svc:4000"
     ).rstrip("/")
+    if not endpoint.endswith("/v1"):
+        endpoint += "/v1"
     req = urllib.request.Request(
-        endpoint + "/v1/chat/completions",
+        endpoint
+        + ("/responses" if provider == "openai-responses" else "/chat/completions"),
         data=json.dumps(payload).encode(),
         headers={
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + os.environ["ANTHROPIC_API_KEY"],
+            "Authorization": "Bearer "
+            + (
+                os.environ["JUDGE_API_KEY"]
+                if provider == "openai-responses"
+                else os.environ["ANTHROPIC_API_KEY"]
+            ),
         },
     )
     with urllib.request.urlopen(req, timeout=90) as response:
         body = json.load(response)
-    text = body["choices"][0]["message"]["content"].strip()
-    Path("/logs/verifier/answer-judge-raw.txt").write_text(text)
-    verdict = parse_verdict(text)
-    Path("/logs/verifier/answer-judge.json").write_text(json.dumps(verdict, indent=2))
+    if provider == "openai-responses":
+        if body.get("status") != "completed" or body.get("error"):
+            raise ValueError("judge Responses request did not complete")
+        text = "\n".join(
+            content["text"]
+            for item in body.get("output", [])
+            if item.get("type") == "message"
+            for content in item.get("content", [])
+            if content.get("type") == "output_text"
+        ).strip()
+    else:
+        text = body["choices"][0]["message"]["content"].strip()
+    (output_dir / "answer-judge-raw.txt").write_text(text)
+    return parse_verdict(text)

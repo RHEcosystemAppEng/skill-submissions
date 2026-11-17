@@ -99,6 +99,7 @@ sys.exit(0)
     shim.chmod(0o755)
     run = subprocess.run(
         ["bash", str(script)],
+        check=False,
         env={
             **os.environ,
             "PATH": str(binary) + os.pathsep + os.environ["PATH"],
